@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Sweetshot.Library", "Sweetshot.Library\Sweetshot.Library.shproj", "{FEF56AC2-4CE6-4A52-B0B8-25BEF67D57C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sweetshot.Tests", "Sweetshot.Tests\Sweetshot.Tests.csproj", "{0C50C729-7F3F-4AE1-B812-0FD51157DDFB}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Sweetshot.TypeProviders", "Sweetshot.TypeProviders\Sweetshot.TypeProviders.fsproj", "{A52FACE0-35E2-4957-9C13-40A586E15B89}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Sweetshot.Library\Sweetshot.Library.projitems*{0c50c729-7f3f-4ae1-b812-0fd51157ddfb}*SharedItemsImports = 4
+		Sweetshot.Library\Sweetshot.Library.projitems*{fef56ac2-4ce6-4a52-b0b8-25bef67d57c6}*SharedItemsImports = 13
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0C50C729-7F3F-4AE1-B812-0FD51157DDFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C50C729-7F3F-4AE1-B812-0FD51157DDFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C50C729-7F3F-4AE1-B812-0FD51157DDFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C50C729-7F3F-4AE1-B812-0FD51157DDFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A52FACE0-35E2-4957-9C13-40A586E15B89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A52FACE0-35E2-4957-9C13-40A586E15B89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A52FACE0-35E2-4957-9C13-40A586E15B89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A52FACE0-35E2-4957-9C13-40A586E15B89}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
