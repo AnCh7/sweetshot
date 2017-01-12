@@ -1,6 +1,7 @@
-namespace Sweetshot.Library.Models.Requests
+namespace Sweetshot.Library.Models.Responses
 {
-    public class FollowResponse 
+    // TODO
+    public class FollowResponse
     {
     }
 }

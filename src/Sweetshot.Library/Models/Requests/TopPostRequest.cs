@@ -1,14 +1,17 @@
-﻿namespace Sweetshot.Library.Models.Requests
+﻿using Sweetshot.Library.Models.Requests.Common;
+
+namespace Sweetshot.Library.Models.Requests
 {
     public class TopPostRequest : SessionIdField
     {
-        public TopPostRequest(string token, int offset, int limit) : base(token)
+        public TopPostRequest(string sessionId, int limit, string offset = "") : base(sessionId)
         {
-            Offset = offset;
             Limit = limit;
+            Offset = offset;
         }
 
-        public int Offset { get; private set; }
         public int Limit { get; private set; }
+
+        public string Offset { get; private set; }
     }
 }

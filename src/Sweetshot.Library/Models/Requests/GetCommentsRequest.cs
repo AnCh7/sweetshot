@@ -1,12 +1,14 @@
+using Sweetshot.Library.Models.Requests.Common;
+
 namespace Sweetshot.Library.Models.Requests
 {
-	public class GetCommentsRequest : SessionIdField
-	{
-		public GetCommentsRequest(string token, string _url) : base(token)
-		{
-			url = _url;
-		}
+    public class GetCommentsRequest : SessionIdField
+    {
+        public GetCommentsRequest(string sessionId, string url) : base(sessionId)
+        {
+            Url = url;
+        }
 
-		public string url { get; private set; }
-	}
+        public string Url { get; private set; }
+    }
 }

@@ -1,7 +1,7 @@
-namespace Sweetshot.Library.Models.Requests
+namespace Sweetshot.Library.Models.Responses
 {
-
-	public class CreateCommentResponse 
-	{
-	}
+    // TODO
+    public class CreateCommentResponse
+    {
+    }
 }

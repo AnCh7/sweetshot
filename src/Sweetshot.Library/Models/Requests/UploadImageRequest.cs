@@ -1,14 +1,16 @@
-﻿namespace Sweetshot.Library.Models.Requests
+﻿using Sweetshot.Library.Models.Requests.Common;
+
+namespace Sweetshot.Library.Models.Requests
 {
     public class UploadImageRequest : SessionIdField
     {
-        public UploadImageRequest(string token, string title, byte[] photo) : base(token)
+        public UploadImageRequest(string sessionId, string title, byte[] photo) : base(sessionId)
         {
-            this.title = title;
-            this.photo = photo;
+            Title = title;
+            Photo = photo;
         }
 
-        public string title { get; private set; }
-        public byte[] photo { get; private set; }
+        public string Title { get; private set; }
+        public byte[] Photo { get; private set; }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using RestSharp;
 using Sweetshot.Library.Models.Common;
 using Sweetshot.Library.Models.Requests;
@@ -13,26 +11,36 @@ namespace Sweetshot.Library.HttpClient
 {
     public class SteepshotApiClient
     {
-        private const string Url = "http://138.197.40.124/api/v1/";
         private readonly IApiGateway _gateway;
-        private readonly IUnmarshaller _unmarshaller;
+        private readonly IJsonConverter _jsonConverter;
 
-        public SteepshotApiClient()
+        public SteepshotApiClient(string url)
         {
-            _unmarshaller = new JsonNetUnmarshaller();
-            _gateway = new ApiGateway(Url);
+            _gateway = new ApiGateway(url);
+            _jsonConverter = new JsonNetConverter();
         }
 
         public async Task<OperationResult<LoginResponse>> Login(LoginRequest request)
         {
+            return await Authentication("login", request);
+        }
+
+        public async Task<OperationResult<LoginResponse>> Register(RegisterRequest request)
+        {
+            return await Authentication("register", request);
+        }
+
+        private async Task<OperationResult<LoginResponse>> Authentication(string endpoint, LoginRequest request)
+        {
             var parameters = new List<RequestParameter>
             {
-                new RequestParameter { Key = "application/json", Value = JsonConvert.SerializeObject(request), Type = ParameterType.RequestBody }
+                new RequestParameter {Key = "application/json", Value = _jsonConverter.Serialize(request), Type = ParameterType.RequestBody}
             };
 
-            var response = await _gateway.Post("login", parameters);
+            var response = await _gateway.Post(endpoint, parameters);
 
-            var result = Process<LoginResponse>(response);
+            var errorResult = CheckErrors(response);
+            var result = CreateResult<LoginResponse>(response.Content, errorResult);
             if (result.Success)
             {
                 foreach (var cookie in response.Cookies)
@@ -46,7 +54,7 @@ namespace Sweetshot.Library.HttpClient
                 if (string.IsNullOrEmpty(result.Result.SessionId))
                 {
                     result.Success = false;
-                    result.Error = "SessionId field is missing";
+                    result.Errors.Add("SessionId field is missing.");
                 }
             }
 
@@ -61,8 +69,8 @@ namespace Sweetshot.Library.HttpClient
             };
 
             var response = await _gateway.Get($"/user/{request.Username}/posts/", parameters);
-            var result = Process<UserPostResponse>(response);
-            return result;
+            var errorResult = CheckErrors(response);
+            return CreateResult<UserPostResponse>(response.Content, errorResult);
         }
 
         public async Task<OperationResult<UserPostResponse>> GetTopPosts(TopPostRequest request)
@@ -70,114 +78,40 @@ namespace Sweetshot.Library.HttpClient
             var parameters = new List<RequestParameter>
             {
                 new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie},
-                new RequestParameter {Key = "Offset", Value = request.Offset, Type = ParameterType.QueryString},
-                new RequestParameter {Key = "Limit", Value = request.Limit, Type = ParameterType.QueryString},
-                new RequestParameter
-                {
-                    Key = "application/json",
-                    Value = JsonConvert.SerializeObject(request),
-                    Type = ParameterType.RequestBody
-                }
+                new RequestParameter {Key = "limit", Value = request.Limit, Type = ParameterType.QueryString}
             };
+
+            if (!string.IsNullOrEmpty(request.Offset))
+            {
+                parameters.Add(new RequestParameter {Key = "offset", Value = request.Offset, Type = ParameterType.QueryString});
+            }
 
             var response = await _gateway.Get("posts/top", parameters);
-            var result = Process<UserPostResponse>(response);
-            return result;
+            var errorResult = CheckErrors(response);
+            return CreateResult<UserPostResponse>(response.Content, errorResult);
         }
 
-        public async Task<OperationResult<RegisterResponse>> Register(RegisterRequest request)
-        {
-            var parameters = new List<RequestParameter>
-            {
-                new RequestParameter { Key = "application/json", Value = JsonConvert.SerializeObject(request), Type = ParameterType.RequestBody }
-            };
-
-            var response = await _gateway.Post("register", parameters);
-
-            foreach (var cookie in response.Cookies)
-                if (cookie.Name == "sessionid")
-                {
-                }
-
-            return null;
-        }
-
-        public async Task<OperationResult<VoteResponse>> UpVote(VoteRequest request)
+        public async Task<OperationResult<VoteResponse>> Vote(VoteRequest request)
         {
             var parameters = new List<RequestParameter>
             {
                 new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie},
-                new RequestParameter
-                {
-                    Key = "application/json",
-                    Value = JsonConvert.SerializeObject(request),
-                    Type = ParameterType.RequestBody
-                }
+                new RequestParameter {Key = "application/json", Value = _jsonConverter.Serialize(request), Type = ParameterType.RequestBody}
             };
 
-            var response = await _gateway.Post($"/post/{request.identifier}/upvote", parameters);
-            var result = Process<VoteResponse>(response);
-            return result;
-        }
-
-        public async Task<OperationResult<VoteResponse>> DownVote(VoteRequest request)
-        {
-            var parameters = new List<RequestParameter>
+            var endpoint = $"/post/{request.Identifier}/";
+            if (request.Type == VoteType.Up)
             {
-                new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie},
-                new RequestParameter
-                {
-                    Key = "application/json",
-                    Value = JsonConvert.SerializeObject(request),
-                    Type = ParameterType.RequestBody
-                }
-            };
-
-            var response = await _gateway.Post($"/post/{request.identifier}/downvote", parameters);
-            var result = Process<VoteResponse>(response);
-            return result;
-        }
-
-        public async Task<OperationResult<ImageUploadResponse>> Upload(UploadImageRequest request)
-        {
-            var parameters = new List<RequestParameter>
+                endpoint = endpoint + "upvote";
+            }
+            else
             {
-                new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie}
-            };
+                endpoint = endpoint + "downvote";
+            }
 
-            var response = await _gateway.Upload("post", request.title, request.photo, parameters);
-            var result = Process<ImageUploadResponse>(response);
-            return result;
-        }
-
-        public async Task<OperationResult<GetCommentResponse>> GetComments(GetCommentsRequest request)
-        {
-            var parameters = new List<RequestParameter>
-            {
-                new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie}
-            };
-
-            var response = await _gateway.Get($"/post/{request.url}/comments", parameters);
-            var result = Process<GetCommentResponse>(response);
-            return result;
-        }
-
-        public async Task<OperationResult<CreateCommentResponse>> CreateComment(CreateCommentsRequest request)
-        {
-            var parameters = new List<RequestParameter>
-            {
-                new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie},
-                new RequestParameter
-                {
-                    Key = "application/json",
-                    Value = JsonConvert.SerializeObject(request),
-                    Type = ParameterType.RequestBody
-                }
-            };
-
-            var response = await _gateway.Post($"/post/{request.url}/comment", parameters);
-            var result = Process<CreateCommentResponse>(response);
-            return result;
+            var response = await _gateway.Post(endpoint, parameters);
+            var errorResult = CheckErrors(response);
+            return CreateResult<VoteResponse>(response.Content, errorResult);
         }
 
         public async Task<OperationResult<FollowResponse>> Follow(FollowRequest request)
@@ -187,72 +121,154 @@ namespace Sweetshot.Library.HttpClient
                 new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie}
             };
 
-            var response = await _gateway.Post($"/user/{request.username}/follow", parameters);
-            var result = Process<FollowResponse>(response);
-            return result;
+            var endpoint = $"/user/{request.Username}/";
+            if (request.Type == FollowType.Follow)
+            {
+                endpoint = endpoint + "follow";
+            }
+            else
+            {
+                endpoint = endpoint + "unfollow";
+            }
+
+            var response = await _gateway.Post(endpoint, parameters);
+            var errorResult = CheckErrors(response);
+            return CreateResult<FollowResponse>(response.Content, errorResult);
         }
 
-        public async Task<OperationResult<FollowResponse>> Unfollow(FollowRequest request)
+        public async Task<OperationResult<GetCommentResponse>> GetComments(GetCommentsRequest request)
         {
             var parameters = new List<RequestParameter>
             {
                 new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie}
             };
 
-            var response = await _gateway.Post($"/user/{request.username}/unfollow", parameters);
-            var result = Process<FollowResponse>(response);
-            return result;
+            var response = await _gateway.Get($"/post/{request.Url}/comments", parameters);
+            var errorResult = CheckErrors(response);
+            return CreateResult<GetCommentResponse>(response.Content, errorResult);
         }
 
-        private OperationResult<T> Process<T>(IRestResponse response)
+        public async Task<OperationResult<CreateCommentResponse>> CreateComment(CreateCommentsRequest request)
         {
-            var result = new OperationResult<T>();
+            var parameters = new List<RequestParameter>
+            {
+                new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie},
+                new RequestParameter {Key = "application/json", Value = _jsonConverter.Serialize(request), Type = ParameterType.RequestBody}
+            };
+
+            var response = await _gateway.Post($"/post/{request.Url}/comment", parameters);
+            var errorResult = CheckErrors(response);
+            return CreateResult<CreateCommentResponse>(response.Content, errorResult);
+        }
+
+        public async Task<OperationResult<ImageUploadResponse>> Upload(UploadImageRequest request)
+        {
+            var parameters = new List<RequestParameter>
+            {
+                new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie}
+            };
+
+            var response = await _gateway.Upload("post", request.Title, request.Photo, parameters);
+            var errorResult = CheckErrors(response);
+            return CreateResult<ImageUploadResponse>(response.Content, errorResult);
+        }
+
+        private OperationResult CheckErrors(IRestResponse response)
+        {
+            var result = new OperationResult();
             var content = response.Content;
 
             // Network transport or framework errors
-            // TODO Check ErrorMessage
             if (response.ErrorException != null)
             {
-                result.Error = response.ErrorException.Message;
+                result.Errors.Add(response.ErrorMessage);
             }
             // Transport errors
-            // TODO Check
             else if (response.ResponseStatus != ResponseStatus.Completed)
             {
-                result.Error = "Wrong response status";
+                result.Errors.Add("ResponseStatus: " + response.ResponseStatus);
             }
             // HTTP errors
-            // TODO Check
-            else if (response.StatusCode != HttpStatusCode.OK && response.StatusCode != HttpStatusCode.Created)
+            else if (response.StatusCode == HttpStatusCode.InternalServerError ||
+                     response.StatusCode != HttpStatusCode.OK &&
+                     response.StatusCode != HttpStatusCode.Created)
             {
-                result.Error = response.StatusCode.ToString();
+                result.Errors.Add(response.StatusDescription);
+            }
+            // TODO
+            else if (content.StartsWith(@"{""error"":"))
+            {
+            }
+            else if (content.StartsWith(@"{""status"":"))
+            {
             }
             else
             {
                 result.Success = true;
             }
 
-            // Parse entity or error
-            if (result.Success)
-            {
-                var entity = _unmarshaller.Process<T>(content);
-                result.Result = entity;
-            }
-            else
+            if (!result.Success)
             {
                 if (string.IsNullOrEmpty(content))
                 {
-                    result.Error = "Empty response content";
+                    result.Errors.Add("Empty response content");
                 }
-                else if (content.Contains("<html>"))
+                else if (content.Contains("<html>") || content.Contains("<h1>"))
                 {
-                    result.Error = content;
+                    result.Errors.Add(content);
+                }
+                else if (content.Contains("non_field_errors"))
+                {
+                    var definition = new {non_field_errors = new List<string>()};
+                    var value = _jsonConverter.DeserializeAnonymousType(content, definition);
+                    result.Errors.AddRange(value.non_field_errors);
+                }
+                else if (content.StartsWith(@"{""error"":"))
+                {
+                    var definition = new {error = ""};
+                    var value = _jsonConverter.DeserializeAnonymousType(content, definition);
+                    result.Errors.Add(value.error);
+                }
+                else if (content.StartsWith(@"{""detail"":"))
+                {
+                    var definition = new {detail = ""};
+                    var value = _jsonConverter.DeserializeAnonymousType(content, definition);
+                    result.Errors.Add(value.detail);
+                }
+                else if (content.StartsWith(@"{""status"":"))
+                {
+                    var definition = new {status = ""};
+                    var value = _jsonConverter.DeserializeAnonymousType(content, definition);
+                    result.Errors.Add(value.status);
                 }
                 else
                 {
-                    var error = _unmarshaller.Process<NonFieldError>(content);
-                    result.Error = error.Message.First();
+                    var values = _jsonConverter.Deserialize<Dictionary<string, List<string>>>(content);
+                    foreach (var kvp in values)
+                    {
+                        foreach (var v in kvp.Value)
+                        {
+                            result.Errors.Add(kvp.Key + " " + v);
+                        }
+                    }
                 }
+            }
+
+            return result;
+        }
+
+        private OperationResult<T> CreateResult<T>(string json, OperationResult error)
+        {
+            var result = new OperationResult<T>();
+
+            if (error.Success)
+            {
+                result.Result = _jsonConverter.Deserialize<T>(json);
+            }
+            else
+            {
+                result.Errors.AddRange(error.Errors);
+                result.Success = false;
             }
 
             return result;

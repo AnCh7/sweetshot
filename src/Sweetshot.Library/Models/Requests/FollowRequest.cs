@@ -1,12 +1,22 @@
+using Sweetshot.Library.Models.Requests.Common;
+
 namespace Sweetshot.Library.Models.Requests
 {
+    public enum FollowType
+    {
+        Follow,
+        UnFollow
+    }
+
     public class FollowRequest : SessionIdField
     {
-        public FollowRequest(string token, string _username) : base(token)
+        public FollowRequest(string sessionId, FollowType type, string username) : base(sessionId)
         {
-            username = _username;
+            Username = username;
+            Type = type;
         }
 
-        public string username { get; private set; }
+        public string Username { get; private set; }
+        public FollowType Type { get; private set; }
     }
 }

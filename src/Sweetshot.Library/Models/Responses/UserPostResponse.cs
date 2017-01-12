@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace Sweetshot.Library.Models.Responses
 {
@@ -19,26 +18,13 @@ namespace Sweetshot.Library.Models.Responses
         public string Category { get; set; }
         public string Author { get; set; }
         public string Avatar { get; set; }
-
-        [JsonProperty(PropertyName = "author_rewards")]
         public string AuthorRewards { get; set; }
-
-        [JsonProperty(PropertyName = "author_reputation")]
         public string AuthorReputation { get; set; }
-
-        [JsonProperty(PropertyName = "net_votes")]
         public string NetVotes { get; set; }
-
         public string Children { get; set; }
-
         public string Created { get; set; }
-        [JsonProperty(PropertyName = "curator_payout_value")]
         public string CuratorPayoutValue { get; set; }
-
-        [JsonProperty(PropertyName = "total_payout_value")]
         public string TotalPayoutValue { get; set; }
-
-        [JsonProperty(PropertyName = "pending_payout_value")]
         public string PendingPayoutValue { get; set; }
         public List<string> Replies { get; set; }
         public int Vote { get; set; }

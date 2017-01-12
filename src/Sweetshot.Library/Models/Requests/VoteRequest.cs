@@ -1,12 +1,25 @@
-﻿namespace Sweetshot.Library.Models.Requests
+﻿using Newtonsoft.Json;
+using Sweetshot.Library.Models.Requests.Common;
+
+namespace Sweetshot.Library.Models.Requests
 {
+    public enum VoteType
+    {
+        Up,
+        Down
+    }
+
     public class VoteRequest : SessionIdField
     {
-        public VoteRequest(string token, string _identifier) : base(token)
+        public VoteRequest(string sessionId, VoteType type, string identifier) : base(sessionId)
         {
-            identifier = _identifier;
+            Type = type;
+            Identifier = identifier;
         }
 
-        public string identifier { get; private set; }
+        [JsonProperty(PropertyName = "identifier")]
+        public string Identifier { get; private set; }
+
+        public VoteType Type { get; private set; }
     }
 }

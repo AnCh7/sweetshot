@@ -1,7 +1,8 @@
-﻿namespace Sweetshot.Library.Models.Requests
+﻿namespace Sweetshot.Library.Models.Responses
 {
-    public class VoteResponse 
+    public class VoteResponse
     {
-        public bool IsVoted => string.IsNullOrEmpty("sdfsdfsd");
+        public double NewTotalPayoutReward { get; set; }
+        public string Status { get; set; }
     }
 }

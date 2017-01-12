@@ -1,8 +1,8 @@
-﻿namespace Sweetshot.Library.Models.Requests
+namespace Sweetshot.Library.Models.Requests.Common
 {
     public class SessionIdField
     {
-        public SessionIdField(string sessionId)
+        protected SessionIdField(string sessionId)
         {
             SessionId = sessionId;
         }

@@ -1,7 +1,7 @@
-﻿namespace Sweetshot.Library.Models.Requests
+﻿namespace Sweetshot.Library.Models.Responses
 {
-    public class ImageUploadResponse 
+    // TODO
+    public class ImageUploadResponse
     {
-        public bool IsUploaded => string.IsNullOrEmpty("dsdfsdf");
     }
 }

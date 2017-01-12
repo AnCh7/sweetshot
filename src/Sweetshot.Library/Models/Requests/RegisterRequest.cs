@@ -1,13 +1,15 @@
+using Newtonsoft.Json;
+
 namespace Sweetshot.Library.Models.Requests
 {
+    public class RegisterRequest : LoginRequest
+    {
+        public RegisterRequest(string postingKey, string username, string password) : base(username, password)
+        {
+            PostingKey = postingKey;
+        }
 
-	public class RegisterRequest : LoginRequest
-	{
-		public RegisterRequest(string key, string username, string password) : base(username, password)
-		{
-			posting_key = key;
-		}
-		
-		public string posting_key { get; set; }
-	}
+        [JsonProperty(PropertyName = "posting_key")]
+        public string PostingKey { get; set; }
+    }
 }

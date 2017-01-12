@@ -1,4 +1,6 @@
-﻿namespace Sweetshot.Library.Models.Requests
+﻿using Sweetshot.Library.Models.Requests.Common;
+
+namespace Sweetshot.Library.Models.Requests
 {
     public class UserPostRequest : SessionIdField
     {

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
-    <SharedGUID>fef56ac2-4ce6-4a52-b0b8-25bef67d57c6</SharedGUID>
+    <SharedGUID>d00f0d15-a2d0-4fdd-ba54-c750eaaeea18</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
     <Import_RootNamespace>Sweetshot.Library</Import_RootNamespace>
@@ -11,9 +11,8 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)HttpClient\ApiGateway.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpClient\SteepshotApiClient.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Models\Common\NonFieldError.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Common\OperationResult.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Models\Common\SessionIDField.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\Common\SessionIdField.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\CreateCommentsRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\FollowRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\GetCommentsRequest.cs" />
@@ -23,15 +22,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\UploadImageRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\UserPostRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\VoteRequest.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\Comment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\CreateCommentResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\FollowResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\GetCommentResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\ImageUploadResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\LoginResponse.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\RegisterResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\UserPostResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\VoteResponse.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Serializing\JsonNetUnmarshaller.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializing\JsonNetDeserializer.cs" />
   </ItemGroup>
 </Project>

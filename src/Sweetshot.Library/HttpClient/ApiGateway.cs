@@ -25,7 +25,11 @@ namespace Sweetshot.Library.HttpClient
 
         public ApiGateway(string url)
         {
-            if (string.IsNullOrEmpty(url)) throw new ArgumentNullException(nameof(url));
+            if (string.IsNullOrEmpty(url))
+            {
+                throw new ArgumentNullException(nameof(url));
+            }
+
             _restClient = new RestClient(url);
         }
 
@@ -58,7 +62,9 @@ namespace Sweetshot.Library.HttpClient
             var restRequest = new RestRequest(endpoint) {RequestFormat = DataFormat.Json};
 
             foreach (var parameter in parameters)
+            {
                 restRequest.AddParameter(parameter.Key, parameter.Value, parameter.Type);
+            }
 
             return restRequest;
         }
