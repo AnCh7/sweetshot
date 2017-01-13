@@ -61,7 +61,7 @@ namespace Sweetshot.Library.HttpClient
             return result;
         }
 
-        public async Task<OperationResult<UserPostResponse>> GetUserPosts(UserPostRequest request)
+        public async Task<OperationResult<UserPostResponse>> GetUserPosts(UserRequest request)
         {
             var parameters = new List<RequestParameter>
             {
@@ -240,6 +240,18 @@ namespace Sweetshot.Library.HttpClient
             var response = await _gateway.Post("logout", parameters);
             var errorResult = CheckErrors(response);
             return CreateResult<LogoutResponse>(response.Content, errorResult);
+        }
+
+        public async Task<OperationResult<UserResponse>> GetUserProfile(UserRequest request)
+        {
+            var parameters = new List<RequestParameter>
+            {
+                new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie}
+            };
+
+            var response = await _gateway.Get($"/user/{request.Username}", parameters);
+            var errorResult = CheckErrors(response);
+            return CreateResult<UserResponse>(response.Content, errorResult);
         }
 
         private OperationResult CheckErrors(IRestResponse response)

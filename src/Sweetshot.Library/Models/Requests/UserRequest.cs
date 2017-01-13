@@ -3,9 +3,9 @@ using Sweetshot.Library.Models.Requests.Common;
 
 namespace Sweetshot.Library.Models.Requests
 {
-    public class UserPostRequest : SessionIdField
+    public class UserRequest : SessionIdField
     {
-        public UserPostRequest(string sessionId, string username) : base(sessionId)
+        public UserRequest(string sessionId, string username) : base(sessionId)
         {
             if (string.IsNullOrWhiteSpace(username))
             {

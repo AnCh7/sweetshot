@@ -12,6 +12,7 @@ namespace Sweetshot.Tests
     // add more tests
     // more asserts (DTO fields, errors)
     // new method in API
+    // specify types of all DTO fields
 
     // Discuss all request parameters
     // обсудить обязательность параметров
@@ -103,7 +104,7 @@ namespace Sweetshot.Tests
         public void UserPosts()
         {
             // Arrange
-            var request = new UserPostRequest(_sessionId, Name);
+            var request = new UserRequest(_sessionId, Name);
 
             // Act
             var response = _api.GetUserPosts(request).Result;
@@ -119,7 +120,7 @@ namespace Sweetshot.Tests
         public void UserPosts_Invalid_Username()
         {
             // Arrange
-            var request = new UserPostRequest(_sessionId, Name + "x");
+            var request = new UserRequest(_sessionId, Name + "x");
 
             // Act
             var response = _api.GetUserPosts(request).Result;
@@ -832,6 +833,34 @@ namespace Sweetshot.Tests
 
             // Assert
             AssertSuccessfulResult(response);
+        }
+
+        [Test]
+        public void UserProfile()
+        {
+            // Arrange
+            var request = new UserRequest(_sessionId, Name);
+
+            // Act
+            var response = _api.GetUserProfile(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.NotNull(response.Result.Username);
+        }
+
+        [Test]
+        public void UserProfile_Invalid_Username()
+        {
+            // Arrange
+            var request = new UserRequest(_sessionId, "qweqweqwe");
+
+            // Act
+            var response = _api.GetUserProfile(request).Result;
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.Contains("<h1>Server Error (500)</h1>", response.Errors);
         }
 
         private void AssertSuccessfulResult<T>(OperationResult<T> response)
