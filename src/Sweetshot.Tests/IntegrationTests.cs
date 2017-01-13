@@ -910,6 +910,22 @@ namespace Sweetshot.Tests
             Assert.IsEmpty(response.Result.Results);
         }
 
+        [Test]
+        public void UserFriends_Following_Offset()
+        {
+            // Arrange
+            var request = new UserFriendsRequest(_sessionId, Name, FriendsType.Following, "vivianupman");
+
+            // Act
+            var response = _api.GetUserFriends(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.NotNull(response.Result.Count);
+            Assert.NotNull(response.Result.Offset);
+            Assert.IsNotEmpty(response.Result.Results);
+        }
+
         private void AssertSuccessfulResult<T>(OperationResult<T> response)
         {
             Assert.NotNull(response);

@@ -261,6 +261,11 @@ namespace Sweetshot.Library.HttpClient
                 new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie}
             };
 
+            if (!string.IsNullOrWhiteSpace(request.Offset))
+            {
+                parameters.Add(new RequestParameter {Key = "offset", Value = request.Offset, Type = ParameterType.QueryString});
+            }
+
             var endpoint = $"/user/{request.Username}/";
             if (request.Type == FriendsType.Followers)
             {
