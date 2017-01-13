@@ -788,6 +788,20 @@ namespace Sweetshot.Tests
             Assert.Contains("Authentication credentials were not provided.", response.Errors);
         }
 
+        // TODO Update this one after fix from backend
+        [Test]
+        public void Logout()
+        {
+            // Arrange
+            var request = new LogoutRequest(_sessionId);
+
+            // Act
+            var response = _api.Logout(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+        }
+
         private void AssertSuccessfulResult<T>(OperationResult<T> response)
         {
             Assert.NotNull(response);

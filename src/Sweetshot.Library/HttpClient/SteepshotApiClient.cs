@@ -216,6 +216,18 @@ namespace Sweetshot.Library.HttpClient
             return CreateResult<ChangePasswordResponse>(response.Content, errorResult);
         }
 
+        public async Task<OperationResult<LogoutResponse>> Logout(LogoutRequest request)
+        {
+            var parameters = new List<RequestParameter>
+            {
+                new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie}
+            };
+
+            var response = await _gateway.Post("logout", parameters);
+            var errorResult = CheckErrors(response);
+            return CreateResult<LogoutResponse>(response.Content, errorResult);
+        }
+
         private OperationResult CheckErrors(IRestResponse response)
         {
             var result = new OperationResult();
