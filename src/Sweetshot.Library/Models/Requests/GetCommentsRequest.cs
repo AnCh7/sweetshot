@@ -1,3 +1,4 @@
+using System;
 using Sweetshot.Library.Models.Requests.Common;
 
 namespace Sweetshot.Library.Models.Requests
@@ -6,6 +7,11 @@ namespace Sweetshot.Library.Models.Requests
     {
         public GetCommentsRequest(string sessionId, string url) : base(sessionId)
         {
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                throw new ArgumentNullException(nameof(url));
+            }
+
             Url = url;
         }
 

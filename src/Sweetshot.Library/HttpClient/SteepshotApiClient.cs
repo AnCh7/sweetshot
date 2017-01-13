@@ -182,12 +182,25 @@ namespace Sweetshot.Library.HttpClient
 
             if (!string.IsNullOrWhiteSpace(request.Offset))
             {
-                parameters.Add(new RequestParameter { Key = "offset", Value = request.Offset, Type = ParameterType.QueryString });
+                parameters.Add(new RequestParameter {Key = "offset", Value = request.Offset, Type = ParameterType.QueryString});
             }
 
             var response = await _gateway.Get("categories/top", parameters);
             var errorResult = CheckErrors(response);
             return CreateResult<CategoriesResponse>(response.Content, errorResult);
+        }
+
+        public async Task<OperationResult<SearchCategoriesResponse>> SearchCategories(SearchCategoriesRequest request)
+        {
+            var parameters = new List<RequestParameter>
+            {
+                new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie},
+                new RequestParameter {Key = "query", Value = request.Query, Type = ParameterType.QueryString}
+            };
+
+            var response = await _gateway.Get("categories/search", parameters);
+            var errorResult = CheckErrors(response);
+            return CreateResult<SearchCategoriesResponse>(response.Content, errorResult);
         }
 
         private OperationResult CheckErrors(IRestResponse response)

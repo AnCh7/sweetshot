@@ -1,4 +1,5 @@
-﻿using Sweetshot.Library.Models.Requests.Common;
+﻿using System;
+using Sweetshot.Library.Models.Requests.Common;
 
 namespace Sweetshot.Library.Models.Requests
 {
@@ -6,6 +7,15 @@ namespace Sweetshot.Library.Models.Requests
     {
         public UploadImageRequest(string sessionId, string title, byte[] photo) : base(sessionId)
         {
+            if (string.IsNullOrWhiteSpace(title))
+            {
+                throw new ArgumentNullException(nameof(title));
+            }
+            if (photo == null)
+            {
+                throw new ArgumentNullException(nameof(photo));
+            }
+
             Title = title;
             Photo = photo;
         }

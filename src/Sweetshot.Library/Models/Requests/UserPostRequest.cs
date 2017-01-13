@@ -1,4 +1,5 @@
-﻿using Sweetshot.Library.Models.Requests.Common;
+﻿using System;
+using Sweetshot.Library.Models.Requests.Common;
 
 namespace Sweetshot.Library.Models.Requests
 {
@@ -6,6 +7,11 @@ namespace Sweetshot.Library.Models.Requests
     {
         public UserPostRequest(string sessionId, string username) : base(sessionId)
         {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                throw new ArgumentNullException(nameof(username));
+            }
+
             Username = username;
         }
 

@@ -20,6 +20,8 @@ namespace Sweetshot.Tests
     // check DTOs for all fields
     // next, prev and other fields, check is all needed/exists
     // Assert all DTO fields
+    // имена параметров брать из реквестов
+    // поиск по категориям сделать тот же ответ как и вкатегоряих просто 
 
     [TestFixture]
     public class IntegrationTests
@@ -674,6 +676,36 @@ namespace Sweetshot.Tests
             AssertSuccessfulResult(response);
             Assert.NotNull(response.Result);
             Assert.IsNotEmpty(response.Result.Results);
+        }
+
+        [Test]
+        public void Categories_Search()
+        {
+            // Arrange
+            var request = new SearchCategoriesRequest(_sessionId, "foo");
+
+            // Act
+            var response = _api.SearchCategories(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.NotNull(response.Result);
+            Assert.IsNotEmpty(response.Result.Results);
+        }
+
+        [Test]
+        public void Categories_Search_Invalid_Query()
+        {
+            // Arrange
+            var request = new SearchCategoriesRequest(_sessionId, "qwerqwerqwerqwerqwerqwerqwerqwer");
+
+            // Act
+            var response = _api.SearchCategories(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.NotNull(response.Result);
+            Assert.IsEmpty(response.Result.Results);
         }
 
         private void AssertSuccessfulResult<T>(OperationResult<T> response)

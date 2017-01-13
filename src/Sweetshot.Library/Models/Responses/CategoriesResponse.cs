@@ -11,4 +11,9 @@ namespace Sweetshot.Library.Models.Responses
     {
         public List<Category> Results { get; set; }
     }
+
+    public class SearchCategoriesResponse
+    {
+        public List<string> Results { get; set; }
+    }
 }

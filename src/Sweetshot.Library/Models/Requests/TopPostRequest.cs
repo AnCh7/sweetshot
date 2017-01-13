@@ -1,4 +1,5 @@
-﻿using Sweetshot.Library.Models.Requests.Common;
+﻿using System;
+using Sweetshot.Library.Models.Requests.Common;
 
 namespace Sweetshot.Library.Models.Requests
 {
@@ -6,6 +7,11 @@ namespace Sweetshot.Library.Models.Requests
     {
         public TopPostRequest(string sessionId, int limit, string offset = "") : base(sessionId)
         {
+            if (limit < 0)
+            {
+                throw new ArgumentException(nameof(limit));
+            }
+
             Limit = limit;
             Offset = offset;
         }

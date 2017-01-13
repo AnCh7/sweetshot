@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 using Sweetshot.Library.Models.Requests.Common;
 
 namespace Sweetshot.Library.Models.Requests
@@ -13,6 +14,11 @@ namespace Sweetshot.Library.Models.Requests
     {
         public VoteRequest(string sessionId, VoteType type, string identifier) : base(sessionId)
         {
+            if (string.IsNullOrWhiteSpace(identifier))
+            {
+                throw new ArgumentNullException(nameof(identifier));
+            }
+
             Type = type;
             Identifier = identifier;
         }

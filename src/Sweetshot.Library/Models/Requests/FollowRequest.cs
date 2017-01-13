@@ -1,3 +1,4 @@
+using System;
 using Sweetshot.Library.Models.Requests.Common;
 
 namespace Sweetshot.Library.Models.Requests
@@ -12,6 +13,11 @@ namespace Sweetshot.Library.Models.Requests
     {
         public FollowRequest(string sessionId, FollowType type, string username) : base(sessionId)
         {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                throw new ArgumentNullException(nameof(username));
+            }
+
             Username = username;
             Type = type;
         }
