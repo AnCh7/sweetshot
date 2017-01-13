@@ -254,6 +254,28 @@ namespace Sweetshot.Library.HttpClient
             return CreateResult<UserResponse>(response.Content, errorResult);
         }
 
+        public async Task<OperationResult<UserFriendsResponse>> GetUserFriends(UserFriendsRequest request)
+        {
+            var parameters = new List<RequestParameter>
+            {
+                new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie}
+            };
+
+            var endpoint = $"/user/{request.Username}/";
+            if (request.Type == FriendsType.Followers)
+            {
+                endpoint = endpoint + "followers";
+            }
+            else
+            {
+                endpoint = endpoint + "following";
+            }
+
+            var response = await _gateway.Get(endpoint, parameters);
+            var errorResult = CheckErrors(response);
+            return CreateResult<UserFriendsResponse>(response.Content, errorResult);
+        }
+
         private OperationResult CheckErrors(IRestResponse response)
         {
             var result = new OperationResult();

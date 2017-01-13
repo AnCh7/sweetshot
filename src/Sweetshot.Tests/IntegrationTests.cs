@@ -863,6 +863,53 @@ namespace Sweetshot.Tests
             Assert.Contains("<h1>Server Error (500)</h1>", response.Errors);
         }
 
+        [Test]
+        public void UserFriends_Followers()
+        {
+            // Arrange
+            var request = new UserFriendsRequest(_sessionId, Name, FriendsType.Followers);
+
+            // Act
+            var response = _api.GetUserFriends(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.NotNull(response.Result.Count);
+            Assert.NotNull(response.Result.Offset);
+            Assert.IsNotEmpty(response.Result.Results);
+        }
+
+        [Test]
+        public void UserFriends_Following()
+        {
+            // Arrange
+            var request = new UserFriendsRequest(_sessionId, Name, FriendsType.Following);
+
+            // Act
+            var response = _api.GetUserFriends(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.NotNull(response.Result.Count);
+            Assert.NotNull(response.Result.Offset);
+            Assert.IsNotEmpty(response.Result.Results);
+        }
+
+        [Test]
+        public void UserFriends_Following_Invalid_Username()
+        {
+            // Arrange
+            var request = new UserFriendsRequest(_sessionId, Name + "x", FriendsType.Following);
+
+            // Act
+            var response = _api.GetUserFriends(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.NotNull(response.Result.Count == 0);
+            Assert.IsEmpty(response.Result.Results);
+        }
+
         private void AssertSuccessfulResult<T>(OperationResult<T> response)
         {
             Assert.NotNull(response);
