@@ -643,13 +643,16 @@ namespace Sweetshot.Tests
             // Arrange
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\cat.jpg");
             var file = File.ReadAllBytes(path);
-            var request = new UploadImageRequest(_sessionId, "cat", file);
+            var request = new UploadImageRequest(_sessionId, "cat", file, "cat1", "cat2", "cat3", "cat4");
 
             // Act
             var response = _api.Upload(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
+            Assert.NotNull(response.Result.Body);
+            Assert.NotNull(response.Result.Title);
+            Assert.IsNotEmpty(response.Result.Tags);
         }
 
         [Test]

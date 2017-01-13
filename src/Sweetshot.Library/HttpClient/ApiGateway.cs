@@ -16,7 +16,7 @@ namespace Sweetshot.Library.HttpClient
     {
         Task<IRestResponse> Get(string endpoint, IEnumerable<RequestParameter> parameters);
         Task<IRestResponse> Post(string endpoint, IEnumerable<RequestParameter> parameters);
-        Task<IRestResponse> Upload(string endpoint, string filename, byte[] file, IEnumerable<RequestParameter> parameters);
+        Task<IRestResponse> Upload(string endpoint, string filename, byte[] file, IEnumerable<RequestParameter> parameters, List<string> tags);
     }
 
     public class ApiGateway : IApiGateway
@@ -47,12 +47,16 @@ namespace Sweetshot.Library.HttpClient
             return response;
         }
 
-        public Task<IRestResponse> Upload(string endpoint, string filename, byte[] file, IEnumerable<RequestParameter> parameters)
+        public Task<IRestResponse> Upload(string endpoint, string filename, byte[] file, IEnumerable<RequestParameter> parameters, List<string> tags)
         {
             var request = CreateRequest(endpoint, parameters);
             request.AddFile("photo", file, filename);
             request.AlwaysMultipartFormData = true;
             request.AddParameter("title", filename);
+            foreach (var tag in tags)
+            {
+                request.AddParameter("tags", tag);
+            }
             var response = _restClient.ExecutePostTaskAsync(request);
             return response;
         }

@@ -182,7 +182,7 @@ namespace Sweetshot.Library.HttpClient
                 new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie}
             };
 
-            var response = await _gateway.Upload("post", request.Title, request.Photo, parameters);
+            var response = await _gateway.Upload("post", request.Title, request.Photo, parameters, request.Tags);
             var errorResult = CheckErrors(response);
             return CreateResult<ImageUploadResponse>(response.Content, errorResult);
         }

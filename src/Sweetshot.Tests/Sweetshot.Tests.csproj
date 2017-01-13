@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="IntegrationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Responses\image_upload.json" />
     <None Include="Responses\followers_following.json" />
     <None Include="Responses\user.json" />
     <Compile Include="UnitTests.cs" />
