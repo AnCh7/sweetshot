@@ -60,6 +60,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="Responses\categories_top.json" />
     <None Include="Responses\login.json" />
     <None Include="Responses\post_up_down_vote.json" />
     <None Include="Responses\user_posts.json" />

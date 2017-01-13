@@ -616,6 +616,21 @@ namespace Sweetshot.Tests
             AssertSuccessfulResult(response);
         }
 
+        [Test]
+        public void Categories()
+        {
+            // Arrange
+            var request = new CategoriesRequest(_sessionId);
+
+            // Act
+            var response = _api.GetCategories(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.NotNull(response.Result);
+            Assert.IsNotEmpty(response.Result.Results);
+        }
+
         private void AssertSuccessfulResult<T>(OperationResult<T> response)
         {
             Assert.NotNull(response);

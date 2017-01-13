@@ -22,15 +22,15 @@ namespace Sweetshot.Library.HttpClient
 
         public async Task<OperationResult<LoginResponse>> Login(LoginRequest request)
         {
-            return await Authentication("login", request);
+            return await Authenticate("login", request);
         }
 
         public async Task<OperationResult<LoginResponse>> Register(RegisterRequest request)
         {
-            return await Authentication("register", request);
+            return await Authenticate("register", request);
         }
 
-        private async Task<OperationResult<LoginResponse>> Authentication(string endpoint, LoginRequest request)
+        private async Task<OperationResult<LoginResponse>> Authenticate(string endpoint, LoginRequest request)
         {
             var parameters = new List<RequestParameter>
             {
@@ -171,6 +171,18 @@ namespace Sweetshot.Library.HttpClient
             var response = await _gateway.Upload("post", request.Title, request.Photo, parameters);
             var errorResult = CheckErrors(response);
             return CreateResult<ImageUploadResponse>(response.Content, errorResult);
+        }
+
+        public async Task<OperationResult<CategoriesResponse>> GetCategories(CategoriesRequest request)
+        {
+            var parameters = new List<RequestParameter>
+            {
+                new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie}
+            };
+
+            var response = await _gateway.Get("categories/top", parameters);
+            var errorResult = CheckErrors(response);
+            return CreateResult<CategoriesResponse>(response.Content, errorResult);
         }
 
         private OperationResult CheckErrors(IRestResponse response)
