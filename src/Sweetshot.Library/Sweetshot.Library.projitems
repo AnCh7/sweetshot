@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)HttpClient\SteepshotApiClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Common\OperationResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\CategoriesRequest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\ChangePasswordRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\Common\SessionIdField.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\CreateCommentsRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\FollowRequest.cs" />
@@ -25,6 +26,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\UserPostRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\VoteRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\CategoriesResponse.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\ChangePasswordResponse.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\Common\StatusField.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\CreateCommentResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\FollowResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\GetCommentResponse.cs" />

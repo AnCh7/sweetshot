@@ -22,18 +22,20 @@ namespace Sweetshot.Tests
     // Assert all DTO fields
     // имена параметров брать из реквестов
     // поиск по категориям сделать тот же ответ как и вкатегоряих просто 
+    // move endpoints name to config
 
     [TestFixture]
     public class IntegrationTests
     {
         private const string Name = "joseph.kalu";
         private const string Password = "test1234";
+        private const string NewPassword = "test12345";
         private string _sessionId = string.Empty;
 
         private readonly SteepshotApiClient _api = new SteepshotApiClient(ConfigurationManager.AppSettings["sweetshot_url"]);
 
         [OneTimeSetUp]
-        public void Setup()
+        public void Authenticate()
         {
             var request = new LoginRequest(Name, Password);
             _sessionId = _api.Login(request).Result.Result.SessionId;
@@ -706,6 +708,84 @@ namespace Sweetshot.Tests
             AssertSuccessfulResult(response);
             Assert.NotNull(response.Result);
             Assert.IsEmpty(response.Result.Results);
+        }
+
+        [Test]
+        public void Categories_Search_Short_Query()
+        {
+            // Arrange
+            var request = new SearchCategoriesRequest(_sessionId, "fo");
+
+            // Act
+            var response = _api.SearchCategories(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.NotNull(response.Result);
+            Assert.IsEmpty(response.Result.Results);
+        }
+
+        [Test]
+        public void ChangePassword()
+        {
+            // Arrange
+            var request = new ChangePasswordRequest(_sessionId, Password, NewPassword, NewPassword);
+
+            // Act
+            var response = _api.ChangePassword(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.AreEqual("OK", response.Result.Status);
+
+            // Revert
+            var loginResponse = _api.Login(new LoginRequest(Name, NewPassword)).Result;
+            var response2 = _api.ChangePassword(new ChangePasswordRequest(loginResponse.Result.SessionId, NewPassword, Password, Password)).Result;
+            AssertSuccessfulResult(response2);
+            Assert.AreEqual("OK", response2.Result.Status);
+        }
+
+        [Test]
+        public void ChangePassword_Invalid_OldPassword()
+        {
+            // Arrange
+            var request = new ChangePasswordRequest(_sessionId, Password + "x", NewPassword, NewPassword);
+
+            // Act
+            var response = _api.ChangePassword(request).Result;
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.Contains("old_password Old password is invalid.", response.Errors);
+        }
+
+        // TODO Add more tests about password types
+        [Test]
+        public void ChangePassword_NewPassword_Short()
+        {
+            // Arrange
+            var request = new ChangePasswordRequest(_sessionId, Password, "t", NewPassword);
+
+            // Act
+            var response = _api.ChangePassword(request).Result;
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.Contains("new_password This password is too short. It must contain at least 8 characters.", response.Errors);
+        }
+
+        [Test]
+        public void ChangePassword_Invalid_SessionId()
+        {
+            // Arrange
+            var request = new ChangePasswordRequest(_sessionId + "x", Password, NewPassword, NewPassword);
+
+            // Act
+            var response = _api.ChangePassword(request).Result;
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.Contains("Authentication credentials were not provided.", response.Errors);
         }
 
         private void AssertSuccessfulResult<T>(OperationResult<T> response)

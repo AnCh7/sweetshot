@@ -11,6 +11,10 @@ namespace Sweetshot.Library.Models.Requests
             {
                 throw new ArgumentNullException(nameof(query));
             }
+            if (query.Length <= 2)
+            {
+                throw new ArgumentOutOfRangeException(nameof(query), "Min length is 3");
+            }
 
             Query = query;
         }

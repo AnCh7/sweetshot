@@ -203,6 +203,19 @@ namespace Sweetshot.Library.HttpClient
             return CreateResult<SearchCategoriesResponse>(response.Content, errorResult);
         }
 
+        public async Task<OperationResult<ChangePasswordResponse>> ChangePassword(ChangePasswordRequest request)
+        {
+            var parameters = new List<RequestParameter>
+            {
+                new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie},
+                new RequestParameter {Key = "application/json", Value = _jsonConverter.Serialize(request), Type = ParameterType.RequestBody}
+            };
+
+            var response = await _gateway.Post("user/change-password", parameters);
+            var errorResult = CheckErrors(response);
+            return CreateResult<ChangePasswordResponse>(response.Content, errorResult);
+        }
+
         private OperationResult CheckErrors(IRestResponse response)
         {
             var result = new OperationResult();
@@ -229,9 +242,9 @@ namespace Sweetshot.Library.HttpClient
             else if (content.StartsWith(@"{""error"":"))
             {
             }
-            else if (content.StartsWith(@"{""status"":"))
-            {
-            }
+            //else if (content.StartsWith(@"{""status"":"))
+            //{
+            //}
             else
             {
                 result.Success = true;
@@ -265,12 +278,12 @@ namespace Sweetshot.Library.HttpClient
                     var value = _jsonConverter.DeserializeAnonymousType(content, definition);
                     result.Errors.Add(value.detail);
                 }
-                else if (content.StartsWith(@"{""status"":"))
-                {
-                    var definition = new {status = ""};
-                    var value = _jsonConverter.DeserializeAnonymousType(content, definition);
-                    result.Errors.Add(value.status);
-                }
+                //else if (content.StartsWith(@"{""status"":"))
+                //{
+                //    var definition = new {status = ""};
+                //    var value = _jsonConverter.DeserializeAnonymousType(content, definition);
+                //    result.Errors.Add(value.status);
+                //}
                 else
                 {
                     var values = _jsonConverter.Deserialize<Dictionary<string, List<string>>>(content);
