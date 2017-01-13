@@ -631,6 +631,51 @@ namespace Sweetshot.Tests
             Assert.IsNotEmpty(response.Result.Results);
         }
 
+        [Test]
+        public void Categories_Offset()
+        {
+            // Arrange
+            var request = new CategoriesRequest(_sessionId, "food");
+
+            // Act
+            var response = _api.GetCategories(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.NotNull(response.Result);
+            Assert.IsNotEmpty(response.Result.Results);
+        }
+
+        [Test]
+        public void Categories_Offset_Empty()
+        {
+            // Arrange
+            var request = new CategoriesRequest(_sessionId, " ");
+
+            // Act
+            var response = _api.GetCategories(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.NotNull(response.Result);
+            Assert.IsNotEmpty(response.Result.Results);
+        }
+
+        [Test]
+        public void Categories_Offset_Not_Exisiting()
+        {
+            // Arrange
+            var request = new CategoriesRequest(_sessionId, "qweqweqwe");
+
+            // Act
+            var response = _api.GetCategories(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.NotNull(response.Result);
+            Assert.IsNotEmpty(response.Result.Results);
+        }
+
         private void AssertSuccessfulResult<T>(OperationResult<T> response)
         {
             Assert.NotNull(response);

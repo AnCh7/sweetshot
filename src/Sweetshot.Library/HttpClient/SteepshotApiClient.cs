@@ -51,7 +51,7 @@ namespace Sweetshot.Library.HttpClient
                     }
                 }
 
-                if (string.IsNullOrEmpty(result.Result.SessionId))
+                if (string.IsNullOrWhiteSpace(result.Result.SessionId))
                 {
                     result.Success = false;
                     result.Errors.Add("SessionId field is missing.");
@@ -81,7 +81,7 @@ namespace Sweetshot.Library.HttpClient
                 new RequestParameter {Key = "limit", Value = request.Limit, Type = ParameterType.QueryString}
             };
 
-            if (!string.IsNullOrEmpty(request.Offset))
+            if (!string.IsNullOrWhiteSpace(request.Offset))
             {
                 parameters.Add(new RequestParameter {Key = "offset", Value = request.Offset, Type = ParameterType.QueryString});
             }
@@ -180,6 +180,11 @@ namespace Sweetshot.Library.HttpClient
                 new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie}
             };
 
+            if (!string.IsNullOrWhiteSpace(request.Offset))
+            {
+                parameters.Add(new RequestParameter { Key = "offset", Value = request.Offset, Type = ParameterType.QueryString });
+            }
+
             var response = await _gateway.Get("categories/top", parameters);
             var errorResult = CheckErrors(response);
             return CreateResult<CategoriesResponse>(response.Content, errorResult);
@@ -221,7 +226,7 @@ namespace Sweetshot.Library.HttpClient
 
             if (!result.Success)
             {
-                if (string.IsNullOrEmpty(content))
+                if (string.IsNullOrWhiteSpace(content))
                 {
                     result.Errors.Add("Empty response content");
                 }

@@ -4,8 +4,11 @@ namespace Sweetshot.Library.Models.Requests
 {
     public class CategoriesRequest : SessionIdField
     {
-        public CategoriesRequest(string sessionId) : base(sessionId)
+        public CategoriesRequest(string sessionId, string offset = "") : base(sessionId)
         {
+            Offset = offset;
         }
+
+        public string Offset { get; private set; }
     }
 }
