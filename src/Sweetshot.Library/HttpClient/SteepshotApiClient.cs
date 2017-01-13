@@ -73,7 +73,7 @@ namespace Sweetshot.Library.HttpClient
             return CreateResult<UserPostResponse>(response.Content, errorResult);
         }
 
-        public async Task<OperationResult<UserPostResponse>> GetTopPosts(TopPostRequest request)
+        public async Task<OperationResult<UserPostResponse>> GetPosts(PostsRequest request)
         {
             var parameters = new List<RequestParameter>
             {
@@ -86,7 +86,21 @@ namespace Sweetshot.Library.HttpClient
                 parameters.Add(new RequestParameter {Key = "offset", Value = request.Offset, Type = ParameterType.QueryString});
             }
 
-            var response = await _gateway.Get("posts/top", parameters);
+            var endpoint = "/posts/";
+            if (request.Type == PostType.Top)
+            {
+                endpoint = endpoint + "top";
+            }
+            else if (request.Type == PostType.Hot)
+            {
+                endpoint = endpoint + "hot";
+            }
+            else
+            {
+                endpoint = endpoint + "new";
+            }
+
+            var response = await _gateway.Get(endpoint, parameters);
             var errorResult = CheckErrors(response);
             return CreateResult<UserPostResponse>(response.Content, errorResult);
         }

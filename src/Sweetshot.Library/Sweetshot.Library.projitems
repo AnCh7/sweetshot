@@ -22,7 +22,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\LogoutRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\RegisterRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\SearchCategoriesRequest.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\TopPostRequest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\PostsRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\UploadImageRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\UserPostRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\VoteRequest.cs" />
@@ -34,6 +34,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\GetCommentResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\ImageUploadResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\LoginResponse.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\LogoutResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\UserPostResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\VoteResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializing\JsonNetDeserializer.cs" />

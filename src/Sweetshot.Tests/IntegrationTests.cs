@@ -23,6 +23,7 @@ namespace Sweetshot.Tests
     // имена параметров брать из реквестов
     // поиск по категориям сделать тот же ответ как и вкатегоряих просто 
     // move endpoints name to config
+    // replace endpoint setup by emun to string
 
     [TestFixture]
     public class IntegrationTests
@@ -128,14 +129,14 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        public void TopPosts()
+        public void Posts_Top()
         {
             // Arrange
             const int limit = 5;
-            var request = new TopPostRequest(_sessionId, limit);
+            var request = new PostsRequest(_sessionId, PostType.Top, limit);
 
             // Act
-            var response = _api.GetTopPosts(request).Result;
+            var response = _api.GetPosts(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -143,13 +144,13 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        public void TopPosts_Check_Limit_Zero()
+        public void Posts_Top_Check_Limit_Zero()
         {
             // Arrange
-            var request = new TopPostRequest(_sessionId, 0);
+            var request = new PostsRequest(_sessionId, PostType.Top, 0);
 
             // Act
-            var response = _api.GetTopPosts(request).Result;
+            var response = _api.GetPosts(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -157,13 +158,13 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        public void TopPosts_Check_Limit_Negative()
+        public void Posts_Top_Check_Limit_Negative()
         {
             // Arrange
-            var request = new TopPostRequest(_sessionId, -10);
+            var request = new PostsRequest(_sessionId, PostType.Top, -10);
 
             // Act
-            var response = _api.GetTopPosts(request).Result;
+            var response = _api.GetPosts(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -171,17 +172,47 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        public void TopPosts_Check_Offset()
+        public void Posts_Top_Check_Offset()
         {
             // Arrange
-            var request = new TopPostRequest(_sessionId, 3, "/life/@hanshotfirst/best-buddies-i-see-you");
+            var request = new PostsRequest(_sessionId, PostType.Top, 3, "/life/@hanshotfirst/best-buddies-i-see-you");
 
             // Act
-            var response = _api.GetTopPosts(request).Result;
+            var response = _api.GetPosts(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
             Assert.IsTrue(response.Result.Count == 0);
+        }
+
+        [Test]
+        public void Posts_Hot()
+        {
+            // Arrange
+            const int limit = 5;
+            var request = new PostsRequest(_sessionId, PostType.Hot, limit);
+
+            // Act
+            var response = _api.GetPosts(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.IsTrue(response.Result.Results.Any());
+        }
+
+        [Test]
+        public void Posts_New()
+        {
+            // Arrange
+            const int limit = 5;
+            var request = new PostsRequest(_sessionId, PostType.New, limit);
+
+            // Act
+            var response = _api.GetPosts(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.IsTrue(response.Result.Results.Any());
         }
 
         // TODO Need to create a profile and test it
@@ -789,6 +820,7 @@ namespace Sweetshot.Tests
         }
 
         // TODO Update this one after fix from backend
+        // TODO Discuss do we need it
         [Test]
         public void Logout()
         {
