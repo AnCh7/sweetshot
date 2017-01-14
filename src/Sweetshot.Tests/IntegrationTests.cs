@@ -9,9 +9,8 @@ using Sweetshot.Library.Models.Requests;
 
 namespace Sweetshot.Tests
 {
-    // add more tests
+    // Check all tests, add some new too
     // more asserts (DTO fields, errors)
-    // new method in API
     // specify types of all DTO fields
 
     // Discuss all request parameters
@@ -24,7 +23,8 @@ namespace Sweetshot.Tests
     // имена параметров брать из реквестов
     // поиск по категориям сделать тот же ответ как и вкатегоряих просто 
     // move endpoints name to config
-    // replace endpoint setup by emun to string
+
+    //для постов не обязателен sessionId
 
     [TestFixture]
     public class IntegrationTests
