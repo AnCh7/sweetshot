@@ -13,12 +13,12 @@ namespace Sweetshot.Library.Models.Requests
 
     public class VoteRequest : SessionIdField
     {
-        public VoteRequest(string sessionId, VoteType type, string identifier) : base(sessionId)
+        public VoteRequest(string sessionId, bool isUpVote, string identifier) : base(sessionId)
         {
             if (string.IsNullOrWhiteSpace(identifier))
                 throw new ArgumentNullException(nameof(identifier));
 
-            Type = type;
+            Type = isUpVote ? VoteType.Up : VoteType.Down;
             Identifier = identifier;
         }
 

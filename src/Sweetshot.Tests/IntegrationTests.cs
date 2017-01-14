@@ -24,7 +24,8 @@ namespace Sweetshot.Tests
     // поиск по категориям сделать тот же ответ как и вкатегоряих просто 
     // move endpoints name to config
 
-    //для постов не обязателен sessionId
+    // для постов не обязателен sessionId
+    // просмотреть карточки трелло
 
     [TestFixture]
     public class IntegrationTests
@@ -320,7 +321,7 @@ namespace Sweetshot.Tests
         public void Vote_Up()
         {
             // Arrange
-            var request = new VoteRequest(_sessionId, VoteType.Up, "/life/@hanshotfirst/best-buddies-i-see-you");
+            var request = new VoteRequest(_sessionId, true, "/life/@hanshotfirst/best-buddies-i-see-you");
 
             // Act
             var response = _api.Vote(request).Result;
@@ -335,7 +336,7 @@ namespace Sweetshot.Tests
         public void Vote_Up_Already_Voted()
         {
             // Arrange
-            var request = new VoteRequest(_sessionId, VoteType.Up, "/spam/@joseph.kalu/test-post-tue-jan--3-170111-2017");
+            var request = new VoteRequest(_sessionId, true, "/spam/@joseph.kalu/test-post-tue-jan--3-170111-2017");
 
             // Act
             var response = _api.Vote(request).Result;
@@ -349,7 +350,7 @@ namespace Sweetshot.Tests
         public void Vote_Down()
         {
             // Arrange
-            var request = new VoteRequest(_sessionId, VoteType.Down, "/life/@hanshotfirst/best-buddies-i-see-you");
+            var request = new VoteRequest(_sessionId, false, "/life/@hanshotfirst/best-buddies-i-see-you");
 
             // Act
             var response = _api.Vote(request).Result;
@@ -364,7 +365,7 @@ namespace Sweetshot.Tests
         public void Vote_Down_Already_Voted()
         {
             // Arrange
-            var request = new VoteRequest(_sessionId, VoteType.Down, "/spam/@joseph.kalu/test-post-tue-jan--3-170111-2017");
+            var request = new VoteRequest(_sessionId, false, "/spam/@joseph.kalu/test-post-tue-jan--3-170111-2017");
 
             // Act
             var response = _api.Vote(request).Result;
@@ -378,7 +379,7 @@ namespace Sweetshot.Tests
         public void Vote_Empty_Identifier()
         {
             // Arrange
-            var request = new VoteRequest(_sessionId, VoteType.Up, "");
+            var request = new VoteRequest(_sessionId, true, "");
 
             // Act
             var response = _api.Vote(request).Result;
@@ -392,7 +393,7 @@ namespace Sweetshot.Tests
         public void Vote_Invalid_Identifier1()
         {
             // Arrange
-            var request = new VoteRequest(_sessionId, VoteType.Up, "qwe");
+            var request = new VoteRequest(_sessionId, true, "qwe");
 
             // Act
             var response = _api.Vote(request).Result;
@@ -406,7 +407,7 @@ namespace Sweetshot.Tests
         public void Vote_Invalid_Identifier2()
         {
             // Arrange
-            var request = new VoteRequest(_sessionId, VoteType.Up, "qwe/qwe");
+            var request = new VoteRequest(_sessionId, true, "qwe/qwe");
 
             // Act
             var response = _api.Vote(request).Result;
@@ -420,7 +421,7 @@ namespace Sweetshot.Tests
         public void Vote_Invalid_Identifier3()
         {
             // Arrange
-            var request = new VoteRequest(_sessionId, VoteType.Up, "/qwe/qwe");
+            var request = new VoteRequest(_sessionId, true, "/qwe/qwe");
 
             // Act
             var response = _api.Vote(request).Result;
@@ -434,7 +435,7 @@ namespace Sweetshot.Tests
         public void Vote_Invalid_Identifier4()
         {
             // Arrange
-            var request = new VoteRequest(_sessionId, VoteType.Up, "/qwe/@qwe");
+            var request = new VoteRequest(_sessionId, true, "/qwe/@qwe");
 
             // Act
             var response = _api.Vote(request).Result;
@@ -448,7 +449,7 @@ namespace Sweetshot.Tests
         public void Vote_Invalid_Identifier5()
         {
             // Arrange
-            var request = new VoteRequest(_sessionId, VoteType.Up, "/qwe/@qwe/");
+            var request = new VoteRequest(_sessionId, true, "/qwe/@qwe/");
 
             // Act
             var response = _api.Vote(request).Result;
