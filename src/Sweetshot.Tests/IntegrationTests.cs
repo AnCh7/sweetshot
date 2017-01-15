@@ -9,17 +9,13 @@ using Sweetshot.Library.Models.Requests;
 
 namespace Sweetshot.Tests
 {
-    // Check all tests, add some new too
-    // more asserts (DTO fields, errors)
-    // specify types of all DTO fields
-
-    // Discuss all request parameters
-    // обсудить обязательность параметров
-    // discuss error responses types
-
+    // check all tests
+    // add more tests
     // check DTOs for all fields
-    // next, prev and other fields, check is all needed/exists
-    // Assert all DTO fields
+    // specify types of all DTO fields
+    // test all types of DTO fields
+    // test (assert) errors
+
     // имена параметров брать из реквестов
     // поиск по категориям сделать тот же ответ как и вкатегоряих просто 
     // move endpoints name to config
@@ -765,7 +761,7 @@ namespace Sweetshot.Tests
         public void ChangePassword()
         {
             // Arrange
-            var request = new ChangePasswordRequest(_sessionId, Password, NewPassword, NewPassword);
+            var request = new ChangePasswordRequest(_sessionId, Password, NewPassword);
 
             // Act
             var response = _api.ChangePassword(request).Result;
@@ -776,7 +772,7 @@ namespace Sweetshot.Tests
 
             // Revert
             var loginResponse = _api.Login(new LoginRequest(Name, NewPassword)).Result;
-            var response2 = _api.ChangePassword(new ChangePasswordRequest(loginResponse.Result.SessionId, NewPassword, Password, Password)).Result;
+            var response2 = _api.ChangePassword(new ChangePasswordRequest(loginResponse.Result.SessionId, NewPassword, Password)).Result;
             AssertSuccessfulResult(response2);
             Assert.AreEqual("OK", response2.Result.Status);
         }
@@ -785,7 +781,7 @@ namespace Sweetshot.Tests
         public void ChangePassword_Invalid_OldPassword()
         {
             // Arrange
-            var request = new ChangePasswordRequest(_sessionId, Password + "x", NewPassword, NewPassword);
+            var request = new ChangePasswordRequest(_sessionId, Password + "x", NewPassword);
 
             // Act
             var response = _api.ChangePassword(request).Result;
@@ -800,7 +796,7 @@ namespace Sweetshot.Tests
         public void ChangePassword_NewPassword_Short()
         {
             // Arrange
-            var request = new ChangePasswordRequest(_sessionId, Password, "t", NewPassword);
+            var request = new ChangePasswordRequest(_sessionId, Password, "t");
 
             // Act
             var response = _api.ChangePassword(request).Result;
@@ -814,7 +810,7 @@ namespace Sweetshot.Tests
         public void ChangePassword_Invalid_SessionId()
         {
             // Arrange
-            var request = new ChangePasswordRequest(_sessionId + "x", Password, NewPassword, NewPassword);
+            var request = new ChangePasswordRequest(_sessionId + "x", Password, NewPassword);
 
             // Act
             var response = _api.ChangePassword(request).Result;

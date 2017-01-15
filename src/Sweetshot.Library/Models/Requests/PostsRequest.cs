@@ -12,13 +12,8 @@ namespace Sweetshot.Library.Models.Requests
 
     public class PostsRequest : SessionIdField
     {
-        public PostsRequest(string sessionId, PostType type, int limit, string offset = "") : base(sessionId)
+        public PostsRequest(string sessionId, PostType type, int limit = 0, string offset = "") : base(sessionId)
         {
-            if (limit < 0)
-            {
-                throw new ArgumentException(nameof(limit));
-            }
-
             Type = type;
             Limit = limit;
             Offset = offset;
