@@ -55,21 +55,11 @@
   <ItemGroup>
     <Compile Include="IntegrationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <None Include="Responses\categories.json" />
-    <None Include="Responses\image_upload.json" />
-    <None Include="Responses\followers_following.json" />
-    <None Include="Responses\user.json" />
     <Compile Include="UnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-    <None Include="Responses\login.json" />
-    <None Include="Responses\post_up_down_vote.json" />
-    <None Include="Responses\user_posts.json" />
-    <None Include="Responses\posts_top.json" />
-    <None Include="Responses\TODO" />
-    <None Include="Responses\comments.json" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Data\cat.jpg">

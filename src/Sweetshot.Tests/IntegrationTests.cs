@@ -11,13 +11,15 @@ namespace Sweetshot.Tests
 {
     // check all tests
     // add more tests
+    // test (assert) errors
+
     // check DTOs for all fields
     // specify types of all DTO fields
     // test all types of DTO fields
-    // test (assert) errors
-    // имена параметров брать из реквестов
+
     // просмотреть карточки трелло
     // check chat
+
     [TestFixture]
     public class IntegrationTests
     {
