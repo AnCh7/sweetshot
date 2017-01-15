@@ -15,14 +15,9 @@ namespace Sweetshot.Tests
     // specify types of all DTO fields
     // test all types of DTO fields
     // test (assert) errors
-
     // имена параметров брать из реквестов
-    // поиск по категориям сделать тот же ответ как и вкатегоряих просто 
-    // move endpoints name to config
-
-    // для постов не обязателен sessionId
     // просмотреть карточки трелло
-
+    // check chat
     [TestFixture]
     public class IntegrationTests
     {
@@ -680,6 +675,8 @@ namespace Sweetshot.Tests
             // Assert
             AssertSuccessfulResult(response);
             Assert.NotNull(response.Result);
+            Assert.IsTrue(response.Result.Count > 0);
+            Assert.NotNull(response.Result.TotalCount > 0);
             Assert.IsNotEmpty(response.Result.Results);
         }
 
@@ -973,6 +970,18 @@ namespace Sweetshot.Tests
             Assert.NotNull(response.Result.Offset);
             Assert.IsNotEmpty(response.Result.Results);
             Assert.IsTrue(response.Result.Results.Count == 5);
+        }
+
+        [Test]
+        public void Terms_Of_Service()
+        {
+            // Arrange
+            // Act
+            var response = _api.TermsOfService().Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.IsNotEmpty(response.Result.Text);
         }
 
         private void AssertSuccessfulResult<T>(OperationResult<T> response)
