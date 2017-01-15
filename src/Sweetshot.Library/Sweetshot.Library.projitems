@@ -24,7 +24,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\PostsRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\UploadImageRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\UserFriendsRequest.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\UserRequest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\UserProfileRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\VoteRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\CategoriesResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\ChangePasswordResponse.cs" />

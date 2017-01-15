@@ -101,7 +101,7 @@ namespace Sweetshot.Tests
         public void UserPosts()
         {
             // Arrange
-            var request = new UserRequest(_sessionId, Name);
+            var request = new UserPostsRequest(_sessionId, Name);
 
             // Act
             var response = _api.GetUserPosts(request).Result;
@@ -117,7 +117,7 @@ namespace Sweetshot.Tests
         public void UserPosts_Invalid_Username()
         {
             // Arrange
-            var request = new UserRequest(_sessionId, Name + "x");
+            var request = new UserPostsRequest(_sessionId, Name + "x");
 
             // Act
             var response = _api.GetUserPosts(request).Result;
@@ -127,11 +127,27 @@ namespace Sweetshot.Tests
         }
 
         [Test]
+        public void UserRecentPosts()
+        {
+            // Arrange
+            var request = new UserRecentPostsRequest(_sessionId);
+
+            // Act
+            var response = _api.GetUserRecentPosts(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.IsTrue(response.Result.Count > 0);
+            Assert.IsNotEmpty(response.Result.Results.First().Body);
+            Assert.IsNotEmpty(response.Result.Results.First().Author);
+        }
+
+        [Test]
         public void Posts_Top()
         {
             // Arrange
             const int limit = 5;
-            var request = new PostsRequest(_sessionId, PostType.Top, limit);
+            var request = new PostsRequest(PostType.Top, limit);
 
             // Act
             var response = _api.GetPosts(request).Result;
@@ -145,7 +161,7 @@ namespace Sweetshot.Tests
         public void Posts_Top_Check_Limit_Zero()
         {
             // Arrange
-            var request = new PostsRequest(_sessionId, PostType.Top, 0);
+            var request = new PostsRequest(PostType.Top, 0);
 
             // Act
             var response = _api.GetPosts(request).Result;
@@ -159,7 +175,7 @@ namespace Sweetshot.Tests
         public void Posts_Top_Check_Limit_Negative()
         {
             // Arrange
-            var request = new PostsRequest(_sessionId, PostType.Top, -10);
+            var request = new PostsRequest(PostType.Top, -10);
 
             // Act
             var response = _api.GetPosts(request).Result;
@@ -173,7 +189,7 @@ namespace Sweetshot.Tests
         public void Posts_Top_Check_Offset()
         {
             // Arrange
-            var request = new PostsRequest(_sessionId, PostType.Top, 3, "/life/@hanshotfirst/best-buddies-i-see-you");
+            var request = new PostsRequest(PostType.Top, 3, "/life/@hanshotfirst/best-buddies-i-see-you");
 
             // Act
             var response = _api.GetPosts(request).Result;
@@ -188,7 +204,7 @@ namespace Sweetshot.Tests
         {
             // Arrange
             const int limit = 5;
-            var request = new PostsRequest(_sessionId, PostType.Hot, limit);
+            var request = new PostsRequest(PostType.Hot, limit);
 
             // Act
             var response = _api.GetPosts(request).Result;
@@ -203,7 +219,7 @@ namespace Sweetshot.Tests
         {
             // Arrange
             const int limit = 5;
-            var request = new PostsRequest(_sessionId, PostType.New, limit);
+            var request = new PostsRequest(PostType.New, limit);
 
             // Act
             var response = _api.GetPosts(request).Result;
@@ -839,7 +855,7 @@ namespace Sweetshot.Tests
         public void UserProfile()
         {
             // Arrange
-            var request = new UserRequest(_sessionId, Name);
+            var request = new UserProfileRequest(_sessionId, Name);
 
             // Act
             var response = _api.GetUserProfile(request).Result;
@@ -853,7 +869,7 @@ namespace Sweetshot.Tests
         public void UserProfile_Invalid_Username()
         {
             // Arrange
-            var request = new UserRequest(_sessionId, "qweqweqwe");
+            var request = new UserProfileRequest(_sessionId, "qweqweqwe");
 
             // Act
             var response = _api.GetUserProfile(request).Result;

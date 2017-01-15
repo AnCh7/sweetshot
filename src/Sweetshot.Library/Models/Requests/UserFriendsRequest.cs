@@ -6,7 +6,7 @@
         Following
     }
 
-    public class UserFriendsRequest : UserRequest
+    public class UserFriendsRequest : UserPostsRequest
     {
         public UserFriendsRequest(string sessionId, string username, FriendsType type, string offset = "", int limit = 0)
             : base(sessionId, username)
