@@ -8,7 +8,9 @@ namespace Sweetshot.Library.Models.Requests
         public UserPostsRequest(string sessionId, string username) : base(sessionId)
         {
             if (string.IsNullOrWhiteSpace(username))
+            {
                 throw new ArgumentNullException(nameof(username));
+            }
 
             Username = username;
         }

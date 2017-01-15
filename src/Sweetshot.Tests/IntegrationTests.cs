@@ -729,6 +729,22 @@ namespace Sweetshot.Tests
         }
 
         [Test]
+        public void Categories_Limit()
+        {
+            // Arrange
+            var request = new CategoriesRequest(_sessionId, limit: 5);
+
+            // Act
+            var response = _api.GetCategories(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.NotNull(response.Result);
+            Assert.IsNotEmpty(response.Result.Results);
+            Assert.IsTrue(response.Result.Results.Count == 5);
+        }
+
+        [Test]
         public void Categories_Search()
         {
             // Arrange
@@ -940,6 +956,23 @@ namespace Sweetshot.Tests
             Assert.NotNull(response.Result.Count);
             Assert.NotNull(response.Result.Offset);
             Assert.IsNotEmpty(response.Result.Results);
+        }
+
+        [Test]
+        public void UserFriends_Following_Limit()
+        {
+            // Arrange
+            var request = new UserFriendsRequest(_sessionId, Name, FriendsType.Following, limit: 5);
+
+            // Act
+            var response = _api.GetUserFriends(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.NotNull(response.Result.Count);
+            Assert.NotNull(response.Result.Offset);
+            Assert.IsNotEmpty(response.Result.Results);
+            Assert.IsTrue(response.Result.Results.Count == 5);
         }
 
         private void AssertSuccessfulResult<T>(OperationResult<T> response)

@@ -172,7 +172,8 @@ namespace Sweetshot.Library.HttpClient
         {
             var parameters = new List<RequestParameter>
             {
-                new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie}
+                new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie},
+                new RequestParameter {Key = "limit", Value = request.Limit, Type = ParameterType.QueryString}
             };
 
             if (!string.IsNullOrWhiteSpace(request.Offset))
@@ -239,7 +240,8 @@ namespace Sweetshot.Library.HttpClient
         {
             var parameters = new List<RequestParameter>
             {
-                new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie}
+                new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie},
+                new RequestParameter {Key = "limit", Value = request.Limit, Type = ParameterType.QueryString}
             };
 
             if (!string.IsNullOrWhiteSpace(request.Offset))
