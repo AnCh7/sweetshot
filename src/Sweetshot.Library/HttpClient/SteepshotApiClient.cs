@@ -199,6 +199,14 @@ namespace Sweetshot.Library.HttpClient
             return CreateResult<TermOfServiceResponse>(response.Content, errorResult);
         }
 
+        public async Task<OperationResult<Post>> GetPostInfo(PostsInfoRequest request)
+        {
+            var endpoint = $"/post/{request.Url}/info";
+            var response = await _gateway.Get(endpoint, new List<RequestParameter>());
+            var errorResult = CheckErrors(response);
+            return CreateResult<Post>(response.Content, errorResult);
+        }
+
         private List<RequestParameter> CreateSessionParameter(string sessionId)
         {
             var parameters = new List<RequestParameter>

@@ -41,4 +41,19 @@ namespace Sweetshot.Library.Models.Requests
 
         public PostType Type { get; private set; }
     }
+
+    public class PostsInfoRequest
+    {
+        public PostsInfoRequest(string url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                throw new ArgumentNullException(nameof(url));
+            }
+
+            Url = url;
+        }
+
+        public string Url { get; private set; }
+    }
 }

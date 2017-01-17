@@ -13,8 +13,6 @@ namespace Sweetshot.Tests
     // add more tests
     // test (assert) errors
     // remove throws in DTOs
-    // check trello
-    // add / check /post/(?P<url>.+)/info (no auth)
 
     [TestFixture]
     public class IntegrationTests
@@ -44,6 +42,7 @@ namespace Sweetshot.Tests
 
             // Assert
             AssertSuccessfulResult(response);
+            Assert.That(response.Result.IsLoggedIn, Is.True);
             Assert.That("User was logged in.", Is.EqualTo(response.Result.Message));
             Assert.That(response.Result.SessionId, Is.Not.Empty);
         }
@@ -254,6 +253,7 @@ namespace Sweetshot.Tests
             var response = _api.Register(request).Result;
 
             // Assert
+            //Assert.That(response.Result.IsLoggedIn, Is.False);
             //AssertSuccessfulResult(response);
             //Assert.That(response.Result.SessionId);
             //Assert.That(response.Result.Username);
@@ -358,6 +358,7 @@ namespace Sweetshot.Tests
 
             // Assert
             AssertSuccessfulResult(response);
+            Assert.That(response.Result.IsVoted, Is.True);
             Assert.That(response.Result.NewTotalPayoutReward, Is.Not.Null);
             Assert.That(response.Result.Message, Is.EqualTo("Upvoted"));
             Assert.That(response.Result.NewTotalPayoutReward, Is.Not.Null);
@@ -377,6 +378,7 @@ namespace Sweetshot.Tests
 
             // Assert
             AssertSuccessfulResult(response);
+            Assert.That(response.Result.IsVoted, Is.True);
             Assert.That(response.Result.NewTotalPayoutReward, Is.Not.Null);
             Assert.That(response.Result.Message, Is.EqualTo("Downvoted"));
             Assert.That(response.Result.NewTotalPayoutReward, Is.Not.Null);
@@ -491,6 +493,7 @@ namespace Sweetshot.Tests
 
             // Assert
             AssertSuccessfulResult(response);
+            Assert.That(response.Result.IsFollowed, Is.True);
             Assert.That(response.Result.Message, Is.EqualTo("User is followed"));
         }
 
@@ -505,6 +508,7 @@ namespace Sweetshot.Tests
 
             // Assert
             AssertSuccessfulResult(response);
+            Assert.That(response.Result.IsFollowed, Is.False);
             Assert.That(response.Result.Message, Is.EqualTo("User is unfollowed"));
         }
 
@@ -595,6 +599,7 @@ namespace Sweetshot.Tests
 
             // Assert
             AssertSuccessfulResult(response);
+            Assert.That(response.Result.IsCreated, Is.True);
             Assert.That(response.Result.Message, Is.EqualTo("Comment created"));
         }
 
@@ -780,7 +785,7 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        public void Categories_Search_Empty_Query() 
+        public void Categories_Search_Empty_Query()
         {
             // Arrange
             var request = new SearchCategoriesRequest(" ");
@@ -791,6 +796,25 @@ namespace Sweetshot.Tests
             // Assert 
             AssertFailedResult(response);
             Assert.That(response.Errors.Contains("This field may not be blank."));
+        }
+
+        [Test]
+        public void Categories_Search_Test_Limit()
+        {
+            // Arrange
+            const int defaultLimit = 50;
+            var request = new SearchCategoriesRequest("steem");
+
+            // Act
+            var response = _api.SearchCategories(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.That(response.Result, Is.Not.Null);
+            Assert.That(response.Result.Count, Is.EqualTo(defaultLimit));
+            Assert.That(response.Result.TotalCount >= defaultLimit);
+            Assert.That(response.Result.Results, Is.Not.Empty);
+            Assert.That(response.Result.Results.First().Name, Is.Not.Empty);
         }
 
         [Test]
@@ -821,11 +845,8 @@ namespace Sweetshot.Tests
             var response = _api.SearchCategories(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
-            Assert.That(response.Result, Is.Not.Null);
-            Assert.That(response.Result.Count > 0);
-            Assert.That(response.Result.TotalCount, Is.EqualTo(-1));
-            Assert.That(response.Result.Results, Is.Not.Empty);
+            AssertFailedResult(response);
+            Assert.That(response.Errors.Contains("Category used for offset was not found"));
         }
 
         [Test]
@@ -858,12 +879,14 @@ namespace Sweetshot.Tests
 
             // Assert
             AssertSuccessfulResult(response);
+            Assert.That(response.Result.IsChanged, Is.True);
             Assert.That(response.Result.Message, Is.EqualTo("Password was changed"));
 
             // Revert
             var loginResponse = _api.Login(new LoginRequest(Name, NewPassword)).Result;
             var response2 = _api.ChangePassword(new ChangePasswordRequest(loginResponse.Result.SessionId, NewPassword, Password)).Result;
             AssertSuccessfulResult(response2);
+            Assert.That(response.Result.IsChanged, Is.True);
             Assert.That(response2.Result.Message, Is.EqualTo("Password was changed"));
         }
 
@@ -921,6 +944,7 @@ namespace Sweetshot.Tests
 
             // Assert
             AssertSuccessfulResult(response);
+            Assert.That(response.Result.IsLoggedOut, Is.True);
             Assert.That(response.Result.Message, Is.EqualTo("User is logged out"));
         }
 
@@ -945,7 +969,7 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.FollowersCount, Is.Not.Null);
             Assert.That(response.Result.FollowingCount, Is.Not.Null);
             Assert.That(response.Result.Username, Is.Not.Empty);
-            Assert.That(response.Result.CurrentUsername, Is.Not.Empty);
+            Assert.That(response.Result.CurrentUsername, Is.Not.Null);
             Assert.That(response.Result.ProfileImage, Is.Not.Empty);
             Assert.That(response.Result.HasFollowed, Is.Not.Null);
             Assert.That(response.Result.EstimatedBalance, Is.Not.Null);
@@ -1061,6 +1085,51 @@ namespace Sweetshot.Tests
             // Assert
             AssertSuccessfulResult(response);
             Assert.That(response.Result.Text, Is.Not.Empty);
+        }
+
+        [Test]
+        public void GetPostInfo()
+        {
+            // Arrange
+            var request = new PostsInfoRequest("/spam/@joseph.kalu/test-post-127");
+
+            // Act
+            var response = _api.GetPostInfo(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.That(response.Result.Body, Is.Not.Empty);
+            Assert.That(response.Result.Title, Is.Not.Empty);
+            Assert.That(response.Result.Url, Is.Not.Empty);
+            Assert.That(response.Result.Category, Is.Not.Empty);
+            Assert.That(response.Result.Author, Is.Not.Empty);
+            Assert.That(response.Result.Avatar, Is.Not.Empty);
+            Assert.That(response.Result.AuthorRewards, Is.Not.Null);
+            Assert.That(response.Result.AuthorReputation, Is.Not.Null);
+            Assert.That(response.Result.NetVotes, Is.Not.Null);
+            Assert.That(response.Result.Children, Is.Not.Null);
+            Assert.That(response.Result.Created, Is.Not.Null);
+            Assert.That(response.Result.CuratorPayoutValue, Is.Not.Null);
+            Assert.That(response.Result.TotalPayoutValue, Is.Not.Null);
+            Assert.That(response.Result.PendingPayoutValue, Is.Not.Null);
+            Assert.That(response.Result.MaxAcceptedPayout, Is.Not.Null);
+            Assert.That(response.Result.TotalPayoutReward, Is.Not.Null);
+            Assert.That(response.Result.Vote, Is.False);
+            Assert.That(response.Result.Tags, Is.Not.Null);
+            Assert.That(response.Result.Depth, Is.Not.Null);
+        }
+
+        [Test]
+        public void GetPostInfo_Invalid_Url()
+        {
+            // Arrange
+            var request = new PostsInfoRequest("/spam/@joseph.kalu/qweqeqwqweqweqwe");
+
+            // Act
+            var response = _api.GetPostInfo(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
         }
 
         private void AssertSuccessfulResult<T>(OperationResult<T> response)
