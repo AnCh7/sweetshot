@@ -65,9 +65,7 @@ namespace Sweetshot.Library.HttpClient
 
         public async Task<OperationResult<UserPostResponse>> GetUserPosts(UserPostsRequest request)
         {
-            var parameters = CreateSessionParameter(request.SessionId);
-
-            var response = await _gateway.Get($"/user/{request.Username}/posts/", parameters);
+            var response = await _gateway.Get($"/user/{request.Username}/posts/", new List<RequestParameter>());
             var errorResult = CheckErrors(response);
             return CreateResult<UserPostResponse>(response.Content, errorResult);
         }
@@ -114,14 +112,12 @@ namespace Sweetshot.Library.HttpClient
 
         public async Task<OperationResult<GetCommentResponse>> GetComments(GetCommentsRequest request)
         {
-            var parameters = CreateSessionParameter(request.SessionId);
-
-            var response = await _gateway.Get($"/post/{request.Url}/comments", parameters);
+            var response = await _gateway.Get($"/post/{request.Url}/comments", new List<RequestParameter>());
             var errorResult = CheckErrors(response);
             return CreateResult<GetCommentResponse>(response.Content, errorResult);
         }
 
-        public async Task<OperationResult<CreateCommentResponse>> CreateComment(CreateCommentsRequest request)
+        public async Task<OperationResult<CreateCommentResponse>> CreateComment(CreateCommentRequest request)
         {
             var parameters = CreateSessionParameter(request.SessionId);
             parameters.Add(new RequestParameter {Key = "application/json", Value = _jsonConverter.Serialize(request), Type = ParameterType.RequestBody});
@@ -180,9 +176,7 @@ namespace Sweetshot.Library.HttpClient
 
         public async Task<OperationResult<UserProfileResponse>> GetUserProfile(UserProfileRequest request)
         {
-            var parameters = CreateSessionParameter(request.SessionId);
-
-            var response = await _gateway.Get($"/user/{request.Username}", parameters);
+            var response = await _gateway.Get($"/user/{request.Username}", new List<RequestParameter>());
             var errorResult = CheckErrors(response);
             return CreateResult<UserProfileResponse>(response.Content, errorResult);
         }
@@ -217,12 +211,15 @@ namespace Sweetshot.Library.HttpClient
 
         private List<RequestParameter> CreateOffsetLimitParameters(string offset, int limit)
         {
-            var parameters = new List<RequestParameter>
+            var parameters = new List<RequestParameter>();
+            if (!string.IsNullOrWhiteSpace(offset))
             {
-                new RequestParameter {Key = "offset", Value = offset, Type = ParameterType.QueryString},
-                new RequestParameter {Key = "limit", Value = limit, Type = ParameterType.QueryString}
-            };
-
+                parameters.Add(new RequestParameter {Key = "offset", Value = offset, Type = ParameterType.QueryString});
+            }
+            if (limit >= 0)
+            {
+                parameters.Add(new RequestParameter {Key = "limit", Value = limit, Type = ParameterType.QueryString});
+            }
             return parameters;
         }
 

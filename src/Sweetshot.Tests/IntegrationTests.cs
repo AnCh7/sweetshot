@@ -14,7 +14,13 @@ namespace Sweetshot.Tests
     // test (assert) errors
     // remove throws in DTOs
     // check trello
-    // check chat
+
+    /*
+            Кука не нужна:
+            /post/(?P<url>.+)/info
+
+*/
+
     [TestFixture]
     public class IntegrationTests
     {
@@ -93,7 +99,7 @@ namespace Sweetshot.Tests
         public void UserPosts()
         {
             // Arrange
-            var request = new UserPostsRequest(_sessionId, Name);
+            var request = new UserPostsRequest(Name);
 
             // Act
             var response = _api.GetUserPosts(request).Result;
@@ -128,7 +134,7 @@ namespace Sweetshot.Tests
         public void UserPosts_Invalid_Username()
         {
             // Arrange
-            var request = new UserPostsRequest(_sessionId, Name + "x");
+            var request = new UserPostsRequest(Name + "x");
 
             // Act
             var response = _api.GetUserPosts(request).Result;
@@ -525,7 +531,7 @@ namespace Sweetshot.Tests
         public void Comments()
         {
             // Arrange
-            var request = new GetCommentsRequest(_sessionId, "@asduj/new-application-coming---");
+            var request = new GetCommentsRequest("@asduj/new-application-coming---");
 
             // Act
             var response = _api.GetComments(request).Result;
@@ -559,7 +565,7 @@ namespace Sweetshot.Tests
         public void Comments_Invalid_Url()
         {
             // Arrange
-            var request = new GetCommentsRequest(_sessionId, "qwe");
+            var request = new GetCommentsRequest("qwe");
 
             // Act
             var response = _api.GetComments(request).Result;
@@ -573,7 +579,7 @@ namespace Sweetshot.Tests
         public void Comments_Invalid_Url_But_Valid_User()
         {
             // Arrange
-            var request = new GetCommentsRequest(_sessionId, "@asduj/qweqweqweqw");
+            var request = new GetCommentsRequest("@asduj/qweqweqweqw");
 
             // Act
             var response = _api.GetComments(request).Result;
@@ -587,7 +593,7 @@ namespace Sweetshot.Tests
         public void CreateComment()
         {
             // Arrange
-            var request = new CreateCommentsRequest(_sessionId, "/spam/@joseph.kalu/test-post-127", "хипстеры наелись фалафели в коворкинге", "свитшот");
+            var request = new CreateCommentRequest(_sessionId, "/spam/@joseph.kalu/test-post-127", "хипстеры наелись фалафели в коворкинге", "свитшот");
 
             // Act
             var response = _api.CreateComment(request).Result;
@@ -601,7 +607,7 @@ namespace Sweetshot.Tests
         public void CreateComment_Wrong_Identifier()
         {
             // Arrange
-            var request = new CreateCommentsRequest(_sessionId, "@asduj/new-application-coming---", "хипстеры наелись фалафели в коворкинге", "свитшот");
+            var request = new CreateCommentRequest(_sessionId, "@asduj/new-application-coming---", "хипстеры наелись фалафели в коворкинге", "свитшот");
 
             // Act
             var response = _api.CreateComment(request).Result;
@@ -615,7 +621,7 @@ namespace Sweetshot.Tests
         public void CreateComment_Empty_Body()
         {
             // Arrange
-            var request = new CreateCommentsRequest(_sessionId, "/spam/@joseph.kalu/test-post-127", "", "свитшот");
+            var request = new CreateCommentRequest(_sessionId, "/spam/@joseph.kalu/test-post-127", "", "свитшот");
 
             // Act
             var response = _api.CreateComment(request).Result;
@@ -629,7 +635,7 @@ namespace Sweetshot.Tests
         public void CreateComment_Empty_Title()
         {
             // Arrange
-            var request = new CreateCommentsRequest(_sessionId, "/spam/@joseph.kalu/test-post-127", "свитшот", "");
+            var request = new CreateCommentRequest(_sessionId, "/spam/@joseph.kalu/test-post-127", "свитшот", "");
 
             // Act
             var response = _api.CreateComment(request).Result;
@@ -840,8 +846,8 @@ namespace Sweetshot.Tests
             // Assert
             AssertSuccessfulResult(response);
             Assert.That(response.Result, Is.Not.Null);
-            Assert.That(response.Result.Count > 0);
-            Assert.That(response.Result.TotalCount, Is.EqualTo(-1));
+            Assert.That(response.Result.Count, Is.EqualTo(limit));
+            Assert.That(response.Result.TotalCount > 0);
             Assert.That(response.Result.Results, Is.Not.Empty);
             Assert.That(response.Result.Results.Count, Is.EqualTo(limit));
         }
@@ -927,7 +933,7 @@ namespace Sweetshot.Tests
         public void UserProfile()
         {
             // Arrange
-            var request = new UserProfileRequest(_sessionId, Name);
+            var request = new UserProfileRequest(Name);
 
             // Act
             var response = _api.GetUserProfile(request).Result;
@@ -954,7 +960,7 @@ namespace Sweetshot.Tests
         public void UserProfile_Invalid_Username()
         {
             // Arrange
-            var request = new UserProfileRequest(_sessionId, "qweqweqwe");
+            var request = new UserProfileRequest("qweqweqwe");
 
             // Act
             var response = _api.GetUserProfile(request).Result;
