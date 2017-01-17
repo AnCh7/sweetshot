@@ -32,17 +32,13 @@ namespace Sweetshot.Library.Models.Requests
         New
     }
 
-    public class PostsRequest
+    public class PostsRequest : OffsetLimitFields
     {
-        public PostsRequest(PostType type, int limit = 0, string offset = "")
+        public PostsRequest(PostType type, string offset = "", int limit = 0) : base(offset, limit)
         {
             Type = type;
-            Limit = limit;
-            Offset = offset;
         }
 
         public PostType Type { get; private set; }
-        public int Limit { get; private set; }
-        public string Offset { get; private set; }
     }
 }

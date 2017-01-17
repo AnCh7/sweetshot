@@ -188,7 +188,7 @@ namespace Sweetshot.Tests
         {
             // Arrange
             const int limit = 5;
-            var request = new PostsRequest(PostType.Top, limit);
+            var request = new PostsRequest(PostType.Top, limit: limit);
 
             // Act
             var response = _api.GetPosts(request).Result;
@@ -199,25 +199,10 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        public void Posts_Top_Check_Limit_Negative()
-        {
-            // Arrange
-            const int defaultLimit = 10;
-            var request = new PostsRequest(PostType.Top, -10);
-
-            // Act
-            var response = _api.GetPosts(request).Result;
-
-            // Assert
-            AssertSuccessfulResult(response);
-            Assert.That(defaultLimit, Is.EqualTo(response.Result.Count));
-        }
-
-        [Test]
         public void Posts_Top_Check_Offset()
         {
             // Arrange
-            var request = new PostsRequest(PostType.Top, 3, "/life/@hanshotfirst/best-buddies-i-see-you");
+            var request = new PostsRequest(PostType.Top, "/life/@hanshotfirst/best-buddies-i-see-you", 3);
 
             // Act
             var response = _api.GetPosts(request).Result;
@@ -676,7 +661,7 @@ namespace Sweetshot.Tests
         public void Categories()
         {
             // Arrange
-            var request = new CategoriesRequest(_sessionId);
+            var request = new CategoriesRequest();
 
             // Act
             var response = _api.GetCategories(request).Result;
@@ -694,7 +679,7 @@ namespace Sweetshot.Tests
         public void Categories_Offset()
         {
             // Arrange
-            var request = new CategoriesRequest(_sessionId, "food");
+            var request = new CategoriesRequest("food");
 
             // Act
             var response = _api.GetCategories(request).Result;
@@ -709,27 +694,10 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        public void Categories_Offset_Empty()
-        {
-            // Arrange
-            var request = new CategoriesRequest(_sessionId, " ");
-
-            // Act
-            var response = _api.GetCategories(request).Result;
-
-            // Assert
-            AssertSuccessfulResult(response);
-            Assert.That(response.Result, Is.Not.Null);
-            Assert.That(response.Result.Count > 0);
-            Assert.That(response.Result.TotalCount, Is.EqualTo(-1));
-            Assert.That(response.Result.Results, Is.Not.Empty);
-        }
-
-        [Test]
         public void Categories_Offset_Not_Exisiting()
         {
             // Arrange
-            var request = new CategoriesRequest(_sessionId, "qweqweqwe");
+            var request = new CategoriesRequest("qweqweqwe");
 
             // Act
             var response = _api.GetCategories(request).Result;
@@ -747,7 +715,7 @@ namespace Sweetshot.Tests
         {
             // Arrange
             const int limit = 5;
-            var request = new CategoriesRequest(_sessionId, limit: limit);
+            var request = new CategoriesRequest(limit: limit);
 
             // Act
             var response = _api.GetCategories(request).Result;
@@ -762,30 +730,10 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        public void Categories_Limit_Negative()
-        {
-            // Arrange
-            const int limit = -5;
-            const int defaultLimit = 10;
-            var request = new CategoriesRequest(_sessionId, limit: limit);
-
-            // Act
-            var response = _api.GetCategories(request).Result;
-
-            // Assert
-            AssertSuccessfulResult(response);
-            Assert.That(response.Result, Is.Not.Null);
-            Assert.That(response.Result.Count > 0);
-            Assert.That(response.Result.TotalCount, Is.EqualTo(-1));
-            Assert.That(response.Result.Results, Is.Not.Empty);
-            Assert.That(response.Result.Results.Count, Is.EqualTo(defaultLimit));
-        }
-
-        [Test]
         public void Categories_Search()
         {
             // Arrange
-            var request = new SearchCategoriesRequest(_sessionId, "foo");
+            var request = new SearchCategoriesRequest("foo");
 
             // Act
             var response = _api.SearchCategories(request).Result;
@@ -803,7 +751,7 @@ namespace Sweetshot.Tests
         public void Categories_Search_Invalid_Query()
         {
             // Arrange
-            var request = new SearchCategoriesRequest(_sessionId, "qwerqwerqwerqwerqwerqwerqwerqwer");
+            var request = new SearchCategoriesRequest("qwerqwerqwerqwerqwerqwerqwerqwer");
 
             // Act
             var response = _api.SearchCategories(request).Result;
@@ -820,7 +768,7 @@ namespace Sweetshot.Tests
         public void Categories_Search_Short_Query()
         {
             // Arrange
-            var request = new SearchCategoriesRequest(_sessionId, "fo");
+            var request = new SearchCategoriesRequest("fo");
 
             // Act
             var response = _api.SearchCategories(request).Result;
@@ -831,10 +779,10 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        public void Categories_Search_Empty_Query()
+        public void Categories_Search_Empty_Query() 
         {
             // Arrange
-            var request = new SearchCategoriesRequest(_sessionId, "");
+            var request = new SearchCategoriesRequest(" ");
 
             // Act
             var response = _api.SearchCategories(request).Result;
@@ -842,6 +790,60 @@ namespace Sweetshot.Tests
             // Assert 
             AssertFailedResult(response);
             Assert.That(response.Errors.Contains("This field may not be blank."));
+        }
+
+        [Test]
+        public void Categories_Search_Offset()
+        {
+            // Arrange
+            var request = new SearchCategoriesRequest("life", "lifetime");
+
+            // Act
+            var response = _api.SearchCategories(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.That(response.Result, Is.Not.Null);
+            Assert.That(response.Result.Count > 0);
+            Assert.That(response.Result.TotalCount > 0);
+            Assert.That(response.Result.Results, Is.Not.Empty);
+            Assert.That(response.Result.Results.First().Name, Is.EqualTo("lifetime"));
+        }
+
+        [Test]
+        public void Categories_Search_Offset_Not_Exisiting()
+        {
+            // Arrange
+            var request = new SearchCategoriesRequest("life", "qweqweqwe");
+
+            // Act
+            var response = _api.SearchCategories(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.That(response.Result, Is.Not.Null);
+            Assert.That(response.Result.Count > 0);
+            Assert.That(response.Result.TotalCount, Is.EqualTo(-1));
+            Assert.That(response.Result.Results, Is.Not.Empty);
+        }
+
+        [Test]
+        public void Categories_Search_Limit()
+        {
+            // Arrange
+            const int limit = 5;
+            var request = new SearchCategoriesRequest("life", limit: limit);
+
+            // Act
+            var response = _api.SearchCategories(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.That(response.Result, Is.Not.Null);
+            Assert.That(response.Result.Count > 0);
+            Assert.That(response.Result.TotalCount, Is.EqualTo(-1));
+            Assert.That(response.Result.Results, Is.Not.Empty);
+            Assert.That(response.Result.Results.Count, Is.EqualTo(limit));
         }
 
         [Test]
@@ -966,7 +968,7 @@ namespace Sweetshot.Tests
         public void UserFriends_Following()
         {
             // Arrange
-            var request = new UserFriendsRequest(_sessionId, Name, FriendsType.Following);
+            var request = new UserFriendsRequest(Name, FriendsType.Following);
 
             // Act
             var response = _api.GetUserFriends(request).Result;
@@ -985,7 +987,7 @@ namespace Sweetshot.Tests
         public void UserFriends_Followers()
         {
             // Arrange
-            var request = new UserFriendsRequest(_sessionId, Name, FriendsType.Followers);
+            var request = new UserFriendsRequest(Name, FriendsType.Followers);
 
             // Act
             var response = _api.GetUserFriends(request).Result;
@@ -1002,7 +1004,7 @@ namespace Sweetshot.Tests
         public void UserFriends_Followers_Invalid_Username()
         {
             // Arrange
-            var request = new UserFriendsRequest(_sessionId, Name + "x", FriendsType.Followers);
+            var request = new UserFriendsRequest(Name + "x", FriendsType.Followers);
 
             // Act
             var response = _api.GetUserFriends(request).Result;
@@ -1017,7 +1019,7 @@ namespace Sweetshot.Tests
         public void UserFriends_Followers_Offset()
         {
             // Arrange
-            var request = new UserFriendsRequest(_sessionId, Name, FriendsType.Followers, "vivianupman");
+            var request = new UserFriendsRequest(Name, FriendsType.Followers, "vivianupman");
 
             // Act
             var response = _api.GetUserFriends(request).Result;
@@ -1035,7 +1037,7 @@ namespace Sweetshot.Tests
         public void UserFriends_Followers_Limit()
         {
             // Arrange
-            var request = new UserFriendsRequest(_sessionId, Name, FriendsType.Followers, limit: 5);
+            var request = new UserFriendsRequest(Name, FriendsType.Followers, limit: 5);
 
             // Act
             var response = _api.GetUserFriends(request).Result;
@@ -1046,24 +1048,6 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.Offset, Is.Not.Null);
             Assert.That(response.Result.Results, Is.Not.Empty);
             Assert.That(response.Result.Results.Count == 5);
-        }
-
-        [Test]
-        public void UserFriends_Followers_Limit_Negative()
-        {
-            // Arrange
-            const int defaultLimit = 50;
-            var request = new UserFriendsRequest(_sessionId, Name, FriendsType.Followers, limit: -5);
-
-            // Act
-            var response = _api.GetUserFriends(request).Result;
-
-            // Assert
-            AssertSuccessfulResult(response);
-            Assert.That(response.Result.Count, Is.Not.Null);
-            Assert.That(response.Result.Offset, Is.Not.Null);
-            Assert.That(response.Result.Results, Is.Not.Empty);
-            Assert.That(response.Result.Results.Count, Is.EqualTo(defaultLimit));
         }
 
         [Test]
