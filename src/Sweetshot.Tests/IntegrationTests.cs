@@ -16,7 +16,6 @@ namespace Sweetshot.Tests
     // check trello
     // add / check /post/(?P<url>.+)/info (no auth)
 
-
     [TestFixture]
     public class IntegrationTests
     {
