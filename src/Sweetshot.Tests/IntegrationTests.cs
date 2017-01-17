@@ -14,12 +14,7 @@ namespace Sweetshot.Tests
     // test (assert) errors
     // remove throws in DTOs
     // check trello
-
-    /*
-            Кука не нужна:
-            /post/(?P<url>.+)/info
-
-*/
+    // add / check /post/(?P<url>.+)/info (no auth)
 
     [TestFixture]
     public class IntegrationTests
