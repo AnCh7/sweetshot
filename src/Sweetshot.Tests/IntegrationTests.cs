@@ -12,6 +12,9 @@ namespace Sweetshot.Tests
     // test (assert) errors
     // remove throws in DTOs
     // {"detail":["Creating post is impossible. Please try 10 minutes later."]}
+    // invalid api url test
+    // nunit 2.6.4
+    // vs code setup - build / compile, run, unit tests 
 
     [TestFixture]
     public class IntegrationTests
