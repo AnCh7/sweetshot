@@ -17,11 +17,10 @@ namespace Sweetshot.Tests
 
     // vs code setup - run and debug, unit tests with debug 
     // vagrant or docker ?
-
     // requests refactoring
-
-    // Add documents (url mappings)
     // changes in user UserProfile
+    // Add documents (URL mappings)
+    // Linux proxy
 
     [TestFixture]
     public class IntegrationTests
@@ -143,30 +142,12 @@ namespace Sweetshot.Tests
             Assert.That(response.Errors.Contains("Cannot get posts for this username"));
         }
 
-        // TODO not working as expected
         [Test]
-        public void UserPosts_Offset()
+        public void UserPosts_Offset_Limit()
         {
             // Arrange
             var request = new UserPostsRequest(Name);
             request.Offset = "/cat1/@joseph.kalu/cat636203389144533548";
-
-            // Act
-            var response = _api.GetUserPosts(request).Result;
-
-            // Assert
-            AssertSuccessfulResult(response);
-            Assert.That(response.Result.Count, Is.Not.Null);
-            Assert.That(response.Result.Offset, Is.Not.Empty);
-            Assert.That(response.Result.Results, Is.Not.Empty);
-        }
-
-        // TODO not working as expected
-        [Test]
-        public void UserPosts_Limit()
-        {
-            // Arrange
-            var request = new UserPostsRequest(Name);
             request.Limit = 3;
 
             // Act
@@ -177,6 +158,9 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.Count, Is.Not.Null);
             Assert.That(response.Result.Offset, Is.Not.Empty);
             Assert.That(response.Result.Results, Is.Not.Empty);
+            Assert.That(response.Result.Results.First().Url, Is.Not.Empty);
+            Assert.That(request.Offset, Is.EqualTo(response.Result.Results.First().Url));
+            Assert.That(response.Result.Count, Is.EqualTo(request.Limit));
         }
 
         [Test]
@@ -195,30 +179,12 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.Results.First().Author, Is.Not.Empty);
         }
 
-        // TODO not working as expected
         [Test]
-        public void UserRecentPosts_Offset()
+        public void UserRecentPosts_Offset_Limit()
         {
             // Arrange
             var request = new UserRecentPostsRequest(_sessionId);
             request.Offset = "/health/@heiditravels/what-are-you-putting-on-your-face";
-
-            // Act
-            var response = _api.GetUserRecentPosts(request).Result;
-
-            // Assert
-            AssertSuccessfulResult(response);
-            Assert.That(response.Result.Count > 0);
-            Assert.That(response.Result.Results.First().Body, Is.Not.Empty);
-            Assert.That(response.Result.Results.First().Author, Is.Not.Empty);
-        }
-
-        // TODO not working as expected
-        [Test]
-        public void UserRecentPosts_Limit()
-        {
-            // Arrange
-            var request = new UserRecentPostsRequest(_sessionId);
             request.Limit = 3;
 
             // Act
@@ -229,6 +195,9 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.Count > 0);
             Assert.That(response.Result.Results.First().Body, Is.Not.Empty);
             Assert.That(response.Result.Results.First().Author, Is.Not.Empty);
+            Assert.That(response.Result.Results.First().Url, Is.Not.Empty);
+            Assert.That(request.Offset, Is.EqualTo(response.Result.Results.First().Url));
+            Assert.That(response.Result.Count, Is.EqualTo(request.Limit));
         }
 
         [Test]
@@ -261,27 +230,11 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        public void Posts_Top_Check_Limit()
-        {
-            // Arrange
-            const int limit = 5;
-            var request = new PostsRequest(PostType.Top);
-            request.Limit = limit;
-
-            // Act
-            var response = _api.GetPosts(request).Result;
-
-            // Assert
-            AssertSuccessfulResult(response);
-            Assert.That(limit, Is.EqualTo(response.Result.Count));
-        }
-
-        [Test]
-        public void Posts_Top_Check_Offset()
+        public void Posts_Top_Offset_Limit()
         {
             // Arrange
             var request = new PostsRequest(PostType.Top);
-            request.Offset = "/life/@hanshotfirst/best-buddies-i-see-you";
+            request.Offset = "/steemit/@heiditravels/elevate-your-social-media-experience-with-steemit";
             request.Limit = 3;
 
             // Act
@@ -289,9 +242,10 @@ namespace Sweetshot.Tests
 
             // Assert
             AssertSuccessfulResult(response);
-            Assert.That(response.Result.Offset, Is.Empty);
-            Assert.That(response.Result.Count, Is.EqualTo(0));
-            Assert.That(response.Result.Results.Count, Is.EqualTo(0));
+            Assert.That(response.Result.Offset, Is.Not.Empty);
+            Assert.That(response.Result.Count > 0);
+            Assert.That(request.Limit, Is.EqualTo(response.Result.Count));
+            Assert.That(response.Result.Results.First().Url, Is.EqualTo(request.Offset));
         }
 
         [Test]
