@@ -224,7 +224,7 @@ namespace Sweetshot.Library.HttpClient
             {
                 parameters.Add(new RequestParameter {Key = "offset", Value = offset, Type = ParameterType.QueryString});
             }
-            if (limit >= 0)
+            if (limit > 0)
             {
                 parameters.Add(new RequestParameter {Key = "limit", Value = limit, Type = ParameterType.QueryString});
             }
