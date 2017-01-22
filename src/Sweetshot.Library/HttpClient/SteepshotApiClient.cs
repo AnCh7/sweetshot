@@ -33,7 +33,6 @@ namespace Sweetshot.Library.HttpClient
         }
 
         /// <summary>
-        ///     TODO
         /// </summary>
         public async Task<OperationResult<LoginResponse>> Register(RegisterRequest request)
         {
@@ -94,11 +93,11 @@ namespace Sweetshot.Library.HttpClient
         /// </summary>
         public async Task<OperationResult<UserPostResponse>> GetUserRecentPosts(UserRecentPostsRequest request)
         {
-            //TODO Refactor this
-            var parameters = CreateOffsetLimitParameters(request.Offset, request.Limit);
-            parameters.Add(new RequestParameter {Key = "sessionid", Value = request.SessionId, Type = ParameterType.Cookie});
+            var parameters = CreateSessionParameter(request.SessionId);
+            var parameters2 = CreateOffsetLimitParameters(request.Offset, request.Limit);
+            parameters2.AddRange(parameters);
 
-            var response = await _gateway.Get("/recent", parameters);
+            var response = await _gateway.Get("/recent", parameters2);
             var errorResult = CheckErrors(response);
             return CreateResult<UserPostResponse>(response.Content, errorResult);
         }
@@ -269,8 +268,9 @@ namespace Sweetshot.Library.HttpClient
             return CreateResult<LogoutResponse>(response.Content, errorResult);
         }
 
-        // TODO
         /// <summary>
+        ///     Examples: 
+        ///     1) GET https://steepshot.org/api/v1/user/joseph.kalu HTTP/1.1
         /// </summary>
         public async Task<OperationResult<UserProfileResponse>> GetUserProfile(UserProfileRequest request)
         {
@@ -279,8 +279,11 @@ namespace Sweetshot.Library.HttpClient
             return CreateResult<UserProfileResponse>(response.Content, errorResult);
         }
 
-        // TODO
         /// <summary>
+        ///     Examples: 
+        ///     1) GET https://steepshot.org/api/v1/user/joseph.kalu/following HTTP/1.1
+        ///     2) GET https://steepshot.org/api/v1/user/joseph.kalu/followers HTTP/1.1
+        ///     3) GET https://steepshot.org/api/v1/user/joseph.kalu/followers?offset=vivianupman&limit=5 HTTP/1.1
         /// </summary>
         public async Task<OperationResult<UserFriendsResponse>> GetUserFriends(UserFriendsRequest request)
         {

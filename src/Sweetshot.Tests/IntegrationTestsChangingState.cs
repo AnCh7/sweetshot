@@ -26,7 +26,6 @@ namespace Sweetshot.Tests
             _sessionId = _api.Login(request).Result.Result.SessionId;
         }
 
-        // TODO add more tests
         [Test]
         [Order(0)]
         public void Upload()
@@ -44,6 +43,24 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.Body, Is.Not.Empty);
             Assert.That(response.Result.Title, Is.Not.Empty);
             Assert.That(response.Result.Tags, Is.Not.Empty);
+        }
+
+        [Test]
+        public void Upload_Throttling()
+        {
+            // Arrange
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\cat.jpg");
+            var file = File.ReadAllBytes(path);
+            var request = new UploadImageRequest(_sessionId, "cat" + DateTime.UtcNow.Ticks, file, "cat1", "cat2", "cat3", "cat4");
+
+            // Act
+            var response = _api.Upload(request).Result;
+            var response2 = _api.Upload(request).Result;
+            var response3 = _api.Upload(request).Result;
+
+            // Assert
+            AssertFailedResult(response3);
+            Assert.That(response3.Errors.Contains("Creating post is impossible. Please try 10 minutes later."));
         }
 
         [Test]
@@ -166,7 +183,6 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.Message, Is.EqualTo("User is logged out"));
         }
 
-        // TODO Need to create a profile and test it
         [Ignore("Ignoring")]
         [Order(7)]
         public void Register()
@@ -214,6 +230,14 @@ namespace Sweetshot.Tests
             Assert.That(response.Success, Is.True);
             Assert.That(response.Result, Is.Not.Null);
             Assert.That(response.Errors, Is.Empty);
+        }
+
+        private void AssertFailedResult<T>(OperationResult<T> response)
+        {
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response.Success, Is.False);
+            Assert.That(response.Result, Is.Null);
+            Assert.That(response.Errors, Is.Not.Empty);
         }
     }
 }

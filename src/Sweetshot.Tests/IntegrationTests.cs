@@ -1,4 +1,6 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using Sweetshot.Library.HttpClient;
@@ -10,17 +12,11 @@ namespace Sweetshot.Tests
     // check all tests
     // add more tests
     // test (assert) errors
-
-    // remove throws in DTOs
-    // {"detail":["Creating post is impossible. Please try 10 minutes later."]}
-    // invalid api url test
+    // Register - tests, request examples
 
     // vs code setup - run and debug, unit tests with debug 
     // vagrant or docker ?
-    // requests refactoring
-    // changes in user UserProfile
-    // Add documents (URL mappings)
-    // Linux proxy
+    // linux proxy
 
     [TestFixture]
     public class IntegrationTests
@@ -48,7 +44,7 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.SessionId, Is.Not.Empty);
 
             // Setup
-            _sessionId = _api.Login(request).Result.Result.SessionId;
+            _sessionId = response.Result.SessionId;
         }
 
         [Test]
@@ -147,7 +143,7 @@ namespace Sweetshot.Tests
         {
             // Arrange
             var request = new UserPostsRequest(Name);
-            request.Offset = "cat1/@joseph.kalu/cat636203389144533548";
+            request.Offset = "/cat1/@joseph.kalu/cat636203389144533548";
             request.Limit = 3;
 
             // Act
@@ -159,7 +155,7 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.Offset, Is.Not.Empty);
             Assert.That(response.Result.Results, Is.Not.Empty);
             Assert.That(response.Result.Results.First().Url, Is.Not.Empty);
-            Assert.That(request.Offset, Is.EqualTo("/" + response.Result.Results.First().Url));
+            Assert.That(response.Result.Results.First().Url, Is.EqualTo(request.Offset));
             Assert.That(response.Result.Count, Is.EqualTo(request.Limit));
         }
 
@@ -184,7 +180,7 @@ namespace Sweetshot.Tests
         {
             // Arrange
             var request = new UserRecentPostsRequest(_sessionId);
-            request.Offset = "health/@heiditravels/what-are-you-putting-on-your-face";
+            request.Offset = _api.GetUserRecentPosts(request).Result.Result.Results.First().Url;
             request.Limit = 3;
 
             // Act
@@ -196,7 +192,7 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.Results.First().Body, Is.Not.Empty);
             Assert.That(response.Result.Results.First().Author, Is.Not.Empty);
             Assert.That(response.Result.Results.First().Url, Is.Not.Empty);
-            Assert.That(request.Offset, Is.EqualTo("/" + response.Result.Results.First().Url));
+            Assert.That(response.Result.Results.First().Url, Is.EqualTo(request.Offset));
             Assert.That(response.Result.Count, Is.EqualTo(request.Limit));
         }
 
@@ -234,7 +230,7 @@ namespace Sweetshot.Tests
         {
             // Arrange
             var request = new PostsRequest(PostType.Top);
-            request.Offset = "steemit/@heiditravels/elevate-your-social-media-experience-with-steemit";
+            request.Offset = _api.GetPosts(request).Result.Result.Results.First().Url;
             request.Limit = 3;
 
             // Act
@@ -797,6 +793,11 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.ProfileImage, Is.Not.Empty);
             Assert.That(response.Result.HasFollowed, Is.Not.Null);
             Assert.That(response.Result.EstimatedBalance, Is.Not.Null);
+            Assert.That(response.Result.Created, Is.Not.Null);
+            Assert.That(response.Result.Name, Is.Not.Empty);
+            Assert.That(response.Result.About, Is.Not.Empty);
+            Assert.That(response.Result.Location, Is.Not.Empty);
+            Assert.That(response.Result.WebSite, Is.Not.Empty);
         }
 
         [Test]
@@ -827,8 +828,8 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.Count, Is.Not.Null);
             Assert.That(response.Result.Offset, Is.Not.Empty);
             Assert.That(response.Result.Results, Is.Not.Empty);
-            Assert.That(response.Result.Results.First().Author, Is.Not.Empty);
-            Assert.That(response.Result.Results.First().Avatar, Is.Not.Empty);
+            Assert.That(response.Result.Results.First().Author, Is.Not.Null);
+            Assert.That(response.Result.Results.First().Avatar, Is.Not.Null);
             Assert.That(response.Result.Results.First().Reputation, Is.Not.Null);
         }
 
@@ -865,11 +866,12 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        public void UserFriends_Followers_Offset()
+        public void UserFriends_Followers_Offset_Limit()
         {
             // Arrange
             var request = new UserFriendsRequest(Name, FriendsType.Followers);
             request.Offset = "vivianupman";
+            request.Limit = 5;
 
             // Act
             var response = _api.GetUserFriends(request).Result;
@@ -881,23 +883,6 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.Results, Is.Not.Empty);
             Assert.That(response.Result.Results, Is.Not.Empty);
             Assert.That(response.Result.Results.First().Author, Is.EqualTo("vivianupman"));
-        }
-
-        [Test]
-        public void UserFriends_Followers_Limit()
-        {
-            // Arrange
-            var request = new UserFriendsRequest(Name, FriendsType.Followers);
-            request.Limit = 5;
-
-            // Act
-            var response = _api.GetUserFriends(request).Result;
-
-            // Assert
-            AssertSuccessfulResult(response);
-            Assert.That(response.Result.Count, Is.Not.Null);
-            Assert.That(response.Result.Offset, Is.Not.Null);
-            Assert.That(response.Result.Results, Is.Not.Empty);
             Assert.That(response.Result.Results.Count == 5);
         }
 
@@ -957,6 +942,54 @@ namespace Sweetshot.Tests
             // Assert
             AssertFailedResult(response);
             Assert.That(response.Errors.Contains("Wrong identifier."));
+        }
+
+        [Test]
+        public void Upload_Empty_Title()
+        {
+            // Arrange
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\cat.jpg");
+            var file = File.ReadAllBytes(path);
+            var request = new UploadImageRequest(_sessionId, "", file, "cat1", "cat2", "cat3", "cat4");
+
+            // Act
+            var response = _api.Upload(request).Result;
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.That(response.Errors.Contains("This field may not be blank."));
+        }
+
+        [Test]
+        public void Upload_Tags_Less_Than_1()
+        {
+            // Arrange
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\cat.jpg");
+            var file = File.ReadAllBytes(path);
+            var request = new UploadImageRequest(_sessionId, "cat", file);
+
+            // Act
+            var response = _api.Upload(request).Result;
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.That(response.Errors.Contains("The number of tags should be between 1 and 4."));
+        }
+
+        [Test]
+        public void Upload_Tags_Greater_Than_4()
+        {
+            // Arrange
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\cat.jpg");
+            var file = File.ReadAllBytes(path);
+            var request = new UploadImageRequest(_sessionId, "cat", file, "cat1", "cat2", "cat3", "cat4", "cat5");
+
+            // Act
+            var response = _api.Upload(request).Result;
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.That(response.Errors.Contains("The number of tags should be between 1 and 4."));
         }
 
         private void AssertSuccessfulResult<T>(OperationResult<T> response)
