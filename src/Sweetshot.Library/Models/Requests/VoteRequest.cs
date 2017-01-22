@@ -27,6 +27,7 @@ namespace Sweetshot.Library.Models.Requests
         [JsonProperty(PropertyName = "identifier")]
         public string Identifier { get; private set; }
 
+        [JsonIgnore]
         public VoteType Type { get; private set; }
     }
 }

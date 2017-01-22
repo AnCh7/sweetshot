@@ -26,6 +26,7 @@ namespace Sweetshot.Tests
             _sessionId = _api.Login(request).Result.Result.SessionId;
         }
 
+        // TODO add more tests
         [Test]
         [Order(0)]
         public void Upload()

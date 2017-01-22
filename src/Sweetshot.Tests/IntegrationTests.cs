@@ -147,7 +147,7 @@ namespace Sweetshot.Tests
         {
             // Arrange
             var request = new UserPostsRequest(Name);
-            request.Offset = "/cat1/@joseph.kalu/cat636203389144533548";
+            request.Offset = "cat1/@joseph.kalu/cat636203389144533548";
             request.Limit = 3;
 
             // Act
@@ -159,7 +159,7 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.Offset, Is.Not.Empty);
             Assert.That(response.Result.Results, Is.Not.Empty);
             Assert.That(response.Result.Results.First().Url, Is.Not.Empty);
-            Assert.That(request.Offset, Is.EqualTo(response.Result.Results.First().Url));
+            Assert.That(request.Offset, Is.EqualTo("/" + response.Result.Results.First().Url));
             Assert.That(response.Result.Count, Is.EqualTo(request.Limit));
         }
 
@@ -184,7 +184,7 @@ namespace Sweetshot.Tests
         {
             // Arrange
             var request = new UserRecentPostsRequest(_sessionId);
-            request.Offset = "/health/@heiditravels/what-are-you-putting-on-your-face";
+            request.Offset = "health/@heiditravels/what-are-you-putting-on-your-face";
             request.Limit = 3;
 
             // Act
@@ -196,7 +196,7 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.Results.First().Body, Is.Not.Empty);
             Assert.That(response.Result.Results.First().Author, Is.Not.Empty);
             Assert.That(response.Result.Results.First().Url, Is.Not.Empty);
-            Assert.That(request.Offset, Is.EqualTo(response.Result.Results.First().Url));
+            Assert.That(request.Offset, Is.EqualTo("/" + response.Result.Results.First().Url));
             Assert.That(response.Result.Count, Is.EqualTo(request.Limit));
         }
 
@@ -234,7 +234,7 @@ namespace Sweetshot.Tests
         {
             // Arrange
             var request = new PostsRequest(PostType.Top);
-            request.Offset = "/steemit/@heiditravels/elevate-your-social-media-experience-with-steemit";
+            request.Offset = "steemit/@heiditravels/elevate-your-social-media-experience-with-steemit";
             request.Limit = 3;
 
             // Act
@@ -364,7 +364,7 @@ namespace Sweetshot.Tests
         public void Vote_Up_Already_Voted()
         {
             // Arrange
-            var request = new VoteRequest(_sessionId, true, "/spam/@joseph.kalu/test-post-tue-jan--3-170111-2017");
+            var request = new VoteRequest(_sessionId, true, "spam/@joseph.kalu/test-post-tue-jan--3-170111-2017");
 
             // Act
             var response = _api.Vote(request).Result;
@@ -378,7 +378,7 @@ namespace Sweetshot.Tests
         public void Vote_Down_Already_Voted()
         {
             // Arrange
-            var request = new VoteRequest(_sessionId, false, "/spam/@joseph.kalu/test-post-tue-jan--3-170111-2017");
+            var request = new VoteRequest(_sessionId, false, "spam/@joseph.kalu/test-post-tue-jan--3-170111-2017");
 
             // Act
             var response = _api.Vote(request).Result;
@@ -420,7 +420,7 @@ namespace Sweetshot.Tests
         public void Vote_Invalid_Identifier3()
         {
             // Arrange
-            var request = new VoteRequest(_sessionId, true, "/qwe/qwe");
+            var request = new VoteRequest(_sessionId, true, "qwe/qwe");
 
             // Act
             var response = _api.Vote(request).Result;
@@ -434,7 +434,7 @@ namespace Sweetshot.Tests
         public void Vote_Invalid_Identifier4()
         {
             // Arrange
-            var request = new VoteRequest(_sessionId, true, "/qwe/@qwe");
+            var request = new VoteRequest(_sessionId, true, "qwe/@qwe");
 
             // Act
             var response = _api.Vote(request).Result;
@@ -442,20 +442,6 @@ namespace Sweetshot.Tests
             // Assert
             AssertFailedResult(response);
             Assert.That(response.Errors.Contains("Incorrect identifier"));
-        }
-
-        [Test]
-        public void Vote_Invalid_Identifier5()
-        {
-            // Arrange
-            var request = new VoteRequest(_sessionId, true, "/qwe/@qwe/");
-
-            // Act
-            var response = _api.Vote(request).Result;
-
-            // Assert
-            AssertFailedResult(response);
-            Assert.That(response.Errors.Contains("You have used the maximum number of vote changes on this comment."));
         }
 
         [Test]
@@ -552,7 +538,7 @@ namespace Sweetshot.Tests
         public void CreateComment_Empty_Body()
         {
             // Arrange
-            var request = new CreateCommentRequest(_sessionId, "/spam/@joseph.kalu/test-post-127", "", "test_title");
+            var request = new CreateCommentRequest(_sessionId, "spam/@joseph.kalu/test-post-127", "", "test_title");
 
             // Act
             var response = _api.CreateComment(request).Result;
@@ -566,7 +552,7 @@ namespace Sweetshot.Tests
         public void CreateComment_Empty_Title()
         {
             // Arrange
-            var request = new CreateCommentRequest(_sessionId, "/spam/@joseph.kalu/test-post-127", "test_body", "");
+            var request = new CreateCommentRequest(_sessionId, "spam/@joseph.kalu/test-post-127", "test_body", "");
 
             // Act
             var response = _api.CreateComment(request).Result;
@@ -587,7 +573,6 @@ namespace Sweetshot.Tests
 
             // Assert
             AssertSuccessfulResult(response);
-            Assert.That(response.Result, Is.Not.Null);
             Assert.That(response.Result.Count > 0);
             Assert.That(response.Result.TotalCount, Is.EqualTo(-1));
             Assert.That(response.Result.Results, Is.Not.Empty);
@@ -595,20 +580,24 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        public void Categories_Offset()
+        public void Categories_Offset_Limit()
         {
             // Arrange
+            const int limit = 5;
             var request = new CategoriesRequest();
             request.Offset = "food";
+            request.Limit = limit;
 
             // Act
             var response = _api.GetCategories(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
-            Assert.That(response.Result, Is.Not.Null);
+
             Assert.That(response.Result.Count > 0);
             Assert.That(response.Result.TotalCount, Is.EqualTo(-1));
+            Assert.That(response.Result.Results.Count, Is.EqualTo(limit));
+
             Assert.That(response.Result.Results, Is.Not.Empty);
             Assert.That(response.Result.Results.First().Name, Is.EqualTo("food"));
         }
@@ -625,30 +614,9 @@ namespace Sweetshot.Tests
 
             // Assert
             AssertSuccessfulResult(response);
-            Assert.That(response.Result, Is.Not.Null);
             Assert.That(response.Result.Count > 0);
             Assert.That(response.Result.TotalCount, Is.EqualTo(-1));
             Assert.That(response.Result.Results, Is.Not.Empty);
-        }
-
-        [Test]
-        public void Categories_Limit()
-        {
-            // Arrange
-            const int limit = 5;
-            var request = new CategoriesRequest();
-            request.Limit = limit;
-
-            // Act
-            var response = _api.GetCategories(request).Result;
-
-            // Assert
-            AssertSuccessfulResult(response);
-            Assert.That(response.Result, Is.Not.Null);
-            Assert.That(response.Result.Count > 0);
-            Assert.That(response.Result.TotalCount, Is.EqualTo(-1));
-            Assert.That(response.Result.Results, Is.Not.Empty);
-            Assert.That(response.Result.Results.Count, Is.EqualTo(limit));
         }
 
         [Test]
@@ -662,7 +630,6 @@ namespace Sweetshot.Tests
 
             // Assert
             AssertSuccessfulResult(response);
-            Assert.That(response.Result, Is.Not.Null);
             Assert.That(response.Result.Count > 0);
             Assert.That(response.Result.TotalCount >= 0);
             Assert.That(response.Result.Results, Is.Not.Empty);
@@ -680,7 +647,6 @@ namespace Sweetshot.Tests
 
             // Assert
             AssertSuccessfulResult(response);
-            Assert.That(response.Result, Is.Not.Null);
             Assert.That(response.Result.Results, Is.Empty);
             Assert.That(response.Result.Count, Is.EqualTo(0));
             Assert.That(response.Result.TotalCount, Is.EqualTo(0));
@@ -715,41 +681,24 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        public void Categories_Search_Test_Limit()
+        public void Categories_Search_Offset_Limit()
         {
             // Arrange
-            const int defaultLimit = 50;
-            var request = new SearchCategoriesRequest("steem");
+            const int limit = 5;
+            var request = new SearchCategoriesRequest("lif");
+            request.Offset = "life";
+            request.Limit = limit;
 
             // Act
             var response = _api.SearchCategories(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
-            Assert.That(response.Result, Is.Not.Null);
-            Assert.That(response.Result.Count, Is.EqualTo(defaultLimit));
-            Assert.That(response.Result.TotalCount >= defaultLimit);
+            Assert.That(response.Result.Count, Is.EqualTo(limit));
+            Assert.That(response.Result.Results.Count, Is.EqualTo(limit));
+            Assert.That(response.Result.TotalCount > limit);
             Assert.That(response.Result.Results, Is.Not.Empty);
-            Assert.That(response.Result.Results.First().Name, Is.Not.Empty);
-        }
-
-        [Test]
-        public void Categories_Search_Offset()
-        {
-            // Arrange
-            var request = new SearchCategoriesRequest("life");
-            request.Offset = "lifetime";
-
-            // Act
-            var response = _api.SearchCategories(request).Result;
-
-            // Assert
-            AssertSuccessfulResult(response);
-            Assert.That(response.Result, Is.Not.Null);
-            Assert.That(response.Result.Count > 0);
-            Assert.That(response.Result.TotalCount > 0);
-            Assert.That(response.Result.Results, Is.Not.Empty);
-            Assert.That(response.Result.Results.First().Name, Is.EqualTo("lifetime"));
+            Assert.That(response.Result.Results.First().Name, Is.EqualTo("life"));
         }
 
         [Test]
@@ -765,26 +714,6 @@ namespace Sweetshot.Tests
             // Assert
             AssertFailedResult(response);
             Assert.That(response.Errors.Contains("Category used for offset was not found"));
-        }
-
-        [Test]
-        public void Categories_Search_Limit()
-        {
-            // Arrange
-            const int limit = 5;
-            var request = new SearchCategoriesRequest("life");
-            request.Limit = limit;
-
-            // Act
-            var response = _api.SearchCategories(request).Result;
-
-            // Assert
-            AssertSuccessfulResult(response);
-            Assert.That(response.Result, Is.Not.Null);
-            Assert.That(response.Result.Count, Is.EqualTo(limit));
-            Assert.That(response.Result.TotalCount > 0);
-            Assert.That(response.Result.Results, Is.Not.Empty);
-            Assert.That(response.Result.Results.Count, Is.EqualTo(limit));
         }
 
         [Test]
@@ -988,7 +917,7 @@ namespace Sweetshot.Tests
         public void GetPostInfo()
         {
             // Arrange
-            var request = new PostsInfoRequest("/spam/@joseph.kalu/test-post-127");
+            var request = new PostsInfoRequest("spam/@joseph.kalu/test-post-127");
 
             // Act
             var response = _api.GetPostInfo(request).Result;
@@ -1020,7 +949,7 @@ namespace Sweetshot.Tests
         public void GetPostInfo_Invalid_Url()
         {
             // Arrange
-            var request = new PostsInfoRequest("/spam/@joseph.kalu/qweqeqwqweqweqwe");
+            var request = new PostsInfoRequest("spam/@joseph.kalu/qweqeqwqweqweqwe");
 
             // Act
             var response = _api.GetPostInfo(request).Result;

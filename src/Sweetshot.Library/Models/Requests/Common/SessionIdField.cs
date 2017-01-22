@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json;
 
 namespace Sweetshot.Library.Models.Requests.Common
 {
@@ -14,6 +15,7 @@ namespace Sweetshot.Library.Models.Requests.Common
             SessionId = sessionId;
         }
 
+        [JsonIgnore]
         public string SessionId { get; private set; }
     }
 }
