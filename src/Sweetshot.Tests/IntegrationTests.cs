@@ -14,7 +14,6 @@ namespace Sweetshot.Tests
     // test (assert) errors
     // Register - tests, request examples
 
-    // vs code setup - run and debug, unit tests with debug 
     // vagrant or docker ?
     // linux proxy
 
