@@ -28,7 +28,8 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        public void Upload()
+        [Order(0)]
+        public void New_Post()
         {
             // Arrange
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\cat.jpg");
@@ -45,27 +46,12 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.Tags, Is.Not.Empty);
         }
 
-        [Ignore("Ingoring...")]
-        public void Upload_Throttling()
-        {
-            // Arrange
-            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\cat.jpg");
-            var file = File.ReadAllBytes(path);
-            var request = new UploadImageRequest(_sessionId, "cat" + DateTime.UtcNow.Ticks, file, "cat1", "cat2", "cat3", "cat4");
-
-            // Act
-            var response = _api.Upload(request).Result;
-            var response2 = _api.Upload(request).Result;
-            var response3 = _api.Upload(request).Result;
-
-            // Assert
-            AssertFailedResult(response3);
-            Assert.That(response3.Errors.Contains("Creating post is impossible. Please try 10 minutes later."));
-        }
-
         [Test]
+        [Order(1)]
         public void CreateComment()
         {
+            Thread.Sleep(TimeSpan.FromSeconds(5));
+
             var userPostsRequest = new UserPostsRequest(Name);
             var lastPost = _api.GetUserPosts(userPostsRequest).Result.Result.Results.First();
 
@@ -82,19 +68,20 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        public void Vote_Up()
+        [Order(2)]
+        public void Vote_Up_Post()
         {
-            // Prepare
-            var userPostsRequest = new UserPostsRequest(Name);
-            var userPostsResponse = _api.GetUserPosts(userPostsRequest).Result;
-            AssertSuccessfulResult(userPostsResponse);
-            Assert.That(userPostsResponse.Result.Count, Is.Not.Null);
-            Assert.That(userPostsResponse.Result.Offset, Is.Not.Empty);
-            Assert.That(userPostsResponse.Result.Results, Is.Not.Empty);
+            // Create new post
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\cat.jpg");
+            var createPostRequest = new UploadImageRequest(_sessionId, "cat" + DateTime.UtcNow.Ticks, File.ReadAllBytes(path), "cat1", "cat2", "cat3", "cat4");
+            var createPostResponse = _api.Upload(createPostRequest).Result;
+
+            // Check new post
+            var userPostsResponse = _api.GetUserPosts(new UserPostsRequest(Name)).Result;
+            Assert.That(createPostResponse.Result.Title, Is.EqualTo(userPostsResponse.Result.Results.First().Title));
 
             // Arrange
-            var url = userPostsResponse.Result.Results.First().Url;
-            var request = new VoteRequest(_sessionId, true, url);
+            var request = new VoteRequest(_sessionId, true, userPostsResponse.Result.Results.First().Url);
 
             // Act
             var response = _api.Vote(request).Result;
@@ -105,24 +92,28 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.NewTotalPayoutReward, Is.Not.Null);
             Assert.That(response.Result.Message, Is.EqualTo("Upvoted"));
             Assert.That(response.Result.NewTotalPayoutReward, Is.Not.Null);
+
+            // Check if it is was voted
+            Thread.Sleep(TimeSpan.FromSeconds(5));
+            var userPostsResponse2 = _api.GetUserPosts(new UserPostsRequest(Name) {SessionId = _sessionId}).Result;
+            Assert.That(userPostsResponse2.Result.Results.First().Vote, Is.True);
         }
 
         [Test]
-        public void Vote_Down()
+        [Order(3)]
+        public void Vote_Down_Post()
         {
-            // Prepare
-            var userPostsRequest = new UserPostsRequest(Name);
-            var userPostsResponse = _api.GetUserPosts(userPostsRequest).Result;
-            AssertSuccessfulResult(userPostsResponse);
-            Assert.That(userPostsResponse.Result.Count, Is.Not.Null);
-            Assert.That(userPostsResponse.Result.Offset, Is.Not.Empty);
-            Assert.That(userPostsResponse.Result.Results, Is.Not.Empty);
+            // Create new post
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\cat.jpg");
+            var createPostRequest = new UploadImageRequest(_sessionId, "cat" + DateTime.UtcNow.Ticks, File.ReadAllBytes(path), "cat1", "cat2", "cat3", "cat4");
+            var createPostResponse = _api.Upload(createPostRequest).Result;
+
+            // Check new post
+            var userPostsResponse = _api.GetUserPosts(new UserPostsRequest(Name)).Result;
+            Assert.That(createPostResponse.Result.Title, Is.EqualTo(userPostsResponse.Result.Results.First().Title));
 
             // Arrange
-            var url = userPostsResponse.Result.Results.First().Url;
-
-            // Arrange
-            var request = new VoteRequest(_sessionId, false, url);
+            var request = new VoteRequest(_sessionId, false, userPostsResponse.Result.Results.First().Url);
 
             // Act
             var response = _api.Vote(request).Result;
@@ -133,36 +124,32 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.NewTotalPayoutReward, Is.Not.Null);
             Assert.That(response.Result.Message, Is.EqualTo("Downvoted"));
             Assert.That(response.Result.NewTotalPayoutReward, Is.Not.Null);
+
+            // Check if it is was voted
+            Thread.Sleep(TimeSpan.FromSeconds(5));
+            var userPostsResponse2 = _api.GetUserPosts(new UserPostsRequest(Name) {SessionId = _sessionId}).Result;
+            Assert.That(userPostsResponse2.Result.Results.First().Vote, Is.False);
         }
 
         [Test]
+        [Order(4)]
         public void Vote_Up_Comment()
         {
             // Get latest posts
-            var userPostsRequest = new UserPostsRequest(Name);
-            var userPostsResponse = _api.GetUserPosts(userPostsRequest).Result;
-            AssertSuccessfulResult(userPostsResponse);
-            Assert.That(userPostsResponse.Result.Count, Is.Not.Null);
-            Assert.That(userPostsResponse.Result.Offset, Is.Not.Empty);
-            Assert.That(userPostsResponse.Result.Results, Is.Not.Empty);
-
+            var userPostsResponse = _api.GetUserPosts(new UserPostsRequest(Name)).Result;
             var postUrl = userPostsResponse.Result.Results.First().Url;
 
             // Comment latest post
-            var createCommentRequest = new CreateCommentRequest(_sessionId, postUrl, "nailed it !", "свитшот");
-            var createCommentResponse = _api.CreateComment(createCommentRequest).Result;
-            AssertSuccessfulResult(createCommentResponse);
-            Assert.That(createCommentResponse.Result.IsCreated, Is.True);
-            Assert.That(createCommentResponse.Result.Message, Is.EqualTo("Comment created"));
+            const string body = "Vote_Up_Comment_Body";
+            const string title = "Vote_Up_Comment_Title";
+            var resp = _api.CreateComment(new CreateCommentRequest(_sessionId, postUrl, body, title)).Result;
 
             // Load comments for this post
-            var commentsRequest = new GetCommentsRequest(postUrl);
-            var commentsResponse = _api.GetComments(commentsRequest).Result;
-            AssertSuccessfulResult(commentsResponse);
-            Assert.That(commentsResponse.Result.Count, Is.Not.Null);
-            Assert.That(commentsResponse.Result.Results, Is.Not.Empty);
+            var commentsResponse = _api.GetComments(new GetCommentsRequest(postUrl)).Result;
+            Assert.That(commentsResponse.Result.Results.First().Title, Is.EqualTo(title));
+            Assert.That(commentsResponse.Result.Results.First().Body, Is.EqualTo(body));
 
-            // Voteup new comment
+            // Vote
             var commentUrl = commentsResponse.Result.Results.First().Url.Split('#').Last();
             var request = new VoteRequest(_sessionId, true, commentUrl);
 
@@ -178,58 +165,50 @@ namespace Sweetshot.Tests
 
             // Check if it is was voted
             Thread.Sleep(TimeSpan.FromSeconds(5));
-            var commentsRequest2 = new GetCommentsRequest(postUrl) { SessionId = _sessionId };
-            var commentsResponse2 = _api.GetComments(commentsRequest2).Result;
+            var commentsResponse2 = _api.GetComments(new GetCommentsRequest(postUrl) {SessionId = _sessionId}).Result;
             Assert.That(commentsResponse2.Result.Results.First().Vote, Is.True);
         }
 
         [Test]
+        [Order(5)]
         public void Vote_Down_Comment()
         {
-            //TODO
-        }
-
-        [Test]
-        public void Create_Post_Vote_Check()
-        {
-            // Create new post
-            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\cat.jpg");
-            var file = File.ReadAllBytes(path);
-            var createPostRequest = new UploadImageRequest(_sessionId, "cat" + DateTime.UtcNow.Ticks, file, "cat1", "cat2", "cat3", "cat4");
-            var createPostResponse = _api.Upload(createPostRequest).Result;
-
-            // Check if it is there
+            // Get latest posts
             var userPostsResponse = _api.GetUserPosts(new UserPostsRequest(Name)).Result;
-            Assert.That(createPostResponse.Result.Title, Is.EqualTo(userPostsResponse.Result.Results.First().Title));
-            Assert.That(userPostsResponse.Result.Results.First().Vote, Is.False);
+            var postUrl = userPostsResponse.Result.Results.First().Url;
 
-            // Arrange
-            var url = userPostsResponse.Result.Results.First().Url;
-            var request = new VoteRequest(_sessionId, true, url);
+            // Comment latest post
+            const string body = "Vote_Up_Comment_Body";
+            const string title = "Vote_Up_Comment_Title";
+            var resp = _api.CreateComment(new CreateCommentRequest(_sessionId, postUrl, body, title)).Result;
+
+            // Load comments for this post
+            var commentsResponse = _api.GetComments(new GetCommentsRequest(postUrl)).Result;
+            Assert.That(commentsResponse.Result.Results.First().Title, Is.EqualTo(title));
+            Assert.That(commentsResponse.Result.Results.First().Body, Is.EqualTo(body));
+
+            // Vote
+            var commentUrl = commentsResponse.Result.Results.First().Url.Split('#').Last();
+            var request = new VoteRequest(_sessionId, false, commentUrl);
 
             // Act
             var response = _api.Vote(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
-            Assert.That(response.Result.IsVoted, Is.True);
+            Assert.That(response.Result.IsVoted, Is.False);
             Assert.That(response.Result.NewTotalPayoutReward, Is.Not.Null);
-            Assert.That(response.Result.Message, Is.EqualTo("Upvoted"));
+            Assert.That(response.Result.Message, Is.EqualTo("Downvoted"));
             Assert.That(response.Result.NewTotalPayoutReward, Is.Not.Null);
 
             // Check if it is was voted
             Thread.Sleep(TimeSpan.FromSeconds(5));
-            var userPostsResponse2 = _api.GetUserPosts(new UserPostsRequest(Name) { SessionId = _sessionId }).Result;
-            Assert.That(userPostsResponse2.Result.Results.First().Vote, Is.True);
+            var commentsResponse2 = _api.GetComments(new GetCommentsRequest(postUrl) {SessionId = _sessionId}).Result;
+            Assert.That(commentsResponse2.Result.Results.First().Vote, Is.False);
         }
 
         [Test]
-        public void Create_Comment_Vote_Check()
-        {
-            //TODO
-        }
-
-        [Test]
+        [Order(6)]
         public void Follow()
         {
             // Arrange
@@ -245,6 +224,7 @@ namespace Sweetshot.Tests
         }
 
         [Test]
+        [Order(7)]
         public void Follow_UnFollow()
         {
             // Arrange
@@ -260,6 +240,31 @@ namespace Sweetshot.Tests
         }
 
         [Test]
+        [Order(8)]
+        public void ChangePassword()
+        {
+            // Arrange
+            var request = new ChangePasswordRequest(_sessionId, Password, NewPassword);
+
+            // Act
+            var response = _api.ChangePassword(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.That(response.Result.IsChanged, Is.True);
+            Assert.That(response.Result.Message, Is.EqualTo("Password was changed"));
+
+            // Revert
+            var loginResponse = _api.Login(new LoginRequest(Name, NewPassword)).Result;
+            var response2 = _api.ChangePassword(new ChangePasswordRequest(loginResponse.Result.SessionId, NewPassword, Password)).Result;
+            AssertSuccessfulResult(response2);
+            Assert.That(response.Result.IsChanged, Is.True);
+            Assert.That(response2.Result.Message, Is.EqualTo("Password was changed"));
+            Authenticate();
+        }
+
+        [Test]
+        [Order(9)]
         public void Logout()
         {
             // Arrange
@@ -290,43 +295,44 @@ namespace Sweetshot.Tests
             //Assert.That(response.Result.Username);
         }
 
-        [Test]
-        public void ChangePassword()
+        [Ignore("Ingoring...")]
+        public void Upload_Throttling()
         {
             // Arrange
-            var request = new ChangePasswordRequest(_sessionId, Password, NewPassword);
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\cat.jpg");
+            var file = File.ReadAllBytes(path);
+            var request = new UploadImageRequest(_sessionId, "cat" + DateTime.UtcNow.Ticks, file, "cat1", "cat2", "cat3", "cat4");
 
             // Act
-            var response = _api.ChangePassword(request).Result;
+            var response = _api.Upload(request).Result;
+            var response2 = _api.Upload(request).Result;
+            var response3 = _api.Upload(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
-            Assert.That(response.Result.IsChanged, Is.True);
-            Assert.That(response.Result.Message, Is.EqualTo("Password was changed"));
-
-            // Revert
-            var loginResponse = _api.Login(new LoginRequest(Name, NewPassword)).Result;
-            var response2 = _api.ChangePassword(new ChangePasswordRequest(loginResponse.Result.SessionId, NewPassword, Password)).Result;
-            AssertSuccessfulResult(response2);
-            Assert.That(response.Result.IsChanged, Is.True);
-            Assert.That(response2.Result.Message, Is.EqualTo("Password was changed"));
-            Authenticate();
+            AssertFailedResult(response3);
+            Assert.That(response3.Errors.Contains("Creating post is impossible. Please try 10 minutes later."));
         }
 
         private void AssertSuccessfulResult<T>(OperationResult<T> response)
         {
-            Assert.That(response, Is.Not.Null);
-            Assert.That(response.Success, Is.True);
-            Assert.That(response.Result, Is.Not.Null);
-            Assert.That(response.Errors, Is.Empty);
+            lock (response)
+            {
+                Assert.That(response, Is.Not.Null);
+                Assert.That(response.Success, Is.True);
+                Assert.That(response.Result, Is.Not.Null);
+                Assert.That(response.Errors, Is.Empty);
+            }
         }
 
         private void AssertFailedResult<T>(OperationResult<T> response)
         {
-            Assert.That(response, Is.Not.Null);
-            Assert.That(response.Success, Is.False);
-            Assert.That(response.Result, Is.Null);
-            Assert.That(response.Errors, Is.Not.Empty);
+            lock (response)
+            {
+                Assert.That(response, Is.Not.Null);
+                Assert.That(response.Success, Is.False);
+                Assert.That(response.Result, Is.Null);
+                Assert.That(response.Errors, Is.Not.Empty);
+            }
         }
     }
 }
