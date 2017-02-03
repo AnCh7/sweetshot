@@ -28,7 +28,6 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        [Order(0)]
         public void Upload()
         {
             // Arrange
@@ -65,7 +64,6 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        [Order(1)]
         public void CreateComment()
         {
             var userPostsRequest = new UserPostsRequest(Name);
@@ -84,7 +82,6 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        [Order(2)]
         public void Vote_Up()
         {
             // Prepare
@@ -111,7 +108,6 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        [Order(3)]
         public void Vote_Down()
         {
             // Prepare
@@ -182,7 +178,7 @@ namespace Sweetshot.Tests
 
             // Check if it is was voted
             Thread.Sleep(TimeSpan.FromSeconds(5));
-            var commentsRequest2 = new GetCommentsRequest(postUrl) {SessionId = _sessionId};
+            var commentsRequest2 = new GetCommentsRequest(postUrl) { SessionId = _sessionId };
             var commentsResponse2 = _api.GetComments(commentsRequest2).Result;
             Assert.That(commentsResponse2.Result.Results.First().Vote, Is.True);
         }
@@ -223,7 +219,7 @@ namespace Sweetshot.Tests
 
             // Check if it is was voted
             Thread.Sleep(TimeSpan.FromSeconds(5));
-            var userPostsResponse2 = _api.GetUserPosts(new UserPostsRequest(Name) {SessionId = _sessionId}).Result;
+            var userPostsResponse2 = _api.GetUserPosts(new UserPostsRequest(Name) { SessionId = _sessionId }).Result;
             Assert.That(userPostsResponse2.Result.Results.First().Vote, Is.True);
         }
 
@@ -234,7 +230,6 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        [Order(4)]
         public void Follow()
         {
             // Arrange
@@ -250,7 +245,6 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        [Order(5)]
         public void Follow_UnFollow()
         {
             // Arrange
@@ -266,7 +260,6 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        [Order(6)]
         public void Logout()
         {
             // Arrange
@@ -282,7 +275,6 @@ namespace Sweetshot.Tests
         }
 
         [Ignore("Ignoring")]
-        [Order(7)]
         public void Register()
         {
             // Arrange
@@ -299,7 +291,6 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        [Order(8)]
         public void ChangePassword()
         {
             // Arrange

@@ -1121,6 +1121,20 @@ namespace Sweetshot.Tests
             Assert.That(response.Errors.Contains("This field may not be blank."));
         }
 
+         [Test]
+        public void Upload_Empty_Photo()
+        {
+            // Arrange
+            var request = new UploadImageRequest(_sessionId, "title", "cat1", "cat2", "cat3", "cat4");
+
+            // Act
+            var response = _api.Upload(request).Result;
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.That(response.Errors.Contains("Upload a valid image. The file you uploaded was either not an image or a corrupted image."));
+        }
+
         [Test]
         public void Upload_Tags_Less_Than_1()
         {
