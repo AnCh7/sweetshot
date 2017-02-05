@@ -1124,7 +1124,8 @@ namespace Sweetshot.Tests
         public void Upload_Empty_Title()
         {
             // Arrange
-            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\cat.jpg");
+            var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            var path = Path.Combine(dir.Parent.Parent.FullName, @"Data/cat.jpg");
             var file = File.ReadAllBytes(path);
             var request = new UploadImageRequest(_sessionId, "", file, "cat1", "cat2", "cat3", "cat4");
 
@@ -1154,7 +1155,8 @@ namespace Sweetshot.Tests
         public void Upload_Tags_Less_Than_1()
         {
             // Arrange
-            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\cat.jpg");
+            var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            var path = Path.Combine(dir.Parent.Parent.FullName, @"Data/cat.jpg");
             var file = File.ReadAllBytes(path);
             var request = new UploadImageRequest(_sessionId, "cat", file);
 
@@ -1170,7 +1172,8 @@ namespace Sweetshot.Tests
         public void Upload_Tags_Greater_Than_4()
         {
             // Arrange
-            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\cat.jpg");
+            var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            var path = Path.Combine(dir.Parent.Parent.FullName, @"Data/cat.jpg");
             var file = File.ReadAllBytes(path);
             var request = new UploadImageRequest(_sessionId, "cat", file, "cat1", "cat2", "cat3", "cat4", "cat5");
 
