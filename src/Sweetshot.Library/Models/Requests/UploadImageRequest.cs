@@ -5,7 +5,7 @@ namespace Sweetshot.Library.Models.Requests
 {
     public class UploadImageRequest : SessionIdField
     {
-        public UploadImageRequest(string sessionId, string title, params string[] tags)
+        private UploadImageRequest(string sessionId, string title, params string[] tags)
         {
             if (string.IsNullOrWhiteSpace(sessionId)) throw new ArgumentNullException(nameof(sessionId));
 

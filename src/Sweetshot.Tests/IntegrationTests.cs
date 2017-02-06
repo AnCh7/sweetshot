@@ -272,6 +272,21 @@ namespace Sweetshot.Tests
         }
 
         [Test]
+        public void Posts_Top_With_SessionId()
+        {
+            // Arrange
+            var request = new PostsRequest(PostType.Top) {SessionId = _sessionId};
+
+            // Act
+            var response = _api.GetPosts(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.That(response.Result.Offset, Is.Not.Empty);
+            Assert.That(response.Result.Count > 0);
+        }
+
+        [Test]
         public void Posts_Hot()
         {
             // Arrange
@@ -406,6 +421,20 @@ namespace Sweetshot.Tests
         }
 
         [Test]
+        public void Posts_By_Category_With_SessionId()
+        {
+            // Arrange
+            var request = new PostsByCategoryRequest(PostType.Top, "food") { SessionId = _sessionId };
+
+            // Act
+            var response = _api.GetPostsByCategory(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.That(response.Result.Results, Is.Not.Empty);
+        }
+
+        [Test]
         public void Register_PostingKey_Invalid()
         {
             // Arrange
@@ -492,8 +521,12 @@ namespace Sweetshot.Tests
         [Test]
         public void Vote_Up_Already_Voted()
         {
+            // Load last post
+            var userPostsRequest = new UserPostsRequest(Name);
+            var lastPost = _api.GetUserPosts(userPostsRequest).Result.Result.Results.First();
+
             // Arrange
-            var request = new VoteRequest(_sessionId, true, "cat1/@joseph.kalu/cat636218265707845000");
+            var request = new VoteRequest(_sessionId, true, lastPost.Url);
 
             // Act
             var response = _api.Vote(request).Result;
@@ -506,8 +539,12 @@ namespace Sweetshot.Tests
         [Test]
         public void Vote_Down_Already_Voted()
         {
+            // Load last post
+            var userPostsRequest = new UserPostsRequest(Name);
+            var lastPost = _api.GetUserPosts(userPostsRequest).Result.Result.Results.First();
+
             // Arrange
-            var request = new VoteRequest(_sessionId, false, "cat1/@joseph.kalu/cat636218269269392832");
+            var request = new VoteRequest(_sessionId, false, lastPost.Url);
 
             // Act
             var response = _api.Vote(request).Result;
@@ -792,6 +829,23 @@ namespace Sweetshot.Tests
         }
 
         [Test]
+        public void Categories_With_SessionId()
+        {
+            // Arrange
+            var request = new SearchRequest {SessionId = _sessionId};
+
+            // Act
+            var response = _api.GetCategories(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.That(response.Result.Count > 0);
+            Assert.That(response.Result.TotalCount, Is.EqualTo(-1));
+            Assert.That(response.Result.Results, Is.Not.Empty);
+            Assert.That(response.Result.Results.First().Name, Is.Not.Empty);
+        }
+
+        [Test]
         public void Categories_Search()
         {
             // Arrange
@@ -887,6 +941,23 @@ namespace Sweetshot.Tests
             // Assert
             AssertFailedResult(response);
             Assert.That(response.Errors.Contains("Category used for offset was not found"));
+        }
+
+        [Test]
+        public void Categories_Search_With_SessionId()
+        {
+            // Arrange
+            var request = new SearchWithQueryRequest("lif");
+
+            // Act
+            var response = _api.SearchCategories(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.That(response.Result.Count > 0);
+            Assert.That(response.Result.TotalCount >= 0);
+            Assert.That(response.Result.Results, Is.Not.Empty);
+            Assert.That(response.Result.Results.First().Name, Is.Not.Empty);
         }
 
         [Test]
@@ -992,6 +1063,38 @@ namespace Sweetshot.Tests
         }
 
         [Test]
+        public void UserProfile_With_SessionId()
+        {
+            // Arrange
+            var request = new UserProfileRequest(Name) {SessionId = _sessionId};
+
+            // Act
+            var response = _api.GetUserProfile(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.That(response.Result.PostingRewards, Is.Not.Null);
+            Assert.That(response.Result.CurationRewards, Is.Not.Null);
+            Assert.That(response.Result.LastAccountUpdate, Is.Not.Null);
+            Assert.That(response.Result.LastVoteTime, Is.Not.Null);
+            Assert.That(response.Result.Reputation, Is.Not.Null);
+            Assert.That(response.Result.PostCount, Is.Not.Null);
+            Assert.That(response.Result.CommentCount, Is.Not.Null);
+            Assert.That(response.Result.FollowersCount, Is.Not.Null);
+            Assert.That(response.Result.FollowingCount, Is.Not.Null);
+            Assert.That(response.Result.Username, Is.Not.Empty);
+            Assert.That(response.Result.CurrentUsername, Is.Not.Null);
+            Assert.That(response.Result.ProfileImage, Is.Not.Empty);
+            Assert.That(response.Result.HasFollowed, Is.Not.Null);
+            Assert.That(response.Result.EstimatedBalance, Is.Not.Null);
+            Assert.That(response.Result.Created, Is.Not.Null);
+            Assert.That(response.Result.Name, Is.Not.Empty);
+            Assert.That(response.Result.About, Is.Not.Empty);
+            Assert.That(response.Result.Location, Is.Not.Empty);
+            Assert.That(response.Result.WebSite, Is.Not.Empty);
+        }
+
+        [Test]
         public void UserFriends_Following()
         {
             // Arrange
@@ -1064,6 +1167,23 @@ namespace Sweetshot.Tests
         }
 
         [Test]
+        public void UserFriends_Followers_With_SessionId()
+        {
+            // Arrange
+            var request = new UserFriendsRequest(Name, FriendsType.Followers) {SessionId = _sessionId};
+
+            // Act
+            var response = _api.GetUserFriends(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.That(response.Result.Count, Is.Not.Null);
+            Assert.That(response.Result.Offset, Is.Not.Null);
+            Assert.That(response.Result.Results, Is.Not.Empty);
+            Assert.That(response.Result.Results.First().Author, Is.Not.Empty);
+        }
+
+        [Test]
         public void Terms_Of_Service()
         {
             // Arrange
@@ -1080,6 +1200,38 @@ namespace Sweetshot.Tests
         {
             // Arrange
             var request = new PostsInfoRequest("spam/@joseph.kalu/test-post-127");
+
+            // Act
+            var response = _api.GetPostInfo(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.That(response.Result.Body, Is.Not.Empty);
+            Assert.That(response.Result.Title, Is.Not.Empty);
+            Assert.That(response.Result.Url, Is.Not.Empty);
+            Assert.That(response.Result.Category, Is.Not.Empty);
+            Assert.That(response.Result.Author, Is.Not.Empty);
+            Assert.That(response.Result.Avatar, Is.Not.Empty);
+            Assert.That(response.Result.AuthorRewards, Is.Not.Null);
+            Assert.That(response.Result.AuthorReputation, Is.Not.Null);
+            Assert.That(response.Result.NetVotes, Is.Not.Null);
+            Assert.That(response.Result.Children, Is.Not.Null);
+            Assert.That(response.Result.Created, Is.Not.Null);
+            Assert.That(response.Result.CuratorPayoutValue, Is.Not.Null);
+            Assert.That(response.Result.TotalPayoutValue, Is.Not.Null);
+            Assert.That(response.Result.PendingPayoutValue, Is.Not.Null);
+            Assert.That(response.Result.MaxAcceptedPayout, Is.Not.Null);
+            Assert.That(response.Result.TotalPayoutReward, Is.Not.Null);
+            Assert.That(response.Result.Vote, Is.False);
+            Assert.That(response.Result.Tags, Is.Not.Null);
+            Assert.That(response.Result.Depth, Is.Not.Null);
+        }
+
+        [Test]
+        public void GetPostInfo_With_SessionId()
+        {
+            // Arrange
+            var request = new PostsInfoRequest("spam/@joseph.kalu/test-post-127") {SessionId = _sessionId};
 
             // Act
             var response = _api.GetPostInfo(request).Result;
@@ -1186,7 +1338,7 @@ namespace Sweetshot.Tests
             Assert.That(response.Errors.Contains("The number of tags should be between 1 and 4."));
         }
 
-         [Test]
+        [Test]
         public void User_Search()
         {
             // Arrange
@@ -1251,7 +1403,7 @@ namespace Sweetshot.Tests
         public void User_Search_Offset_Limit()
         {
             // Arrange
-            const int limit = 5;
+            const int limit = 2;
             var request = new SearchWithQueryRequest("aar")
             {
                 Offset = "gatilaar",
@@ -1265,7 +1417,7 @@ namespace Sweetshot.Tests
             AssertSuccessfulResult(response);
             Assert.That(response.Result.Count, Is.EqualTo(limit));
             Assert.That(response.Result.Results.Count, Is.EqualTo(limit));
-            Assert.That(response.Result.TotalCount > limit);
+            Assert.That(response.Result.TotalCount >= limit);
             Assert.That(response.Result.Results, Is.Not.Empty);
             Assert.That(response.Result.Results.First().Name, Is.EqualTo("gatilaar"));
         }
@@ -1282,6 +1434,23 @@ namespace Sweetshot.Tests
             // Assert
             AssertFailedResult(response);
             Assert.That(response.Errors.Contains("Username used for offset was not found"));
+        }
+
+        [Test]
+        public void User_Search_With_SessionId()
+        {
+            // Arrange
+            var request = new SearchWithQueryRequest("aar") {SessionId = _sessionId};
+
+            // Act
+            var response = _api.SearchUser(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.That(response.Result.Count > 0);
+            Assert.That(response.Result.TotalCount >= 0);
+            Assert.That(response.Result.Results, Is.Not.Empty);
+            Assert.That(response.Result.Results.First().Name, Is.Not.Empty);
         }
 
         private void AssertSuccessfulResult<T>(OperationResult<T> response)
