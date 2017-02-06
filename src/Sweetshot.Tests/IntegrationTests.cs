@@ -6,7 +6,6 @@ using NUnit.Framework;
 using Sweetshot.Library.HttpClient;
 using Sweetshot.Library.Models.Common;
 using Sweetshot.Library.Models.Requests;
-using Sweetshot.Library.Models.Requests.Common;
 
 namespace Sweetshot.Tests
 {
@@ -738,7 +737,7 @@ namespace Sweetshot.Tests
         public void Categories()
         {
             // Arrange
-            var request = new OffsetLimitFields();
+            var request = new SearchRequest();
 
             // Act
             var response = _api.GetCategories(request).Result;
@@ -756,7 +755,7 @@ namespace Sweetshot.Tests
         {
             // Arrange
             const int limit = 5;
-            var request = new OffsetLimitFields
+            var request = new SearchRequest
             {
                 Offset = "food",
                 Limit = limit
@@ -780,7 +779,7 @@ namespace Sweetshot.Tests
         public void Categories_Offset_Not_Exisiting()
         {
             // Arrange
-            var request = new OffsetLimitFields {Offset = "qweqweqwe"};
+            var request = new SearchRequest {Offset = "qweqweqwe"};
 
             // Act
             var response = _api.GetCategories(request).Result;
@@ -796,7 +795,7 @@ namespace Sweetshot.Tests
         public void Categories_Search()
         {
             // Arrange
-            var request = new SearchRequest("foo");
+            var request = new SearchWithQueryRequest("foo");
 
             // Act
             var response = _api.SearchCategories(request).Result;
@@ -813,7 +812,7 @@ namespace Sweetshot.Tests
         public void Categories_Search_Invalid_Query()
         {
             // Arrange
-            var request = new SearchRequest("qwerqwerqwerqwerqwerqwerqwerqwer");
+            var request = new SearchWithQueryRequest("qwerqwerqwerqwerqwerqwerqwerqwer");
 
             // Act
             var response = _api.SearchCategories(request).Result;
@@ -829,7 +828,7 @@ namespace Sweetshot.Tests
         public void Categories_Search_Short_Query()
         {
             // Arrange
-            var request = new SearchRequest("fo");
+            var request = new SearchWithQueryRequest("fo");
 
             // Act
             var response = _api.SearchCategories(request).Result;
@@ -843,7 +842,7 @@ namespace Sweetshot.Tests
         public void Categories_Search_Empty_Query()
         {
             // Arrange
-            var request = new SearchRequest(" ");
+            var request = new SearchWithQueryRequest(" ");
 
             // Act
             var response = _api.SearchCategories(request).Result;
@@ -858,9 +857,11 @@ namespace Sweetshot.Tests
         {
             // Arrange
             const int limit = 5;
-            var request = new SearchRequest("lif");
-            request.Offset = "life";
-            request.Limit = limit;
+            var request = new SearchWithQueryRequest("lif")
+            {
+                Offset = "life",
+                Limit = limit
+            };
 
             // Act
             var response = _api.SearchCategories(request).Result;
@@ -878,7 +879,7 @@ namespace Sweetshot.Tests
         public void Categories_Search_Offset_Not_Exisiting()
         {
             // Arrange
-            var request = new SearchRequest("life") {Offset = "qweqweqwe"};
+            var request = new SearchWithQueryRequest("life") {Offset = "qweqweqwe"};
 
             // Act
             var response = _api.SearchCategories(request).Result;
@@ -1189,7 +1190,7 @@ namespace Sweetshot.Tests
         public void User_Search()
         {
             // Arrange
-            var request = new SearchRequest("aar");
+            var request = new SearchWithQueryRequest("aar");
 
             // Act
             var response = _api.SearchUser(request).Result;
@@ -1206,7 +1207,7 @@ namespace Sweetshot.Tests
         public void User_Search_Invalid_Query()
         {
             // Arrange
-            var request = new SearchRequest("qwerqwerqwerqwerqwerqwerqwerqwer");
+            var request = new SearchWithQueryRequest("qwerqwerqwerqwerqwerqwerqwerqwer");
 
             // Act
             var response = _api.SearchUser(request).Result;
@@ -1222,7 +1223,7 @@ namespace Sweetshot.Tests
         public void User_Search_Short_Query()
         {
             // Arrange
-            var request = new SearchRequest("fo");
+            var request = new SearchWithQueryRequest("fo");
 
             // Act
             var response = _api.SearchUser(request).Result;
@@ -1236,7 +1237,7 @@ namespace Sweetshot.Tests
         public void User_Search_Empty_Query()
         {
             // Arrange
-            var request = new SearchRequest(" ");
+            var request = new SearchWithQueryRequest(" ");
 
             // Act
             var response = _api.SearchUser(request).Result;
@@ -1251,7 +1252,7 @@ namespace Sweetshot.Tests
         {
             // Arrange
             const int limit = 5;
-            var request = new SearchRequest("aar")
+            var request = new SearchWithQueryRequest("aar")
             {
                 Offset = "gatilaar",
                 Limit = limit
@@ -1273,7 +1274,7 @@ namespace Sweetshot.Tests
         public void User_Search_Offset_Not_Exisiting()
         {
             // Arrange
-            var request = new SearchRequest("aar") {Offset = "qweqweqwe"};
+            var request = new SearchWithQueryRequest("aar") {Offset = "qweqweqwe"};
 
             // Act
             var response = _api.SearchUser(request).Result;
