@@ -249,14 +249,14 @@ namespace Sweetshot.Tests
 
             // Assert
             AssertSuccessfulResult(response);
-            Assert.That(defaultLimit, Is.EqualTo(response.Result.Count));
+            Assert.That(response.Result.Count, Is.EqualTo(defaultLimit));
         }
 
         [Test]
-        public void Posts_Top_Offset_Limit()
+        public void Posts_Hot_Offset_Limit()
         {
             // Arrange
-            var request = new PostsRequest(PostType.Top);
+            var request = new PostsRequest(PostType.Hot);
             request.Offset = _api.GetPosts(request).Result.Result.Results.First().Url;
             request.Limit = 3;
 
@@ -530,10 +530,11 @@ namespace Sweetshot.Tests
 
             // Act
             var response = _api.Vote(request).Result;
+            var response2 = _api.Vote(request).Result;
 
             // Assert
-            AssertFailedResult(response);
-            Assert.That(response.Errors.Contains("You have already voted in a similar way"));
+            AssertFailedResult(response2);
+            Assert.That(response2.Errors.Contains("You have already voted in a similar way"));
         }
 
         [Test]
@@ -548,10 +549,11 @@ namespace Sweetshot.Tests
 
             // Act
             var response = _api.Vote(request).Result;
+            var response2 = _api.Vote(request).Result;
 
             // Assert
-            AssertFailedResult(response);
-            Assert.That(response.Errors.Contains("You have already voted in a similar way"));
+            AssertFailedResult(response2);
+            Assert.That(response2.Errors.Contains("You have already voted in a similar way"));
         }
 
         [Test]
@@ -739,7 +741,7 @@ namespace Sweetshot.Tests
 
             // Assert
             AssertFailedResult(response);
-            Assert.That(response.Errors.Contains("Wrong identifier."));
+            Assert.That(response.Errors.Contains("Discussion is frozen."));
         }
 
         [Test]
@@ -1455,24 +1457,18 @@ namespace Sweetshot.Tests
 
         private void AssertSuccessfulResult<T>(OperationResult<T> response)
         {
-            lock (response)
-            {
-                Assert.That(response, Is.Not.Null);
-                Assert.That(response.Success, Is.True);
-                Assert.That(response.Result, Is.Not.Null);
-                Assert.That(response.Errors, Is.Empty);
-            }
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response.Success, Is.True);
+            Assert.That(response.Result, Is.Not.Null);
+            Assert.That(response.Errors, Is.Empty);
         }
 
         private void AssertFailedResult<T>(OperationResult<T> response)
         {
-            lock (response)
-            {
-                Assert.That(response, Is.Not.Null);
-                Assert.That(response.Success, Is.False);
-                Assert.That(response.Result, Is.Null);
-                Assert.That(response.Errors, Is.Not.Empty);
-            }
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response.Success, Is.False);
+            Assert.That(response.Result, Is.Null);
+            Assert.That(response.Errors, Is.Not.Empty);
         }
     }
 }
