@@ -884,14 +884,14 @@ namespace Sweetshot.Tests
         public void Categories_Search_Short_Query()
         {
             // Arrange
-            var request = new SearchWithQueryRequest("fo");
+            var request = new SearchWithQueryRequest("f");
 
             // Act
             var response = _api.SearchCategories(request).Result;
 
             // Assert 
             AssertFailedResult(response);
-            Assert.That(response.Errors.Contains("Query should have at least 3 characters"));
+            Assert.That(response.Errors.Contains("Query should have at least 2 characters"));
         }
 
         [Test]
