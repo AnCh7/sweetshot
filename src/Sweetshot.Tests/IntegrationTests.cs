@@ -327,7 +327,9 @@ namespace Sweetshot.Tests
             // Assert
             AssertSuccessfulResult(response);
             Assert.That(response.Result.Results, Is.Not.Empty);
-            Assert.That(response.Result.Results.Where(x => !x.Tags.Contains("food")), Is.Empty);
+            var postsWithoutCategoryInTags = response.Result.Results.Where(x => !x.Tags.Contains("food"));
+            var postShouldHaveCategoryInCategory = postsWithoutCategoryInTags.Any(x => !x.Category.Equals("food"));
+            Assert.That(postShouldHaveCategoryInCategory, Is.False);
         }
 
         [Test]
@@ -1144,6 +1146,9 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.Results.First().Author, Is.Not.Null);
             Assert.That(response.Result.Results.First().Avatar, Is.Not.Null);
             Assert.That(response.Result.Results.First().Reputation, Is.Not.Null);
+            Assert.That(response.Result.Results.First().HasFollowed, Is.False);
+            var noHasFollowTrueWithoutSessionId = response.Result.Results.Any(x => x.HasFollowed == true);
+            Assert.That(noHasFollowTrueWithoutSessionId, Is.False);
         }
 
         [Test]
@@ -1160,7 +1165,12 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.Count, Is.Not.Null);
             Assert.That(response.Result.Offset, Is.Not.Null);
             Assert.That(response.Result.Results, Is.Not.Empty);
-            Assert.That(response.Result.Results.First().Author, Is.Not.Empty);
+            Assert.That(response.Result.Results.First().Author, Is.Not.Null);
+            Assert.That(response.Result.Results.First().Avatar, Is.Not.Null);
+            Assert.That(response.Result.Results.First().Reputation, Is.Not.Null);
+            Assert.That(response.Result.Results.First().HasFollowed, Is.False);
+            var noHasFollowTrueWithoutSessionId = response.Result.Results.Any(x => x.HasFollowed == true);
+            Assert.That(noHasFollowTrueWithoutSessionId, Is.False);
         }
 
         [Test]
@@ -1214,6 +1224,9 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.Offset, Is.Not.Null);
             Assert.That(response.Result.Results, Is.Not.Empty);
             Assert.That(response.Result.Results.First().Author, Is.Not.Empty);
+            Assert.That(response.Result.Results.First().HasFollowed, Is.False);
+            var someResponsesAreHasFollowTrue = response.Result.Results.Any(x => x.HasFollowed == true);
+            Assert.That(someResponsesAreHasFollowTrue, Is.True);
         }
 
         [Test]
