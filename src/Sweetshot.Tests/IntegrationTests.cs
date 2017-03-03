@@ -25,7 +25,8 @@ namespace Sweetshot.Tests
         private const string NewPassword = "test123456";
         private string _sessionId = string.Empty;
 
-        private readonly SteepshotApiClient _api = new SteepshotApiClient(ConfigurationManager.AppSettings["sweetshot_url"]);
+        private readonly SteepshotApiClient _api =
+            new SteepshotApiClient(ConfigurationManager.AppSettings["sweetshot_url"]);
 
         [OneTimeSetUp]
         public void Authenticate()
@@ -383,7 +384,9 @@ namespace Sweetshot.Tests
             // Assert
             AssertSuccessfulResult(response);
             Assert.That(response.Result.Results, Is.Not.Empty);
-            Assert.That(response.Result.Results.Where(x => !x.Tags.Contains("food")), Is.Empty);
+            var postsWithoutCategoryInTags = response.Result.Results.Where(x => !x.Tags.Contains("food"));
+            var postShouldHaveCategoryInCategory = postsWithoutCategoryInTags.Any(x => !x.Category.Equals("food"));
+            Assert.That(postShouldHaveCategoryInCategory, Is.False);
         }
 
         [Test]
@@ -398,7 +401,9 @@ namespace Sweetshot.Tests
             // Assert
             AssertSuccessfulResult(response);
             Assert.That(response.Result.Results, Is.Not.Empty);
-            Assert.That(response.Result.Results.Where(x => !x.Tags.Contains("food")), Is.Empty);
+            var postsWithoutCategoryInTags = response.Result.Results.Where(x => !x.Tags.Contains("food"));
+            var postShouldHaveCategoryInCategory = postsWithoutCategoryInTags.Any(x => !x.Category.Equals("food"));
+            Assert.That(postShouldHaveCategoryInCategory, Is.False);
         }
 
         [Test]
@@ -424,7 +429,7 @@ namespace Sweetshot.Tests
         public void Posts_By_Category_With_SessionId()
         {
             // Arrange
-            var request = new PostsByCategoryRequest(PostType.Top, "food") { SessionId = _sessionId };
+            var request = new PostsByCategoryRequest(PostType.Top, "food") {SessionId = _sessionId};
 
             // Act
             var response = _api.GetPostsByCategory(request).Result;
@@ -438,7 +443,8 @@ namespace Sweetshot.Tests
         public void Register_PostingKey_Invalid()
         {
             // Arrange
-            var request = new RegisterRequest("5JdHigxo9s8rdNSfGteprcx1Fhi7SBUwb7e2UcNvnTdz18Si7s1", "anch1", "qwerty12345");
+            var request = new RegisterRequest("5JdHigxo9s8rdNSfGteprcx1Fhi7SBUwb7e2UcNvnTdz18Si7s1", "anch1",
+                "qwerty12345");
 
             // Act
             var response = _api.Register(request).Result;
@@ -452,7 +458,8 @@ namespace Sweetshot.Tests
         public void Register_Username_Already_Exists()
         {
             // Arrange
-            var request = new RegisterRequest("5JdHigxo9s8rdNSfGteprcx1Fhi7SBUwb7e2UcNvnTdz18Si7s1", "anch", "qwerty12345");
+            var request = new RegisterRequest("5JdHigxo9s8rdNSfGteprcx1Fhi7SBUwb7e2UcNvnTdz18Si7s1", "anch",
+                "qwerty12345");
 
             // Act
             var response = _api.Register(request).Result;
@@ -466,7 +473,8 @@ namespace Sweetshot.Tests
         public void Register_PostingKey_Same_With_New_Username()
         {
             // Arrange
-            var request = new RegisterRequest("5JdHigxo9s8rdNSfGteprcx1Fhi7SBUwb7e2UcNvnTdz18Si7s1", "anch1", "qwerty12345");
+            var request = new RegisterRequest("5JdHigxo9s8rdNSfGteprcx1Fhi7SBUwb7e2UcNvnTdz18Si7s1", "anch1",
+                "qwerty12345");
 
             // Act
             var response = _api.Register(request).Result;
@@ -494,7 +502,8 @@ namespace Sweetshot.Tests
         public void Register_Password_Is_Short()
         {
             // Arrange
-            var request = new RegisterRequest("5JdHsgxo9s8rdNsfGteprcxaFhi7SBUwb7e2UcNvnTdh18Si7so", "qweqweqweqwe", "qweqweq");
+            var request = new RegisterRequest("5JdHsgxo9s8rdNsfGteprcxaFhi7SBUwb7e2UcNvnTdh18Si7so", "qweqweqweqwe",
+                "qweqweq");
 
             // Act
             var response = _api.Register(request).Result;
@@ -508,7 +517,8 @@ namespace Sweetshot.Tests
         public void Register_Password_Is_Numeric()
         {
             // Arrange
-            var request = new RegisterRequest("5JdHsgxo9s8rdNsfGteprcxaFhi7SBUwb7e2UcNvnTdh18Si7so", "qweqweqweqwe", "1234567890");
+            var request = new RegisterRequest("5JdHsgxo9s8rdNsfGteprcxaFhi7SBUwb7e2UcNvnTdh18Si7so", "qweqweqweqwe",
+                "1234567890");
 
             // Act
             var response = _api.Register(request).Result;
@@ -734,7 +744,8 @@ namespace Sweetshot.Tests
         public void CreateComment_Wrong_Identifier()
         {
             // Arrange
-            var request = new CreateCommentRequest(_sessionId, "@asduj/new-application-coming---", "test_body", "test_title");
+            var request = new CreateCommentRequest(_sessionId, "@asduj/new-application-coming---", "test_body",
+                "test_title");
 
             // Act
             var response = _api.CreateComment(request).Result;
@@ -770,6 +781,26 @@ namespace Sweetshot.Tests
             // Assert
             AssertFailedResult(response);
             Assert.That(response.Errors.Contains("This field may not be blank."));
+        }
+
+        [Test]
+        public void CreateComment_20_Seconds_Delay()
+        {
+            // Arrange
+            var userPostsRequest = new UserPostsRequest(Name);
+            var userPostsResponse = _api.GetUserPosts(userPostsRequest).Result;
+            var lastPost = userPostsResponse.Result.Results.First();
+            const string body = "Ллойс!";
+            const string title = "Лучший камент ever";
+            var createCommentRequest = new CreateCommentRequest(_sessionId, lastPost.Url, body, title);
+
+            // Act
+            var response1 = _api.CreateComment(createCommentRequest).Result;
+            var response2 = _api.CreateComment(createCommentRequest).Result;
+
+            // Assert
+            AssertFailedResult(response2);
+            Assert.That(response2.Errors.Contains("You may only comment once every 20 seconds."));
         }
 
         [Test]
@@ -1303,7 +1334,8 @@ namespace Sweetshot.Tests
 
             // Assert
             AssertFailedResult(response);
-            Assert.That(response.Errors.Contains("Upload a valid image. The file you uploaded was either not an image or a corrupted image."));
+            Assert.That(response.Errors.Contains(
+                "Upload a valid image. The file you uploaded was either not an image or a corrupted image."));
         }
 
         [Test]

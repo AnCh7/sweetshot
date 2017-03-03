@@ -48,6 +48,8 @@ namespace Sweetshot.Tests
             Assert.That(createPostResponse.Result.Title, Is.EqualTo(lastPost.Title));
 
             // 2) Create new comment
+            // Wait for 20 seconds before commenting
+            Thread.Sleep(TimeSpan.FromSeconds(20));
             const string body = "Ллойс!";
             const string title = "Лучший камент ever";
             var createCommentRequest = new CreateCommentRequest(sessionId, lastPost.Url, body, title);
