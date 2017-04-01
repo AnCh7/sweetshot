@@ -1,0 +1,21 @@
+Metadata-Version: 1.1
+Name: 3to2
+Version: 1.1.1
+Summary: Refactors valid 3.x syntax into valid 2.x syntax, if a syntactical conversion is possible
+Home-page: http://www.startcodon.com/wordpress/?cat=8
+Author: Joe Amenta
+Author-email: airbreather@linux.com
+License: UNKNOWN
+Description: UNKNOWN
+Platform: 
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.2
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Topic :: Software Development :: Code Generators
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
