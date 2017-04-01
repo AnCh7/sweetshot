@@ -1,1 +1,1 @@
-./3to2 /home/anch/Repositories/sweetshot/python-src/ -w
+./3to2 /home/anch/Repositories/sweetshot/python-src/ --write --nobackups --verbose
