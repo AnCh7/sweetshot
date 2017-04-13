@@ -26,7 +26,8 @@ namespace Sweetshot.Tests
         private string _sessionId = string.Empty;
 
         private readonly SteepshotApiClient _api =
-            new SteepshotApiClient(ConfigurationManager.AppSettings["sweetshot_url"]);
+            new SteepshotApiClient(ConfigurationManager.AppSettings["steepshot_url"]);
+        // private readonly SteepshotApiClient _api = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url"]);
 
         [OneTimeSetUp]
         public void Authenticate()
@@ -569,7 +570,7 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        public void Vote_Archived_Post()
+        public void Vote_Archived_Post_Possible_Since_Hardfork()
         {
             // Arrange
             var request = new VoteRequest(_sessionId, false, "spam/@joseph.kalu/test-post-tue-jan--3-170111-2017");
@@ -578,8 +579,7 @@ namespace Sweetshot.Tests
             var response = _api.Vote(request).Result;
 
             // Assert
-            AssertFailedResult(response);
-            Assert.That(response.Errors.Contains("This post is archived."));
+            AssertSuccessfulResult(response);
         }
 
         [Test]
@@ -743,7 +743,7 @@ namespace Sweetshot.Tests
         }
 
         [Test]
-        public void CreateComment_Wrong_Identifier()
+        public void CreateComment_Frozen_Discussion_Possible_Since_Hardfork()
         {
             // Arrange
             var request = new CreateCommentRequest(_sessionId, "@asduj/new-application-coming---", "test_body",
@@ -753,8 +753,7 @@ namespace Sweetshot.Tests
             var response = _api.CreateComment(request).Result;
 
             // Assert
-            AssertFailedResult(response);
-            Assert.That(response.Errors.Contains("Discussion is frozen."));
+            AssertSuccessfulResult(response);
         }
 
         [Test]
@@ -1223,8 +1222,6 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.Count, Is.Not.Null);
             Assert.That(response.Result.Offset, Is.Not.Null);
             Assert.That(response.Result.Results, Is.Not.Empty);
-            Assert.That(response.Result.Results.First().Author, Is.Not.Empty);
-            Assert.That(response.Result.Results.First().HasFollowed, Is.False);
             var someResponsesAreHasFollowTrue = response.Result.Results.Any(x => x.HasFollowed == true);
             Assert.That(someResponsesAreHasFollowTrue, Is.True);
         }
@@ -1382,7 +1379,8 @@ namespace Sweetshot.Tests
 
             // Assert
             AssertFailedResult(response);
-            Assert.That(response.Errors.Contains("The number of tags should be between 1 and 4."));
+            Assert.That(response.Errors.Contains(
+                "The number of tags should not be more than 4. Please remove a couple of tags and try again."));
         }
 
         [Test]
