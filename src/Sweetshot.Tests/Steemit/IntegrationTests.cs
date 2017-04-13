@@ -7,14 +7,12 @@ using Sweetshot.Library.HttpClient;
 using Sweetshot.Library.Models.Common;
 using Sweetshot.Library.Models.Requests;
 
-namespace Sweetshot.Tests
+namespace Sweetshot.Tests.Steemit
 {
     // check all tests
     // add more tests
     // test (assert) errors
     // Register - tests, request examples
-
-    // vagrant or docker ?
     // linux proxy
 
     [TestFixture]
@@ -25,9 +23,7 @@ namespace Sweetshot.Tests
         private const string NewPassword = "test123456";
         private string _sessionId = string.Empty;
 
-        private readonly SteepshotApiClient _api =
-            new SteepshotApiClient(ConfigurationManager.AppSettings["steepshot_url"]);
-        // private readonly SteepshotApiClient _api = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url"]);
+        private readonly SteepshotApiClient _api = new SteepshotApiClient(ConfigurationManager.AppSettings["steepshot_url"]);
 
         [OneTimeSetUp]
         public void Authenticate()
@@ -837,11 +833,9 @@ namespace Sweetshot.Tests
 
             // Assert
             AssertSuccessfulResult(response);
-
             Assert.That(response.Result.Count > 0);
             Assert.That(response.Result.TotalCount, Is.EqualTo(-1));
             Assert.That(response.Result.Results.Count, Is.EqualTo(limit));
-
             Assert.That(response.Result.Results, Is.Not.Empty);
             Assert.That(response.Result.Results.First().Name, Is.EqualTo("food"));
         }
