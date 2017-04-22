@@ -18,77 +18,29 @@ namespace Sweetshot.Tests.Steemit
         private const string PostingKey = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
         private string _sessionId = string.Empty;
 
-        private readonly SteepshotApiClient _api = new SteepshotApiClient(ConfigurationManager.AppSettings["steepshot_url"]);
-
-//        [OneTimeSetUp]
-//        public void Authenticate()
-//        {
-//            // Arrange
-//            var request = new LoginRequest(Name, Password);
-//
-//            // Act
-//            var response = _api.Login(request).Result;
-//
-//            // Assert
-//            AssertSuccessfulResult(response);
-//            Assert.That(response.Result.IsLoggedIn, Is.True);
-//            Assert.That("User was logged in.", Is.EqualTo(response.Result.Message));
-//            Assert.That(response.Result.SessionId, Is.Not.Empty);
-//
-//            // Setup
-//            _sessionId = response.Result.SessionId;
-//        }
-
-        [Test]
-        public void Login_Invalid_Credentials()
+        private SteepshotApiClient steem = new SteepshotApiClient(ConfigurationManager.AppSettings["steepshot_url"]);
+        private SteepshotApiClient golos = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url"]);
+        private SteepshotApiClient Api(string name)
         {
-            // Arrange
-            var request = new LoginRequest(Name + "x", Password + "x");
-
-            // Act
-            var response = _api.Login(request).Result;
-
-            // Assert
-            AssertFailedResult(response);
-            Assert.That(response.Errors.Contains("Unable to login with provided credentials."));
+            switch (name)
+            {
+                case "Steem":
+                    return steem;
+                case "Golos":
+                    return golos;
+                default:
+                    return null;
+            }
         }
 
-        [Test]
-        public void Login_Wrong_Password()
+        [OneTimeSetUp]
+        public void Authenticate(SteepshotApiClient api)
         {
             // Arrange
-            var request = new LoginRequest(Name, Password + "x");
+            var request = new LoginRequest(Name, Password);
 
             // Act
-            var response = _api.Login(request).Result;
-
-            // Assert
-            AssertFailedResult(response);
-            Assert.That(response.Errors.Contains("Unable to login with provided credentials."));
-        }
-
-        [Test]
-        public void Login_Wrong_Username()
-        {
-            // Arrange
-            var request = new LoginRequest(Name + "x", Password);
-
-            // Act
-            var response = _api.Login(request).Result;
-
-            // Assert
-            AssertFailedResult(response);
-            Assert.That(response.Errors.Contains("Unable to login with provided credentials."));
-        }
-
-        [Test]
-        public void Login_With_Posting_Key()
-        {
-            // Arrange
-            var request = new LoginWithPostingKeyRequest(Name, PostingKey);
-
-            // Act
-            var response = _api.LoginWithPostingKey(request).Result;
+            var response = api.Login(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -101,13 +53,74 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Login_With_Posting_Key_Invalid_Credentials()
+        public void Login_Invalid_Credentials([Values("Steem", "Golos")] string name)
+        {
+            // Arrange
+            var request = new LoginRequest(Name + "x", Password + "x");
+
+            // Act
+            var response = Api(name).Login(request).Result;
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.That(response.Errors.Contains("Unable to login with provided credentials."));
+        }
+
+        [Test]
+        public void Login_Wrong_Password([Values("Steem", "Golos")] string name)
+        {
+            // Arrange
+            var request = new LoginRequest(Name, Password + "x");
+
+            // Act
+            var response = Api(name).Login(request).Result;
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.That(response.Errors.Contains("Unable to login with provided credentials."));
+        }
+
+        [Test]
+        public void Login_Wrong_Username([Values("Steem", "Golos")] string name)
+        {
+            // Arrange
+            var request = new LoginRequest(Name + "x", Password);
+
+            // Act
+            var response = Api(name).Login(request).Result;
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.That(response.Errors.Contains("Unable to login with provided credentials."));
+        }
+
+        [Test]
+        public void Login_With_Posting_Key([Values("Steem", "Golos")] string name)
+        {
+            // Arrange
+            var request = new LoginWithPostingKeyRequest(Name, PostingKey);
+
+            // Act
+            var response = Api(name).LoginWithPostingKey(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.That(response.Result.IsLoggedIn, Is.True);
+            Assert.That("User was logged in.", Is.EqualTo(response.Result.Message));
+            Assert.That(response.Result.SessionId, Is.Not.Empty);
+
+            // Setup
+            _sessionId = response.Result.SessionId;
+        }
+
+        [Test]
+        public void Login_With_Posting_Key_Invalid_Credentials([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new LoginWithPostingKeyRequest(Name + "x", PostingKey + "x");
 
             // Act
-            var response = _api.LoginWithPostingKey(request).Result;
+            var response = Api(name).LoginWithPostingKey(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -115,13 +128,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Login_With_Posting_Key_Wrong_PostingKey()
+        public void Login_With_Posting_Key_Wrong_PostingKey([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new LoginWithPostingKeyRequest(Name, PostingKey + "x");
 
             // Act
-            var response = _api.LoginWithPostingKey(request).Result;
+            var response = Api(name).LoginWithPostingKey(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -129,13 +142,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Login_With_Posting_Key_Wrong_Username()
+        public void Login_With_Posting_Key_Wrong_Username([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new LoginWithPostingKeyRequest(Name + "x", PostingKey);
 
             // Act
-            var response = _api.LoginWithPostingKey(request).Result;
+            var response = Api(name).LoginWithPostingKey(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -143,13 +156,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void UserPosts()
+        public void UserPosts([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new UserPostsRequest(Name);
 
             // Act
-            var response = _api.GetUserPosts(request).Result;
+            var response = Api(name).GetUserPosts(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -178,13 +191,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void UserPosts_Invalid_Username()
+        public void UserPosts_Invalid_Username([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new UserPostsRequest(Name + "x");
 
             // Act
-            var response = _api.GetUserPosts(request).Result;
+            var response = Api(name).GetUserPosts(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -192,15 +205,16 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void UserPosts_Offset_Limit()
+        public void UserPosts_Offset_Limit([Values("Steem", "Golos")] string name,
+        [Values("/cat1/@joseph.kalu/cat636203389144533548", "/cat1/@joseph.kalu/cat636281384922864910")] string offset)
         {
             // Arrange
             var request = new UserPostsRequest(Name);
-            request.Offset = "/cat1/@joseph.kalu/cat636203389144533548";
+            request.Offset = offset;
             request.Limit = 3;
 
             // Act
-            var response = _api.GetUserPosts(request).Result;
+            var response = Api(name).GetUserPosts(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -213,13 +227,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void UserPosts_With_SessionId_Some_Votes_True()
+        public void UserPosts_With_SessionId_Some_Votes_True([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new UserPostsRequest(Name) {SessionId = _sessionId};
 
             // Act
-            var response = _api.GetUserPosts(request).Result;
+            var response = Api(name).GetUserPosts(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -227,13 +241,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void UserPosts_Without_SessionId_All_Votes_False()
+        public void UserPosts_Without_SessionId_All_Votes_False([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new UserPostsRequest(Name);
 
             // Act
-            var response = _api.GetUserPosts(request).Result;
+            var response = Api(name).GetUserPosts(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -241,13 +255,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void UserRecentPosts()
+        public void UserRecentPosts([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new UserRecentPostsRequest(_sessionId);
 
             // Act
-            var response = _api.GetUserRecentPosts(request).Result;
+            var response = Api(name).GetUserRecentPosts(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -257,15 +271,15 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void UserRecentPosts_Offset_Limit()
+        public void UserRecentPosts_Offset_Limit([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new UserRecentPostsRequest(_sessionId);
-            request.Offset = _api.GetUserRecentPosts(request).Result.Result.Results.First().Url;
+            request.Offset = Api(name).GetUserRecentPosts(request).Result.Result.Results.First().Url;
             request.Limit = 3;
 
             // Act
-            var response = _api.GetUserRecentPosts(request).Result;
+            var response = Api(name).GetUserRecentPosts(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -278,13 +292,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Posts_Top()
+        public void Posts_Top([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new PostsRequest(PostType.Top);
 
             // Act
-            var response = _api.GetPosts(request).Result;
+            var response = Api(name).GetPosts(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -292,14 +306,14 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Posts_Top_Limit_Default()
+        public void Posts_Top_Limit_Default([Values("Steem", "Golos")] string name)
         {
             // Arrange
             const int defaultLimit = 20;
             var request = new PostsRequest(PostType.Top);
 
             // Act
-            var response = _api.GetPosts(request).Result;
+            var response = Api(name).GetPosts(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -307,15 +321,15 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Posts_Hot_Offset_Limit()
+        public void Posts_Hot_Offset_Limit([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new PostsRequest(PostType.Hot);
-            request.Offset = _api.GetPosts(request).Result.Result.Results.First().Url;
+            request.Offset = Api(name).GetPosts(request).Result.Result.Results.First().Url;
             request.Limit = 3;
 
             // Act
-            var response = _api.GetPosts(request).Result;
+            var response = Api(name).GetPosts(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -326,13 +340,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Posts_Top_With_SessionId()
+        public void Posts_Top_With_SessionId([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new PostsRequest(PostType.Top) {SessionId = _sessionId};
 
             // Act
-            var response = _api.GetPosts(request).Result;
+            var response = Api(name).GetPosts(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -341,13 +355,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Posts_Hot()
+        public void Posts_Hot([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new PostsRequest(PostType.Hot);
 
             // Act
-            var response = _api.GetPosts(request).Result;
+            var response = Api(name).GetPosts(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -355,13 +369,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Posts_New()
+        public void Posts_New([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new PostsRequest(PostType.New);
 
             // Act
-            var response = _api.GetPosts(request).Result;
+            var response = Api(name).GetPosts(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -369,30 +383,30 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Posts_By_Category()
+        public void Posts_By_Category([Values("Steem", "Golos")] string name, [Values("food", "ru--golos")] string category)
         {
             // Arrange
-            var request = new PostsByCategoryRequest(PostType.Top, "food");
+            var request = new PostsByCategoryRequest(PostType.Top, category);
 
             // Act
-            var response = _api.GetPostsByCategory(request).Result;
+            var response = Api(name).GetPostsByCategory(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
             Assert.That(response.Result.Results, Is.Not.Empty);
-            var postsWithoutCategoryInTags = response.Result.Results.Where(x => !x.Tags.Contains("food"));
-            var postShouldHaveCategoryInCategory = postsWithoutCategoryInTags.Any(x => !x.Category.Equals("food"));
+            var postsWithoutCategoryInTags = response.Result.Results.Where(x => !x.Tags.Contains(category));
+            var postShouldHaveCategoryInCategory = postsWithoutCategoryInTags.Any(x => !x.Category.Equals(category));
             Assert.That(postShouldHaveCategoryInCategory, Is.False);
         }
 
         [Test]
-        public void Posts_By_Category_Invalid_Name()
+        public void Posts_By_Category_Invalid_Name([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new PostsByCategoryRequest(PostType.Top, "asdas&^@dsad__sa@@d sd222f_f");
 
             // Act
-            var response = _api.GetPostsByCategory(request).Result;
+            var response = Api(name).GetPostsByCategory(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -400,13 +414,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Posts_By_Category_Not_Existing_Name()
+        public void Posts_By_Category_Not_Existing_Name([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new PostsByCategoryRequest(PostType.Top, "qweqweqweqewqwqweqe");
 
             // Act
-            var response = _api.GetPostsByCategory(request).Result;
+            var response = Api(name).GetPostsByCategory(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -414,13 +428,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Posts_By_Category_Empty_Name()
+        public void Posts_By_Category_Empty_Name([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new PostsByCategoryRequest(PostType.Top, "");
 
             // Act
-            var response = _api.GetPostsByCategory(request).Result;
+            var response = Api(name).GetPostsByCategory(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -428,30 +442,30 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Posts_By_Category_Hot()
+        public void Posts_By_Category_Hot([Values("Steem", "Golos")] string name, [Values("food", "ru--golos")] string category)
         {
             // Arrange
-            var request = new PostsByCategoryRequest(PostType.Hot, "food");
+            var request = new PostsByCategoryRequest(PostType.Hot, category);
 
             // Act
-            var response = _api.GetPostsByCategory(request).Result;
+            var response = Api(name).GetPostsByCategory(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
             Assert.That(response.Result.Results, Is.Not.Empty);
-            var postsWithoutCategoryInTags = response.Result.Results.Where(x => !x.Tags.Contains("food"));
-            var postShouldHaveCategoryInCategory = postsWithoutCategoryInTags.Any(x => !x.Category.Equals("food"));
+            var postsWithoutCategoryInTags = response.Result.Results.Where(x => !x.Tags.Contains(category));
+            var postShouldHaveCategoryInCategory = postsWithoutCategoryInTags.Any(x => !x.Category.Equals(category));
             Assert.That(postShouldHaveCategoryInCategory, Is.False);
         }
 
         [Test]
-        public void Posts_By_Category_New()
+        public void Posts_By_Category_New([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new PostsByCategoryRequest(PostType.New, "food");
 
             // Act
-            var response = _api.GetPostsByCategory(request).Result;
+            var response = Api(name).GetPostsByCategory(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -462,32 +476,32 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Posts_By_Category_Offset_Limit()
+        public void Posts_By_Category_Offset_Limit([Values("Steem", "Golos")] string name, [Values("food", "ru--golos")] string category)
         {
             // Arrange
-            var request = new PostsByCategoryRequest(PostType.Top, "food");
-            request.Offset = _api.GetPostsByCategory(request).Result.Result.Results.First().Url;
+            var request = new PostsByCategoryRequest(PostType.Top, category);
+            request.Offset = Api(name).GetPostsByCategory(request).Result.Result.Results.First().Url;
             request.Limit = 5;
 
             // Act
-            var response = _api.GetPostsByCategory(request).Result;
+            var response = Api(name).GetPostsByCategory(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
             Assert.That(response.Result.Results, Is.Not.Empty);
-            Assert.That(response.Result.Results.Where(x => !x.Tags.Contains("food")), Is.Empty);
+            Assert.That(response.Result.Results.Where(x => !x.Tags.Contains(category)), Is.Empty);
             Assert.That(response.Result.Results.Count, Is.EqualTo(request.Limit));
             Assert.That(response.Result.Results.First().Url, Is.EqualTo(request.Offset));
         }
 
         [Test]
-        public void Posts_By_Category_With_SessionId()
+        public void Posts_By_Category_With_SessionId([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new PostsByCategoryRequest(PostType.Top, "food") {SessionId = _sessionId};
 
             // Act
-            var response = _api.GetPostsByCategory(request).Result;
+            var response = Api(name).GetPostsByCategory(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -495,14 +509,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Register_PostingKey_Invalid()
+        public void Register_PostingKey_Invalid([Values("Steem", "Golos")] string name)
         {
             // Arrange
-            var request = new RegisterRequest("5JdHigxo9s8rdNSfGteprcx1Fhi7SBUwb7e2UcNvnTdz18Si7s1", "anch1",
-                "qwerty12345");
+            var request = new RegisterRequest("5JdHigxo9s8rdNSfGteprcx1Fhi7SBUwb7e2UcNvnTdz18Si7s1", "anch1", "qwerty12345");
 
             // Act
-            var response = _api.Register(request).Result;
+            var response = Api(name).Register(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -510,17 +523,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Register_Username_Already_Exists()
+        public void Register_Username_Already_Exists([Values("Steem", "Golos")] string name)
         {
-            const string postingKey = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
-            const string name = "joseph.kalu";
-            const string password = "test12345";
-
             // Arrange
-            var request = new RegisterRequest(postingKey, name, password);
+            var request = new RegisterRequest(PostingKey, Name, Password);
 
             // Act
-            var response = _api.Register(request).Result;
+            var response = Api(name).Register(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -528,14 +537,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Register_PostingKey_Same_With_New_Username()
+        public void Register_PostingKey_Same_With_New_Username([Values("Steem", "Golos")] string name)
         {
             // Arrange
-            var request = new RegisterRequest("5JdHigxo9s8rdNSfGteprcx1Fhi7SBUwb7e2UcNvnTdz18Si7s1", "anch1",
-                "qwerty12345");
+            var request = new RegisterRequest("5JdHigxo9s8rdNSfGteprcx1Fhi7SBUwb7e2UcNvnTdz18Si7s1", "anch1", "qwerty12345");
 
             // Act
-            var response = _api.Register(request).Result;
+            var response = Api(name).Register(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -543,13 +551,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Register_PostingKey_Is_Blank()
+        public void Register_PostingKey_Is_Blank([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new RegisterRequest("", "qweqweqweqwe", "qweqweqweqwe");
 
             // Act
-            var response = _api.Register(request).Result;
+            var response = Api(name).Register(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -557,14 +565,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Register_Password_Is_Short()
+        public void Register_Password_Is_Short([Values("Steem", "Golos")] string name)
         {
             // Arrange
-            var request = new RegisterRequest("5JdHsgxo9s8rdNsfGteprcxaFhi7SBUwb7e2UcNvnTdh18Si7so", "qweqweqweqwe",
-                "qweqweq");
+            var request = new RegisterRequest("5JdHsgxo9s8rdNsfGteprcxaFhi7SBUwb7e2UcNvnTdh18Si7so", "qweqweqweqwe", "qweqweq");
 
             // Act
-            var response = _api.Register(request).Result;
+            var response = Api(name).Register(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -572,14 +579,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Register_Password_Is_Numeric()
+        public void Register_Password_Is_Numeric([Values("Steem", "Golos")] string name)
         {
             // Arrange
-            var request = new RegisterRequest("5JdHsgxo9s8rdNsfGteprcxaFhi7SBUwb7e2UcNvnTdh18Si7so", "qweqweqweqwe",
-                "1234567890");
+            var request = new RegisterRequest("5JdHsgxo9s8rdNsfGteprcxaFhi7SBUwb7e2UcNvnTdh18Si7so", "qweqweqweqwe", "1234567890");
 
             // Act
-            var response = _api.Register(request).Result;
+            var response = Api(name).Register(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -587,18 +593,18 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Vote_Up_Already_Voted()
+        public void Vote_Up_Already_Voted([Values("Steem", "Golos")] string name)
         {
             // Load last post
             var userPostsRequest = new UserPostsRequest(Name);
-            var lastPost = _api.GetUserPosts(userPostsRequest).Result.Result.Results.First();
+            var lastPost = Api(name).GetUserPosts(userPostsRequest).Result.Result.Results.First();
 
             // Arrange
             var request = new VoteRequest(_sessionId, true, lastPost.Url);
 
             // Act
-            var response = _api.Vote(request).Result;
-            var response2 = _api.Vote(request).Result;
+            var response = Api(name).Vote(request).Result;
+            var response2 = Api(name).Vote(request).Result;
 
             // Assert
             AssertFailedResult(response2);
@@ -606,18 +612,18 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Vote_Down_Already_Voted()
+        public void Vote_Down_Already_Voted([Values("Steem", "Golos")] string name)
         {
             // Load last post
             var userPostsRequest = new UserPostsRequest(Name);
-            var lastPost = _api.GetUserPosts(userPostsRequest).Result.Result.Results.First();
+            var lastPost = Api(name).GetUserPosts(userPostsRequest).Result.Result.Results.First();
 
             // Arrange
             var request = new VoteRequest(_sessionId, false, lastPost.Url);
 
             // Act
-            var response = _api.Vote(request).Result;
-            var response2 = _api.Vote(request).Result;
+            var response = Api(name).Vote(request).Result;
+            var response2 = Api(name).Vote(request).Result;
 
             // Assert
             AssertFailedResult(response2);
@@ -625,13 +631,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Vote_Invalid_Identifier1()
+        public void Vote_Invalid_Identifier1([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new VoteRequest(_sessionId, true, "qwe");
 
             // Act
-            var response = _api.Vote(request).Result;
+            var response = Api(name).Vote(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -639,13 +645,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Vote_Invalid_Identifier2()
+        public void Vote_Invalid_Identifier2([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new VoteRequest(_sessionId, true, "qwe/qwe");
 
             // Act
-            var response = _api.Vote(request).Result;
+            var response = Api(name).Vote(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -653,13 +659,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Vote_Invalid_Identifier3()
+        public void Vote_Invalid_Identifier3([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new VoteRequest(_sessionId, true, "qwe/qwe");
 
             // Act
-            var response = _api.Vote(request).Result;
+            var response = Api(name).Vote(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -667,13 +673,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Vote_Invalid_Identifier4()
+        public void Vote_Invalid_Identifier4([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new VoteRequest(_sessionId, true, "qwe/@qwe");
 
             // Act
-            var response = _api.Vote(request).Result;
+            var response = Api(name).Vote(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -681,13 +687,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Follow_Invalid_Username()
+        public void Follow_Invalid_Username([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new FollowRequest(_sessionId, FollowType.Follow, "qwet32qwe3qwewfoc020mm2nndasdwe");
 
             // Act
-            var response = _api.Follow(request).Result;
+            var response = Api(name).Follow(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -695,13 +701,14 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Comments()
+        public void Comments([Values("Steem", "Golos")] string name,
+            [Values("@joseph.kalu/cat636203355240074655", "@joseph.kalu/cat636281384922864910")] string url)
         {
             // Arrange
             var request = new GetCommentsRequest("@joseph.kalu/cat636203355240074655");
 
             // Act
-            var response = _api.GetComments(request).Result;
+            var response = Api(name).GetComments(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -729,13 +736,14 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Comments_With_SessionId_Check_True_Votes()
+        public void Comments_With_SessionId_Check_True_Votes([Values("Steem", "Golos")] string name,
+            [Values("@joseph.kalu/cat636203355240074655", "@joseph.kalu/hi-golos")] string url)
         {
             // Arrange
-            var request = new GetCommentsRequest("@joseph.kalu/cat636203355240074655") {SessionId = _sessionId};
+            var request = new GetCommentsRequest(url) {SessionId = _sessionId};
 
             // Act
-            var response = _api.GetComments(request).Result;
+            var response = Api(name).GetComments(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -743,13 +751,14 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Comments_Without_SessionId_Check_False_Votes()
+        public void Comments_Without_SessionId_Check_False_Votes([Values("Steem", "Golos")] string name,
+            [Values("@joseph.kalu/cat636203355240074655", "@siberianshamen/chto-takoe-golos")] string url)
         {
             // Arrange
-            var request = new GetCommentsRequest("@joseph.kalu/cat636203355240074655");
+            var request = new GetCommentsRequest(url);
 
             // Act
-            var response = _api.GetComments(request).Result;
+            var response = Api(name).GetComments(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -757,13 +766,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Comments_Invalid_Url()
+        public void Comments_Invalid_Url([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new GetCommentsRequest("qwe");
 
             // Act
-            var response = _api.GetComments(request).Result;
+            var response = Api(name).GetComments(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -771,13 +780,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Comments_Invalid_Url_But_Valid_User()
+        public void Comments_Invalid_Url_But_Valid_User([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new GetCommentsRequest("@asduj/qweqweqweqw");
 
             // Act
-            var response = _api.GetComments(request).Result;
+            var response = Api(name).GetComments(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -785,13 +794,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void CreateComment_Empty_Body()
+        public void CreateComment_Empty_Body([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new CreateCommentRequest(_sessionId, "spam/@joseph.kalu/test-post-127", "", "test_title");
 
             // Act
-            var response = _api.CreateComment(request).Result;
+            var response = Api(name).CreateComment(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -799,13 +808,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void CreateComment_Empty_Title()
+        public void CreateComment_Empty_Title([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new CreateCommentRequest(_sessionId, "spam/@joseph.kalu/test-post-127", "test_body", "");
 
             // Act
-            var response = _api.CreateComment(request).Result;
+            var response = Api(name).CreateComment(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -813,19 +822,19 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void CreateComment_20_Seconds_Delay()
+        public void CreateComment_20_Seconds_Delay([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var userPostsRequest = new UserPostsRequest(Name);
-            var userPostsResponse = _api.GetUserPosts(userPostsRequest).Result;
+            var userPostsResponse = Api(name).GetUserPosts(userPostsRequest).Result;
             var lastPost = userPostsResponse.Result.Results.First();
             const string body = "Ллойс!";
             const string title = "Лучший камент ever";
             var createCommentRequest = new CreateCommentRequest(_sessionId, lastPost.Url, body, title);
 
             // Act
-            var response1 = _api.CreateComment(createCommentRequest).Result;
-            var response2 = _api.CreateComment(createCommentRequest).Result;
+            var response1 = Api(name).CreateComment(createCommentRequest).Result;
+            var response2 = Api(name).CreateComment(createCommentRequest).Result;
 
             // Assert
             AssertFailedResult(response2);
@@ -833,13 +842,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Categories()
+        public void Categories([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new SearchRequest();
 
             // Act
-            var response = _api.GetCategories(request).Result;
+            var response = Api(name).GetCategories(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -850,7 +859,7 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Categories_Offset_Limit()
+        public void Categories_Offset_Limit([Values("Steem", "Golos")] string name)
         {
             // Arrange
             const int limit = 5;
@@ -861,7 +870,7 @@ namespace Sweetshot.Tests.Steemit
             };
 
             // Act
-            var response = _api.GetCategories(request).Result;
+            var response = Api(name).GetCategories(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -873,13 +882,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Categories_Offset_Not_Exisiting()
+        public void Categories_Offset_Not_Exisiting([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new SearchRequest {Offset = "qweqweqwe"};
 
             // Act
-            var response = _api.GetCategories(request).Result;
+            var response = Api(name).GetCategories(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -889,13 +898,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Categories_With_SessionId()
+        public void Categories_With_SessionId([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new SearchRequest {SessionId = _sessionId};
 
             // Act
-            var response = _api.GetCategories(request).Result;
+            var response = Api(name).GetCategories(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -906,13 +915,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Categories_Search()
+        public void Categories_Search([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new SearchWithQueryRequest("ru");
 
             // Act
-            var response = _api.SearchCategories(request).Result;
+            var response = Api(name).SearchCategories(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -923,13 +932,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Categories_Search_Invalid_Query()
+        public void Categories_Search_Invalid_Query([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new SearchWithQueryRequest("qwerqwerqwerqwerqwerqwerqwerqwer");
 
             // Act
-            var response = _api.SearchCategories(request).Result;
+            var response = Api(name).SearchCategories(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -939,13 +948,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Categories_Search_Short_Query()
+        public void Categories_Search_Short_Query([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new SearchWithQueryRequest("f");
 
             // Act
-            var response = _api.SearchCategories(request).Result;
+            var response = Api(name).SearchCategories(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -953,13 +962,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Categories_Search_Empty_Query()
+        public void Categories_Search_Empty_Query([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new SearchWithQueryRequest(" ");
 
             // Act
-            var response = _api.SearchCategories(request).Result;
+            var response = Api(name).SearchCategories(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -967,7 +976,7 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Categories_Search_Offset_Limit()
+        public void Categories_Search_Offset_Limit([Values("Steem", "Golos")] string name)
         {
             // Arrange
             const int limit = 5;
@@ -978,7 +987,7 @@ namespace Sweetshot.Tests.Steemit
             };
 
             // Act
-            var response = _api.SearchCategories(request).Result;
+            var response = Api(name).SearchCategories(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -990,13 +999,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Categories_Search_Offset_Not_Exisiting()
+        public void Categories_Search_Offset_Not_Exisiting([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new SearchWithQueryRequest("life") {Offset = "qweqweqwe"};
 
             // Act
-            var response = _api.SearchCategories(request).Result;
+            var response = Api(name).SearchCategories(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -1004,13 +1013,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Categories_Search_With_SessionId()
+        public void Categories_Search_With_SessionId([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new SearchWithQueryRequest("lif");
 
             // Act
-            var response = _api.SearchCategories(request).Result;
+            var response = Api(name).SearchCategories(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -1021,13 +1030,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void ChangePassword_Invalid_OldPassword()
+        public void ChangePassword_Invalid_OldPassword([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new ChangePasswordRequest(_sessionId, Password + "x", NewPassword);
 
             // Act
-            var response = _api.ChangePassword(request).Result;
+            var response = Api(name).ChangePassword(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -1035,13 +1044,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void ChangePassword_Invalid_SessionId()
+        public void ChangePassword_Invalid_SessionId([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new ChangePasswordRequest(_sessionId + "x", Password, NewPassword);
 
             // Act
-            var response = _api.ChangePassword(request).Result;
+            var response = Api(name).ChangePassword(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -1049,13 +1058,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void ChangePassword_NewPassword_Short()
+        public void ChangePassword_NewPassword_Short([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new ChangePasswordRequest(_sessionId, Password, "t");
 
             // Act
-            var response = _api.ChangePassword(request).Result;
+            var response = Api(name).ChangePassword(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -1063,13 +1072,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void ChangePassword_NewPassword_Numeric()
+        public void ChangePassword_NewPassword_Numeric([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new ChangePasswordRequest(_sessionId, Password, "1234567890");
 
             // Act
-            var response = _api.ChangePassword(request).Result;
+            var response = Api(name).ChangePassword(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -1077,13 +1086,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void UserProfile()
+        public void UserProfile([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new UserProfileRequest(Name);
 
             // Act
-            var response = _api.GetUserProfile(request).Result;
+            var response = Api(name).GetUserProfile(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -1109,13 +1118,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void UserProfile_Invalid_Username()
+        public void UserProfile_Invalid_Username([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new UserProfileRequest("qweqweqwe");
 
             // Act
-            var response = _api.GetUserProfile(request).Result;
+            var response = Api(name).GetUserProfile(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -1123,13 +1132,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void UserProfile_With_SessionId()
+        public void UserProfile_With_SessionId([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new UserProfileRequest(Name) {SessionId = _sessionId};
 
             // Act
-            var response = _api.GetUserProfile(request).Result;
+            var response = Api(name).GetUserProfile(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -1155,13 +1164,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void UserFriends_Following()
+        public void UserFriends_Following([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new UserFriendsRequest(Name, FriendsType.Following);
 
             // Act
-            var response = _api.GetUserFriends(request).Result;
+            var response = Api(name).GetUserFriends(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -1177,13 +1186,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void UserFriends_Followers()
+        public void UserFriends_Followers([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new UserFriendsRequest(Name, FriendsType.Followers);
 
             // Act
-            var response = _api.GetUserFriends(request).Result;
+            var response = Api(name).GetUserFriends(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -1199,13 +1208,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void UserFriends_Followers_Invalid_Username()
+        public void UserFriends_Followers_Invalid_Username([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new UserFriendsRequest(Name + "x", FriendsType.Followers);
 
             // Act
-            var response = _api.GetUserFriends(request).Result;
+            var response = Api(name).GetUserFriends(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -1214,15 +1223,15 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void UserFriends_Followers_Offset_Limit()
+        public void UserFriends_Followers_Offset_Limit([Values("Steem", "Golos")] string name, [Values("vivianupman", "pmartynov")] string offset)
         {
             // Arrange
             var request = new UserFriendsRequest(Name, FriendsType.Followers);
-            request.Offset = "vivianupman";
-            request.Limit = 5;
+            request.Offset = offset;
+            request.Limit = 1;
 
             // Act
-            var response = _api.GetUserFriends(request).Result;
+            var response = Api(name).GetUserFriends(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -1230,18 +1239,18 @@ namespace Sweetshot.Tests.Steemit
             Assert.That(response.Result.Offset, Is.Not.Null);
             Assert.That(response.Result.Results, Is.Not.Empty);
             Assert.That(response.Result.Results, Is.Not.Empty);
-            Assert.That(response.Result.Results.First().Author, Is.EqualTo("vivianupman"));
-            Assert.That(response.Result.Results.Count == 5);
+            Assert.That(response.Result.Results.First().Author, Is.EqualTo(offset));
+            Assert.That(response.Result.Results.Count == 1);
         }
 
         [Test]
-        public void UserFriends_Followers_With_SessionId()
+        public void UserFriends_Followers_With_SessionId([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new UserFriendsRequest(Name, FriendsType.Followers) {SessionId = _sessionId};
 
             // Act
-            var response = _api.GetUserFriends(request).Result;
+            var response = Api(name).GetUserFriends(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -1253,11 +1262,11 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Terms_Of_Service()
+        public void Terms_Of_Service([Values("Steem", "Golos")] string name)
         {
             // Arrange
             // Act
-            var response = _api.TermsOfService().Result;
+            var response = Api(name).TermsOfService().Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -1265,13 +1274,14 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void GetPostInfo()
+        public void GetPostInfo([Values("Steem", "Golos")] string name,
+            [Values("spam/@joseph.kalu/test-post-127", "@joseph.kalu/cat636281384922864910")] string url)
         {
             // Arrange
-            var request = new PostsInfoRequest("spam/@joseph.kalu/test-post-127");
+            var request = new PostsInfoRequest(url);
 
             // Act
-            var response = _api.GetPostInfo(request).Result;
+            var response = Api(name).GetPostInfo(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -1297,13 +1307,14 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void GetPostInfo_With_SessionId()
+        public void GetPostInfo_With_SessionId([Values("Steem", "Golos")] string name,
+            [Values("spam/@joseph.kalu/test-post-127", "@joseph.kalu/cat636281384922864910")] string url)
         {
             // Arrange
-            var request = new PostsInfoRequest("spam/@joseph.kalu/test-post-127") {SessionId = _sessionId};
+            var request = new PostsInfoRequest(url) {SessionId = _sessionId};
 
             // Act
-            var response = _api.GetPostInfo(request).Result;
+            var response = Api(name).GetPostInfo(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -1329,13 +1340,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void GetPostInfo_Invalid_Url()
+        public void GetPostInfo_Invalid_Url([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new PostsInfoRequest("spam/@joseph.kalu/qweqeqwqweqweqwe");
 
             // Act
-            var response = _api.GetPostInfo(request).Result;
+            var response = Api(name).GetPostInfo(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -1343,7 +1354,7 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Upload_Empty_Title()
+        public void Upload_Empty_Title([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
@@ -1352,7 +1363,7 @@ namespace Sweetshot.Tests.Steemit
             var request = new UploadImageRequest(_sessionId, "", file, "cat1", "cat2", "cat3", "cat4");
 
             // Act
-            var response = _api.Upload(request).Result;
+            var response = Api(name).Upload(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -1360,13 +1371,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Upload_Empty_Photo()
+        public void Upload_Empty_Photo([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new UploadImageRequest(_sessionId, "title", "cat1", "cat2", "cat3", "cat4");
 
             // Act
-            var response = _api.Upload(request).Result;
+            var response = Api(name).Upload(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -1374,7 +1385,7 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void Upload_Tags_Greater_Than_4()
+        public void Upload_Tags_Greater_Than_4([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
@@ -1383,22 +1394,21 @@ namespace Sweetshot.Tests.Steemit
             var request = new UploadImageRequest(_sessionId, "cat", file, "cat1", "cat2", "cat3", "cat4", "cat5");
 
             // Act
-            var response = _api.Upload(request).Result;
+            var response = Api(name).Upload(request).Result;
 
             // Assert
             AssertFailedResult(response);
-            Assert.That(response.Errors.Contains(
-                "The number of tags should not be more than 4. Please remove a couple of tags and try again."));
+            Assert.That(response.Errors.Contains("The number of tags should not be more than 4. Please remove a couple of tags and try again."));
         }
 
         [Test]
-        public void User_Search()
+        public void User_Search([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new SearchWithQueryRequest("aar");
 
             // Act
-            var response = _api.SearchUser(request).Result;
+            var response = Api(name).SearchUser(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -1409,13 +1419,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void User_Search_Invalid_Query()
+        public void User_Search_Invalid_Query([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new SearchWithQueryRequest("qwerqwerqwerqwerqwerqwerqwerqwer");
 
             // Act
-            var response = _api.SearchUser(request).Result;
+            var response = Api(name).SearchUser(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -1425,13 +1435,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void User_Search_Short_Query()
+        public void User_Search_Short_Query([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new SearchWithQueryRequest("fo");
 
             // Act
-            var response = _api.SearchUser(request).Result;
+            var response = Api(name).SearchUser(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -1439,13 +1449,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void User_Search_Empty_Query()
+        public void User_Search_Empty_Query([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new SearchWithQueryRequest(" ");
 
             // Act
-            var response = _api.SearchUser(request).Result;
+            var response = Api(name).SearchUser(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -1453,7 +1463,7 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void User_Search_Offset_Limit()
+        public void User_Search_Offset_Limit([Values("Steem", "Golos")] string name)
         {
             // Arrange
             const int limit = 3;
@@ -1464,7 +1474,7 @@ namespace Sweetshot.Tests.Steemit
             };
 
             // Act
-            var response = _api.SearchUser(request).Result;
+            var response = Api(name).SearchUser(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -1476,13 +1486,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void User_Search_Offset_Not_Exisiting()
+        public void User_Search_Offset_Not_Exisiting([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new SearchWithQueryRequest("aar") {Offset = "qweqweqwe"};
 
             // Act
-            var response = _api.SearchUser(request).Result;
+            var response = Api(name).SearchUser(request).Result;
 
             // Assert
             AssertFailedResult(response);
@@ -1490,13 +1500,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void User_Search_With_SessionId()
+        public void User_Search_With_SessionId([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new SearchWithQueryRequest("aar") {SessionId = _sessionId};
 
             // Act
-            var response = _api.SearchUser(request).Result;
+            var response = Api(name).SearchUser(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -1507,13 +1517,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void User_Exists_Check_Valid_Username()
+        public void User_Exists_Check_Valid_Username([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new UserExistsRequests("pmartynov");
 
             // Act
-            var response = _api.UserExistsCheck(request).Result;
+            var response = Api(name).UserExistsCheck(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
@@ -1521,13 +1531,13 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test]
-        public void User_Exists_Check_Invalid_Username()
+        public void User_Exists_Check_Invalid_Username([Values("Steem", "Golos")] string name)
         {
             // Arrange
             var request = new UserExistsRequests("pmartynov123");
 
             // Act
-            var response = _api.UserExistsCheck(request).Result;
+            var response = Api(name).UserExistsCheck(request).Result;
 
             // Assert
             AssertSuccessfulResult(response);
