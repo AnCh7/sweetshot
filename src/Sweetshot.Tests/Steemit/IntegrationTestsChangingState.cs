@@ -28,22 +28,20 @@ namespace Sweetshot.Tests.Steemit
             }
         }
 
-        private string Authenticate(string name, string password, SteepshotApiClient api)
+        private string Authenticate(string name, string postingKey, SteepshotApiClient api)
         {
-            var request = new LoginRequest(name, password);
-            var response = api.Login(request).Result;
+            var request = new LoginWithPostingKeyRequest(name, postingKey);
+            var response = api.LoginWithPostingKey(request).Result;
             return response.Result.SessionId;
         }
 
-        [Test]
-        public void BlockchainStateChangingTest([Values("Steem", "Golos")] string apiName,
-                                                [Values("test12345", "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG")] string password,
-                                                [Values("asduj", "pmartynov")] string user)
+        [Test, Sequential]
+        public void BlockchainStateChangingTest([Values("Steem", "Golos")] string apiName, [Values("asduj", "pmartynov")] string user)
         {
             const string Name = "joseph.kalu";
-            const string NewPassword = "test123456";
+            const string PostingKey = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
 
-            var sessionId = Authenticate(Name, password, Api(apiName));
+            var sessionId = Authenticate(Name, PostingKey, Api(apiName));
 
             // 1) Create new post
             var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
@@ -180,25 +178,6 @@ namespace Sweetshot.Tests.Steemit
             Assert.That(unfollowResponse.Result.IsFollowed, Is.False);
             Assert.That(unfollowResponse.Result.Message, Is.EqualTo("User is unfollowed"));
 
-            // 9) Change password
-            var changePasswordRequest = new ChangePasswordRequest(sessionId, password, NewPassword);
-            var changePasswordResponse = Api(apiName).ChangePassword(changePasswordRequest).Result;
-            AssertResult(changePasswordResponse);
-            Assert.That(changePasswordResponse.Result.IsChanged, Is.True);
-            Assert.That(changePasswordResponse.Result.Message, Is.EqualTo("Password was changed"));
-
-            // Rollback
-            // New sessionId with new credentials
-            var newSessionId = Authenticate(Name, NewPassword, Api(apiName));
-            var changePasswordRequest2 = new ChangePasswordRequest(newSessionId, NewPassword, password);
-            var changePasswordResponse2 = Api(apiName).ChangePassword(changePasswordRequest2).Result;
-            AssertResult(changePasswordResponse2);
-            Assert.That(changePasswordResponse.Result.IsChanged, Is.True);
-            Assert.That(changePasswordResponse2.Result.Message, Is.EqualTo("Password was changed"));
-
-            // Update sessionId
-            sessionId = Authenticate(Name, password, Api(apiName));
-
             // 10) Logout
             var logoutRequest = new LogoutRequest(sessionId);
             var logoutResponse = Api(apiName).Logout(logoutRequest).Result;
@@ -206,26 +185,6 @@ namespace Sweetshot.Tests.Steemit
             Assert.That(logoutResponse.Result.IsLoggedOut, Is.True);
             Assert.That(logoutResponse.Result.Message, Is.EqualTo("User is logged out"));
         }
-
-        //[Test]
-        //public void Register_Test()
-        //{
-            //const string postingKey = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
-            //const string apiName = "joseph.kalu";
-            //const string password = "test12345";
-
-            // Arrange
-            //var request = new RegisterRequest(postingKey, apiName, password);
-
-            // Act
-            //var response = _api.Register(request).Result;
-
-            // Assert
-            //AssertResult(response);
-            //Assert.That(response.Result.IsLoggedIn, Is.True);
-            //Assert.That(response.Result.SessionId, Is.Not.Empty);
-            //Assert.That(response.Result.Message, Is.Not.Empty);
-        //}
 
         //[Ignore("Ingoring...")]
         //public void Upload_Throttling()
