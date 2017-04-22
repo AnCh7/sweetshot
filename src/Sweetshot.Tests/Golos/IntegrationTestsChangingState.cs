@@ -19,7 +19,7 @@ namespace Sweetshot.Tests.Golos
         public void BlockchainStateChangingTest()
         {
             const string name = "joseph.kalu";
-            const string password = "test12345";
+            const string password = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
             const string newPassword = "test123456";
 
             var sessionId = Authenticate(name, password);
@@ -144,7 +144,7 @@ namespace Sweetshot.Tests.Golos
             // 7) Follow
             // Wait for data to be writed into blockchain
             Thread.Sleep(TimeSpan.FromSeconds(15));
-            var followRequest = new FollowRequest(sessionId, FollowType.Follow, "asduj");
+            var followRequest = new FollowRequest(sessionId, FollowType.Follow, "pmartynov");
             var followResponse = _api.Follow(followRequest).Result;
             AssertResult(followResponse);
             Assert.That(followResponse.Result.IsFollowed, Is.True);
@@ -153,7 +153,7 @@ namespace Sweetshot.Tests.Golos
             // 8) UnFollow
             // Wait for data to be writed into blockchain
             Thread.Sleep(TimeSpan.FromSeconds(15));
-            var unfollowRequest = new FollowRequest(sessionId, FollowType.UnFollow, "asduj");
+            var unfollowRequest = new FollowRequest(sessionId, FollowType.UnFollow, "pmartynov");
             var unfollowResponse = _api.Follow(unfollowRequest).Result;
             AssertResult(unfollowResponse);
             Assert.That(unfollowResponse.Result.IsFollowed, Is.False);

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -27,6 +28,7 @@ namespace Sweetshot.Library.HttpClient
         ///     1) POST https://steepshot.org/api/v1/login HTTP/1.1
         ///             {"username":"joseph.kalu","password":"test1234"}
         /// </summary>
+        [Obsolete]
         public async Task<OperationResult<LoginResponse>> Login(LoginRequest request)
         {
             return await Authenticate("login", request);
@@ -34,6 +36,7 @@ namespace Sweetshot.Library.HttpClient
 
         /// <summary>
         /// </summary>
+        [Obsolete]
         public async Task<OperationResult<LoginResponse>> Register(RegisterRequest request)
         {
             return await Authenticate("register", request);
@@ -288,6 +291,7 @@ namespace Sweetshot.Library.HttpClient
         ///             Cookie: sessionid=oh3f8vua8a5s2au5ovfqhsi6zvqgjfif
         ///             {"old_password":"test1234","new_password":"test12345"}
         /// </summary>
+        [Obsolete]
         public async Task<OperationResult<ChangePasswordResponse>> ChangePassword(ChangePasswordRequest request)
         {
             var parameters = CreateSessionParameter(request.SessionId);
