@@ -1,6 +1,5 @@
 1) compare golos and steemit tests
 2) remove /register /login /change-passord test
-3) add login-with-posting key + test
 4) limit\offset tests
 5) register tests
 6) unregister tests

@@ -13,30 +13,31 @@ namespace Sweetshot.Tests.Golos
     public class IntegrationTests
     {
         private const string Name = "joseph.kalu";
-        private const string Password = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
+        private const string Password = "test12345";
         private const string NewPassword = "test123456";
+        private const string PostingKey = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
         private string _sessionId = string.Empty;
 
         private readonly SteepshotApiClient _api = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url"]);
 
-        [OneTimeSetUp]
-        public void Authenticate()
-        {
-            // Arrange
-            var request = new LoginRequest(Name, Password);
-
-            // Act
-            var response = _api.Login(request).Result;
-
-            // Assert
-            AssertSuccessfulResult(response);
-            Assert.That(response.Result.IsLoggedIn, Is.True);
-            Assert.That("User was logged in.", Is.EqualTo(response.Result.Message));
-            Assert.That(response.Result.SessionId, Is.Not.Empty);
-
-            // Setup
-            _sessionId = response.Result.SessionId;
-        }
+//        [OneTimeSetUp]
+//        public void Authenticate()
+//        {
+//            // Arrange
+//            var request = new LoginRequest(Name, Password);
+//
+//            // Act
+//            var response = _api.Login(request).Result;
+//
+//            // Assert
+//            AssertSuccessfulResult(response);
+//            Assert.That(response.Result.IsLoggedIn, Is.True);
+//            Assert.That("User was logged in.", Is.EqualTo(response.Result.Message));
+//            Assert.That(response.Result.SessionId, Is.Not.Empty);
+//
+//            // Setup
+//            _sessionId = response.Result.SessionId;
+//        }
 
         [Test]
         public void Login_Invalid_Credentials()
@@ -78,6 +79,67 @@ namespace Sweetshot.Tests.Golos
             // Assert
             AssertFailedResult(response);
             Assert.That(response.Errors.Contains("Unable to login with provided credentials."));
+        }
+
+        [Test]
+        public void Login_With_Posting_Key()
+        {
+            // Arrange
+            var request = new LoginWithPostingKeyRequest(Name, PostingKey);
+
+            // Act
+            var response = _api.LoginWithPostingKey(request).Result;
+
+            // Assert
+            AssertSuccessfulResult(response);
+            Assert.That(response.Result.IsLoggedIn, Is.True);
+            Assert.That("User was logged in.", Is.EqualTo(response.Result.Message));
+            Assert.That(response.Result.SessionId, Is.Not.Empty);
+
+            // Setup
+            _sessionId = response.Result.SessionId;
+        }
+
+        [Test]
+        public void Login_With_Posting_Key_Invalid_Credentials()
+        {
+            // Arrange
+            var request = new LoginWithPostingKeyRequest(Name + "x", PostingKey + "x");
+
+            // Act
+            var response = _api.LoginWithPostingKey(request).Result;
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.That(response.Errors.Contains("Invalid posting key."));
+        }
+
+        [Test]
+        public void Login_With_Posting_Key_Wrong_PostingKey()
+        {
+            // Arrange
+            var request = new LoginWithPostingKeyRequest(Name, PostingKey + "x");
+
+            // Act
+            var response = _api.LoginWithPostingKey(request).Result;
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.That(response.Errors.Contains("Invalid posting key."));
+        }
+
+        [Test]
+        public void Login_With_Posting_Key_Wrong_Username()
+        {
+            // Arrange
+            var request = new LoginWithPostingKeyRequest(Name + "x", PostingKey);
+
+            // Act
+            var response = _api.LoginWithPostingKey(request).Result;
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.That(response.Errors.Contains("Invalid posting key."));
         }
 
         [Test]
