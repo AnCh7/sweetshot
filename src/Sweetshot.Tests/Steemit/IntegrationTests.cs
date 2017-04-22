@@ -1338,22 +1338,58 @@ namespace Sweetshot.Tests.Steemit
             Assert.False(response.Result.Exists);
         }
 
-        [Test]
-        public void Obsolete_Login()
+        [Test, Sequential]
+        public void Obsolete_Login([Values("Steem", "Golos")] string name)
         {
-            //TODO
+            // TODO
+            // Arrange
+            var request = new LoginRequest(Name, PostingKey);
+
+            // Act
+            var response = Api(name).Login(request).Result;
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.That(response.Errors.Contains("xxxxxxxxxxxxxxx"));
         }
 
-        [Test]
-        public void Obsolete_Register()
+        [Test, Sequential]
+        public void Obsolete_Register([Values("Steem", "Golos")] string name)
         {
-            //TODO
+            // TODO
+            const string username = "joseph.kalu";
+            const string password = "test12345";
+            const string postingKey = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
+
+            // Arrange
+            var request = new RegisterRequest(postingKey, username, password);
+
+            // Act
+            var response = Api(name).Register(request).Result;
+
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.That(response.Errors.Contains("xxxxxxxxxxxxxxx"));
         }
 
-        [Test]
-        public void Obsolete_ChangePassword()
+        [Test, Sequential]
+        public void Obsolete_ChangePassword([Values("Steem", "Golos")] string name)
         {
-            //TODO
+            // TODO
+            const string password = "test12345";
+            const string newPassword = "test123456";
+            const string postingKey = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
+
+            // Arrange
+            var request = new ChangePasswordRequest(Authenticate(Api(name)), password + "x", newPassword);
+
+            // Act
+            var response = Api(name).ChangePassword(request).Result;
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.That(response.Errors.Contains("xxxxxxxxxxxxxxxxxx"));
         }
 
         private void AssertSuccessfulResult<T>(OperationResult<T> response)

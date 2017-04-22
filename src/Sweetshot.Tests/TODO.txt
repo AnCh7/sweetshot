@@ -6,4 +6,3 @@
 9) is.not.null delete
 10) TODO
 11) обновть profile у user
-13) Register_Username_Already_Exists
