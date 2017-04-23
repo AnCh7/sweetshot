@@ -1341,7 +1341,6 @@ namespace Sweetshot.Tests.Steemit
         [Test, Sequential]
         public void Obsolete_Login([Values("Steem", "Golos")] string name)
         {
-            // TODO
             // Arrange
             var request = new LoginRequest(Name, PostingKey);
 
@@ -1349,14 +1348,15 @@ namespace Sweetshot.Tests.Steemit
             var response = Api(name).Login(request).Result;
 
             // Assert
-            AssertFailedResult(response);
-            Assert.That(response.Errors.Contains("xxxxxxxxxxxxxxx"));
+            AssertSuccessfulResult(response);
+            Assert.That(response.Result.IsLoggedIn, Is.True);
+            Assert.That(response.Result.Message, Is.EqualTo("User was logged in."));
+            Assert.That(response.Result.SessionId, Is.Not.Empty);
         }
 
         [Test, Sequential]
-        public void Obsolete_Register([Values("Steem", "Golos")] string name)
+        public void Obsolete_Register_Already_Regirested([Values("Steem", "Golos")] string name)
         {
-            // TODO
             const string username = "joseph.kalu";
             const string password = "test12345";
             const string postingKey = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
@@ -1370,26 +1370,34 @@ namespace Sweetshot.Tests.Steemit
 
             // Assert
             AssertFailedResult(response);
-            Assert.That(response.Errors.Contains("xxxxxxxxxxxxxxx"));
+            Assert.That(response.Errors.Contains("A user with that username already exists."));
         }
 
         [Test, Sequential]
         public void Obsolete_ChangePassword([Values("Steem", "Golos")] string name)
         {
-            // TODO
             const string password = "test12345";
             const string newPassword = "test123456";
             const string postingKey = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
 
             // Arrange
-            var request = new ChangePasswordRequest(Authenticate(Api(name)), password + "x", newPassword);
+            var request = new ChangePasswordRequest(Authenticate(Api(name)), password, newPassword);
 
             // Act
             var response = Api(name).ChangePassword(request).Result;
 
             // Assert
-            AssertFailedResult(response);
-            Assert.That(response.Errors.Contains("xxxxxxxxxxxxxxxxxx"));
+            AssertSuccessfulResult(response);
+            Assert.That(response.Result.IsChanged, Is.True);
+            Assert.That(response.Result.Message, Is.EqualTo("Password was changed"));
+
+            // Rollback
+            var request2 = new ChangePasswordRequest(Authenticate(Api(name)), newPassword, password);
+            var response2 = Api(name).ChangePassword(request2).Result;
+
+            AssertSuccessfulResult(response2);
+            Assert.That(response2.Result.IsChanged, Is.True);
+            Assert.That(response2.Result.Message, Is.EqualTo("Password was changed"));
         }
 
         private void AssertSuccessfulResult<T>(OperationResult<T> response)

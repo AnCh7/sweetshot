@@ -178,7 +178,7 @@ namespace Sweetshot.Tests.Steemit
             Assert.That(unfollowResponse.Result.IsFollowed, Is.False);
             Assert.That(unfollowResponse.Result.Message, Is.EqualTo("User is unfollowed"));
 
-            // 10) Logout
+            // 9) Logout
             var logoutRequest = new LogoutRequest(sessionId);
             var logoutResponse = Api(apiName).Logout(logoutRequest).Result;
             AssertResult(logoutResponse);
