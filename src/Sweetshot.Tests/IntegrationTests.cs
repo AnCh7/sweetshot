@@ -15,8 +15,8 @@ namespace Sweetshot.Tests.Steemit
         private const string Name = "joseph.kalu";
         private const string PostingKey = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
 
-        private SteepshotApiClient steem = new SteepshotApiClient(ConfigurationManager.AppSettings["steepshot_url"]);
-        private SteepshotApiClient golos = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url"]);
+        private SteepshotApiClient steem = new SteepshotApiClient(ConfigurationManager.AppSettings["steepshot_url_qa"]);
+        private SteepshotApiClient golos = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url_qa"]);
         private SteepshotApiClient Api(string name)
         {
             switch (name)
@@ -429,10 +429,10 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test, Sequential]
-        public void Posts_By_Category_With_SessionId([Values("Steem", "Golos")] string name)
+        public void Posts_By_Category_With_SessionId([Values("Steem", "Golos")] string name, [Values("food", "ru--golos")] string category)
         {
             // Arrange
-            var request = new PostsByCategoryRequest(PostType.Top, "food") {SessionId = Authenticate(Api(name))};
+            var request = new PostsByCategoryRequest(PostType.Top, category) {SessionId = Authenticate(Api(name))};
 
             // Act
             var response = Api(name).GetPostsByCategory(request).Result;
@@ -552,10 +552,11 @@ namespace Sweetshot.Tests.Steemit
 
         [Test, Sequential]
         public void Comments([Values("Steem", "Golos")] string name,
-            [Values("@joseph.kalu/cat636203355240074655", "@joseph.kalu/cat636281384922864910")] string url)
+                             [Values("@joseph.kalu/cat636203355240074655",
+                                     "@joseph.kalu/cat636281384922864910")] string url)
         {
             // Arrange
-            var request = new GetCommentsRequest("@joseph.kalu/cat636203355240074655");
+            var request = new GetCommentsRequest(url);
 
             // Act
             var response = Api(name).GetComments(request).Result;
@@ -880,10 +881,10 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test, Sequential]
-        public void UserProfile([Values("Steem", "Golos")] string name)
+        public void UserProfile([Values("Steem", "Golos")] string name, [Values("thecryptofiend", "phoenix")] string user)
         {
             // Arrange
-            var request = new UserProfileRequest(Name);
+            var request = new UserProfileRequest(user);
 
             // Act
             var response = Api(name).GetUserProfile(request).Result;
@@ -908,7 +909,7 @@ namespace Sweetshot.Tests.Steemit
             Assert.That(response.Result.Name, Is.Not.Null);
             Assert.That(response.Result.About, Is.Not.Null);
             Assert.That(response.Result.Location, Is.Not.Null);
-            // TODO Assert.That(response.Result.WebSite, Is.Not.Null);
+            Assert.That(response.Result.Website, Is.Not.Null);
         }
 
         [Test, Sequential]
@@ -926,7 +927,7 @@ namespace Sweetshot.Tests.Steemit
         }
 
         [Test, Sequential]
-        public void UserProfile_With_SessionId([Values("Steem", "Golos")] string name)
+        public void UserProfile_With_SessionId([Values("Steem", "Golos")] string name, [Values("thecryptofiend", "phoenix")] string user)
         {
             // Arrange
             var request = new UserProfileRequest(Name) {SessionId = Authenticate(Api(name))};
@@ -954,7 +955,7 @@ namespace Sweetshot.Tests.Steemit
             Assert.That(response.Result.Name, Is.Not.Null);
             Assert.That(response.Result.About, Is.Not.Null);
             Assert.That(response.Result.Location, Is.Not.Null);
-            //TODO Assert.That(response.Result.WebSite, Is.Not.Null);
+            Assert.That(response.Result.Website, Is.Not.Null);
         }
 
         [Test, Sequential]
