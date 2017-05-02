@@ -1,0 +1,7 @@
+{
+  "search.exclude": {
+    "**/packages": true,
+    "**/.idea": true,
+    "**/python3-src": true
+  }
+}
