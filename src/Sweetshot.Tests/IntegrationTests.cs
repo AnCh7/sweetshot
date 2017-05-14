@@ -1349,10 +1349,8 @@ namespace Sweetshot.Tests.Steemit
             var response = Api(name).Login(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
-            Assert.That(response.Result.IsLoggedIn, Is.True);
-            Assert.That(response.Result.Message, Is.EqualTo("User was logged in."));
-            Assert.That(response.Result.SessionId, Is.Not.Empty);
+            AssertFailedResult(response);
+            Assert.That(response.Errors.Contains("Your version of Steepshot is too old. Please download an update."));
         }
 
         [Test, Sequential]
@@ -1371,7 +1369,7 @@ namespace Sweetshot.Tests.Steemit
 
             // Assert
             AssertFailedResult(response);
-            Assert.That(response.Errors.Contains("A user with that username already exists."));
+            Assert.That(response.Errors.Contains("Your version of Steepshot is too old. Please download an update."));
         }
 
         [Test, Sequential]
@@ -1388,17 +1386,8 @@ namespace Sweetshot.Tests.Steemit
             var response = Api(name).ChangePassword(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
-            Assert.That(response.Result.IsChanged, Is.True);
-            Assert.That(response.Result.Message, Is.EqualTo("Password was changed"));
-
-            // Rollback
-            var request2 = new ChangePasswordRequest(Authenticate(Api(name)), newPassword, password);
-            var response2 = Api(name).ChangePassword(request2).Result;
-
-            AssertSuccessfulResult(response2);
-            Assert.That(response2.Result.IsChanged, Is.True);
-            Assert.That(response2.Result.Message, Is.EqualTo("Password was changed"));
+            AssertFailedResult(response);
+            Assert.That(response.Errors.Contains("Your version of Steepshot is too old. Please download an update."));
         }
 
         private void AssertSuccessfulResult<T>(OperationResult<T> response)
