@@ -7,7 +7,7 @@ using Sweetshot.Library.HttpClient;
 using Sweetshot.Library.Models.Common;
 using Sweetshot.Library.Models.Requests;
 
-namespace Sweetshot.Tests.Steemit
+namespace Sweetshot.Tests
 {
     [TestFixture]
     public class IntegrationTests
@@ -15,16 +15,17 @@ namespace Sweetshot.Tests.Steemit
         private const string Name = "joseph.kalu";
         private const string PostingKey = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
 
-        private SteepshotApiClient steem = new SteepshotApiClient(ConfigurationManager.AppSettings["steepshot_url_qa"]);
-        private SteepshotApiClient golos = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url_qa"]);
+        private readonly SteepshotApiClient _steem = new SteepshotApiClient(ConfigurationManager.AppSettings["steepshot_url"]);
+        private readonly SteepshotApiClient _golos = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url"]);
+
         private SteepshotApiClient Api(string name)
         {
             switch (name)
             {
                 case "Steem":
-                    return steem;
+                    return _steem;
                 case "Golos":
-                    return golos;
+                    return _golos;
                 default:
                     return null;
             }
