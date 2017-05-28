@@ -15,8 +15,10 @@ namespace Sweetshot.Tests
         private const string Name = "joseph.kalu";
         private const string PostingKey = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
 
-        private readonly SteepshotApiClient _steem = new SteepshotApiClient(ConfigurationManager.AppSettings["steepshot_url"]);
-        private readonly SteepshotApiClient _golos = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url"]);
+        private readonly SteepshotApiClient _steem = new SteepshotApiClient(ConfigurationManager.AppSettings["steepshot_url_qa"]);
+        //private readonly SteepshotApiClient _steem = new SteepshotApiClient(ConfigurationManager.AppSettings["steepshot_url"]);
+        private readonly SteepshotApiClient _golos = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url_qa"]);
+        //private readonly SteepshotApiClient _golos = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url"]);
 
         private SteepshotApiClient Api(string name)
         {
@@ -141,7 +143,7 @@ namespace Sweetshot.Tests
 
         [Test, Sequential]
         public void UserPosts_Offset_Limit([Values("Steem", "Golos")] string name,
-        [Values("/cat1/@joseph.kalu/cat636203389144533548", "/cat1/@joseph.kalu/cat636281384922864910")] string offset)
+            [Values("/cat1/@joseph.kalu/cat636203389144533548", "/cat1/@joseph.kalu/cat636281384922864910")] string offset)
         {
             // Arrange
             var request = new UserPostsRequest(Name);
@@ -538,6 +540,100 @@ namespace Sweetshot.Tests
         }
 
         [Test, Sequential]
+        public void Flag_Up_Already_Flagged([Values("Steem", "Golos")] string name)
+        {
+            // Load last post
+            var userPostsRequest = new UserPostsRequest(Name);
+            var lastPost = Api(name).GetUserPosts(userPostsRequest).Result.Result.Results.First();
+
+            // Arrange
+            var request = new FlagRequest(Authenticate(Api(name)), true, lastPost.Url);
+
+            // Act
+            var response = Api(name).Flag(request).Result;
+            var response2 = Api(name).Flag(request).Result;
+
+            // Assert
+            AssertFailedResult(response2);
+            Assert.That(response2.Errors.Contains("You have already voted in a similar way"));
+        }
+
+        [Test, Sequential]
+        public void Flag_Down_Already_Flagged([Values("Steem", "Golos")] string name)
+        {
+            // Load last post
+            var userPostsRequest = new UserPostsRequest(Name);
+            var lastPost = Api(name).GetUserPosts(userPostsRequest).Result.Result.Results.First();
+
+            // Arrange
+            var request = new FlagRequest(Authenticate(Api(name)), false, lastPost.Url);
+
+            // Act
+            var response = Api(name).Flag(request).Result;
+            var response2 = Api(name).Flag(request).Result;
+
+            // Assert
+            AssertFailedResult(response2);
+            Assert.That(response2.Errors.Contains("You have already voted in a similar way"));
+        }
+
+        [Test, Sequential]
+        public void Flag_Invalid_Identifier1([Values("Steem", "Golos")] string name)
+        {
+            // Arrange
+            var request = new FlagRequest(Authenticate(Api(name)), true, "qwe");
+
+            // Act
+            var response = Api(name).Flag(request).Result;
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.That(response.Errors.Contains("Incorrect identifier"));
+        }
+
+        [Test, Sequential]
+        public void Flag_Invalid_Identifier2([Values("Steem", "Golos")] string name)
+        {
+            // Arrange
+            var request = new FlagRequest(Authenticate(Api(name)), true, "qwe/qwe");
+
+            // Act
+            var response = Api(name).Flag(request).Result;
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.That(response.Errors.Contains("Incorrect identifier"));
+        }
+
+        [Test, Sequential]
+        public void Flag_Invalid_Identifier3([Values("Steem", "Golos")] string name)
+        {
+            // Arrange
+            var request = new FlagRequest(Authenticate(Api(name)), true, "qwe/qwe");
+
+            // Act
+            var response = Api(name).Flag(request).Result;
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.That(response.Errors.Contains("Incorrect identifier"));
+        }
+
+        [Test, Sequential]
+        public void Flag_Invalid_Identifier4([Values("Steem", "Golos")] string name)
+        {
+            // Arrange
+            var request = new FlagRequest(Authenticate(Api(name)), true, "qwe/@qwe");
+
+            // Act
+            var response = Api(name).Flag(request).Result;
+
+            // Assert
+            AssertFailedResult(response);
+            Assert.That(response.Errors.Contains("Incorrect identifier"));
+        }
+        
+        [Test, Sequential]
         public void Follow_Invalid_Username([Values("Steem", "Golos")] string name)
         {
             // Arrange
@@ -553,8 +649,8 @@ namespace Sweetshot.Tests
 
         [Test, Sequential]
         public void Comments([Values("Steem", "Golos")] string name,
-                             [Values("@joseph.kalu/cat636203355240074655",
-                                     "@joseph.kalu/cat636281384922864910")] string url)
+            [Values("@joseph.kalu/cat636203355240074655",
+                "@joseph.kalu/cat636281384922864910")] string url)
         {
             // Arrange
             var request = new GetCommentsRequest(url);

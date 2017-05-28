@@ -10,7 +10,7 @@
             "preLaunchTask": "",
             "runtimeExecutable": null,
             "env": {},
-            "externalConsole": false
+            "console": "internalConsole"
         },
         {
             "name": "Attach",
