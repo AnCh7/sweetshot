@@ -15,10 +15,10 @@ namespace Sweetshot.Tests
         private const string Name = "joseph.kalu";
         private const string PostingKey = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
 
-        private readonly SteepshotApiClient _steem = new SteepshotApiClient(ConfigurationManager.AppSettings["steepshot_url_qa"]);
-        //private readonly SteepshotApiClient _steem = new SteepshotApiClient(ConfigurationManager.AppSettings["steepshot_url"]);
-        private readonly SteepshotApiClient _golos = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url_qa"]);
-        //private readonly SteepshotApiClient _golos = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url"]);
+        //private readonly SteepshotApiClient _steem = new SteepshotApiClient(ConfigurationManager.AppSettings["steepshot_url_qa"]);
+        private readonly SteepshotApiClient _steem = new SteepshotApiClient(ConfigurationManager.AppSettings["steepshot_url"]);
+        //private readonly SteepshotApiClient _golos = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url_qa"]);
+        private readonly SteepshotApiClient _golos = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url"]);
 
         private SteepshotApiClient Api(string name)
         {
@@ -143,7 +143,7 @@ namespace Sweetshot.Tests
 
         [Test, Sequential]
         public void UserPosts_Offset_Limit([Values("Steem", "Golos")] string name,
-            [Values("/cat1/@joseph.kalu/cat636203389144533548", "/cat1/@joseph.kalu/cat636281384922864910")] string offset)
+        [Values("/cat1/@joseph.kalu/cat636203389144533548", "/cat1/@joseph.kalu/cat636281384922864910")] string offset)
         {
             // Arrange
             var request = new UserPostsRequest(Name);
@@ -649,8 +649,8 @@ namespace Sweetshot.Tests
 
         [Test, Sequential]
         public void Comments([Values("Steem", "Golos")] string name,
-            [Values("@joseph.kalu/cat636203355240074655",
-                "@joseph.kalu/cat636281384922864910")] string url)
+                             [Values("@joseph.kalu/cat636203355240074655",
+                                     "@joseph.kalu/cat636281384922864910")] string url)
         {
             // Arrange
             var request = new GetCommentsRequest(url);
