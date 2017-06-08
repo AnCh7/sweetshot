@@ -395,7 +395,7 @@ namespace Sweetshot.Library.HttpClient
             var parameters = CreateSessionParameter(request.SessionId);
             var parameters2 = CreateOffsetLimitParameters(request.Offset, request.Limit);
             parameters2.AddRange(parameters);
-            parameters2.Add(new RequestParameter { Key = "query", Value = request.Query, Type = ParameterType.QueryString });
+            parameters2.Add(new RequestParameter {Key = "query", Value = request.Query, Type = ParameterType.QueryString});
 
             var response = await _gateway.Get("user/search", parameters2);
             var errorResult = CheckErrors(response);
@@ -430,15 +430,15 @@ namespace Sweetshot.Library.HttpClient
             return CreateResult<FlagResponse>(response.Content, errorResult);
         }
 
-        public async Task<OperationResult<IsNsfwResponse>> IsNsfw(IsNsfwRequest request)
+        public async Task<OperationResult<IsLowRatedResponse>> IsLowRated(IsLowRatedRequest request)
         {
             var parameters = CreateSessionParameter(request.SessionId);
-            var response = await _gateway.Get("user/nsfw", parameters);
+            var response = await _gateway.Get("user/low-rated", parameters);
             var errorResult = CheckErrors(response);
-            return CreateResult<IsNsfwResponse>(response.Content, errorResult);
+            return CreateResult<IsLowRatedResponse>(response.Content, errorResult);
         }
 
-        public async Task<OperationResult<SetNsfwResponse>> SetNsfw(SetNsfwRequest request)
+        public async Task<OperationResult<SetLowRatedResponse>> SetLowRated(SetLowRatedRequest request)
         {
             var parameters = CreateSessionParameter(request.SessionId);
             parameters.Add(new RequestParameter
@@ -448,9 +448,9 @@ namespace Sweetshot.Library.HttpClient
                 Type = ParameterType.RequestBody
             });
 
-            var response = await _gateway.Post("user/nsfw", parameters);
+            var response = await _gateway.Post("user/low-rated", parameters);
             var errorResult = CheckErrors(response);
-            return CreateResult<SetNsfwResponse>(response.Content, errorResult);
+            return CreateResult<SetLowRatedResponse>(response.Content, errorResult);
         }
 
         private List<RequestParameter> CreateSessionParameter(string sessionId)
@@ -473,11 +473,11 @@ namespace Sweetshot.Library.HttpClient
             var parameters = new List<RequestParameter>();
             if (!string.IsNullOrWhiteSpace(offset))
             {
-                parameters.Add(new RequestParameter { Key = "offset", Value = offset, Type = ParameterType.QueryString });
+                parameters.Add(new RequestParameter {Key = "offset", Value = offset, Type = ParameterType.QueryString});
             }
             if (limit > 0)
             {
-                parameters.Add(new RequestParameter { Key = "limit", Value = limit, Type = ParameterType.QueryString });
+                parameters.Add(new RequestParameter {Key = "limit", Value = limit, Type = ParameterType.QueryString});
             }
             return parameters;
         }
