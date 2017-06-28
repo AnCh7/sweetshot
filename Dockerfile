@@ -1,6 +1,7 @@
-# Using without any modifications these dockerfiles:
+# Based on official docker images:
 # https://github.com/mono/docker/blob/39b989ea0ef3e787fb75410521217cb7cb7df05e/5.0.1.1/Dockerfile
 # https://github.com/JetBrains/teamcity-docker-agent/blob/master/Dockerfile
+# Has only one modification (see below)
 
 FROM jetbrains/teamcity-minimal-agent
 
@@ -32,6 +33,7 @@ RUN apt-get update && \
     \
     usermod -aG docker buildagent
 
+# https://github.com/tianon/docker-brew-ubuntu-core/issues/86
 RUN until apt-get install --no-install-recommends --yes \
   tzdata \
  ; do apt-get --yes update ; done
