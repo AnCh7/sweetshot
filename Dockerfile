@@ -32,4 +32,8 @@ RUN apt-get update && \
     \
     usermod -aG docker buildagent
 
+RUN until apt-get install --no-install-recommends --yes \
+  tzdata \
+ ; do apt-get --yes update ; done
+
 COPY run-docker.sh /services/run-docker.sh

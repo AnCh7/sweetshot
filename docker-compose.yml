@@ -11,22 +11,10 @@ services:
       - TEAMCITY_SERVER_MEM_OPTS="-Xmx1024m"
     networks:
       - teamcitynetwork    
-  default_agent:
-    image: 'jetbrains/teamcity-agent'
-    environment:
-      - SERVER_URL=server:8111
-    networks:
-      - teamcitynetwork
   agent_mono:
     image: 'anch7/teamcity-agent-mono'
     environment:
       - SERVER_URL=server:8111
-    networks:
-      - teamcitynetwork
-  agent_mono_dzoukr:
-    image: 'dzoukr/teamcity-agent'
-    environment:
-      - TEAMCITY_SERVER=server:8111
     networks:
       - teamcitynetwork
 networks:
