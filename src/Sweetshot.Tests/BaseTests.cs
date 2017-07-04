@@ -39,7 +39,7 @@ namespace Sweetshot.Tests
             else
             {
                 Assert.IsNull(response.Result, "Response is failed, but result is NOT null");
-                Assert.IsEmpty(response.Errors, "Response is failed, but errors array is EMPTY");
+                Assert.IsNotEmpty(response.Errors, "Response is failed, but errors array is EMPTY");
 
                 foreach (var error in response.Errors)
                 {
