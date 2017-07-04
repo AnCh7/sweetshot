@@ -32,15 +32,15 @@ sudo ufw status
 7) Add project from github
 
 8) Setup build steps:
+    - git clean -> Command Line -> Custom script: git reset --hard && git clean -f -d -x
     - nuget restore -> Command Line -> Custom script: nuget restore
     - get-nunit -> Command Line -> Custom script: nuget install NUnit.Console -version 3.6.0 -o ~/home/nunit/
     - msbuild -> Command Line -> Custom script: msbuild
     - run-nunit -> Command Line -> Custom script: mono ~/home/nunit/NUnit.ConsoleRunner.3.6.0/tools/nunit3-console.exe src/Sweetshot.Tests/bin/Debug/Sweetshot.Tests.dll
 
-9) Add logic for chaging settings on the fly:
+9) Add logic for chaging settings on the fly (for QA environment):
     - update run-nunit command:
-    sed -i "s/\(<steem_url.*>\)[^<>]*\(<\/steem_url.*\)/\1$https://steepshot.org/api/v1/\2/" $App.config
-    sed -i "s/\(<golos_url.*>\)[^<>]*\(<\/golos_url.*\)/\1$https://golos.steepshot.org/api/v1/\2/" $App.config
-
-    sed -i "s/\(<steem_url.*>\)[^<>]*\(<\/steem_url.*\)/\1$https://qa.steepshot.org/api/v1/\2/" $App.config
-    sed -i "s/\(<golos_url.*>\)[^<>]*\(<\/golos_url.*\)/\1$https://qa.golos.steepshot.org/api/v1/\2/" $App.config
+    sed -i 's/\<steem_url\>/steem_url_prod/g' App.config
+    sed -i 's/\<steem_url_qa\>/steem_url/g' App.config
+    sed -i 's/\<golos_url\>/golos_url_prod/g' App.config
+    sed -i 's/\<golos_url_qa\>/golos_url/g' App.config
