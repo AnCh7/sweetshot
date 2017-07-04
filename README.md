@@ -36,11 +36,9 @@ sudo ufw status
     - nuget restore -> Command Line -> Custom script: nuget restore
     - get-nunit -> Command Line -> Custom script: nuget install NUnit.Console -version 3.6.0 -o ~/home/nunit/
     - msbuild -> Command Line -> Custom script: msbuild
+    - change-config (for QA) -> Command Line -> Custom script: 
+      sed -i 's/\<steem_url\>/steem_url_prod/g' $src/Sweetshot.Tests/bin/Debug/App.config
+      sed -i 's/\<steem_url_qa\>/steem_url/g' $src/Sweetshot.Tests/bin/Debug/App.config
+      sed -i 's/\<golos_url\>/golos_url_prod/g' $src/Sweetshot.Tests/bin/Debug/App.config
+      sed -i 's/\<golos_url_qa\>/golos_url/g' $src/Sweetshot.Tests/bin/Debug/App.config
     - run-nunit -> Command Line -> Custom script: mono ~/home/nunit/NUnit.ConsoleRunner.3.6.0/tools/nunit3-console.exe src/Sweetshot.Tests/bin/Debug/Sweetshot.Tests.dll
-
-9) Add logic for chaging settings on the fly (for QA environment):
-    - update run-nunit command:
-    sed -i 's/\<steem_url\>/steem_url_prod/g' App.config
-    sed -i 's/\<steem_url_qa\>/steem_url/g' App.config
-    sed -i 's/\<golos_url\>/golos_url_prod/g' App.config
-    sed -i 's/\<golos_url_qa\>/golos_url/g' App.config
