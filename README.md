@@ -37,8 +37,8 @@ sudo ufw status
     - get-nunit -> Command Line -> Custom script: nuget install NUnit.Console -version 3.6.0 -o ~/home/nunit/
     - msbuild -> Command Line -> Custom script: msbuild
     - change-config (for QA) -> Command Line -> Custom script: 
-      sed -i 's/\<steem_url\>/steem_url_prod/g' $src/Sweetshot.Tests/bin/Debug/App.config
-      sed -i 's/\<steem_url_qa\>/steem_url/g' $src/Sweetshot.Tests/bin/Debug/App.config
-      sed -i 's/\<golos_url\>/golos_url_prod/g' $src/Sweetshot.Tests/bin/Debug/App.config
-      sed -i 's/\<golos_url_qa\>/golos_url/g' $src/Sweetshot.Tests/bin/Debug/App.config
+      sed -i 's/\<steem_url\>/steem_url_prod/g' src/Sweetshot.Tests/bin/Debug/Sweetshot.Tests.dll.config
+      sed -i 's/\<steem_url_qa\>/steem_url/g' src/Sweetshot.Tests/bin/Debug/Sweetshot.Tests.dll.config
+      sed -i 's/\<golos_url\>/golos_url_prod/g' src/Sweetshot.Tests/bin/Debug/Sweetshot.Tests.dll.config
+      sed -i 's/\<golos_url_qa\>/golos_url/g' src/Sweetshot.Tests/bin/Debug/Sweetshot.Tests.dll.config
     - run-nunit -> Command Line -> Custom script: mono ~/home/nunit/NUnit.ConsoleRunner.3.6.0/tools/nunit3-console.exe src/Sweetshot.Tests/bin/Debug/Sweetshot.Tests.dll
