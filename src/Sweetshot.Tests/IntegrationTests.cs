@@ -10,26 +10,10 @@ using Sweetshot.Library.Models.Requests;
 namespace Sweetshot.Tests
 {
     [TestFixture]
-    public class IntegrationTests
+    public class IntegrationTests : BaseTests
     {
         private const string Name = "joseph.kalu";
         private const string PostingKey = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
-
-        private readonly SteepshotApiClient _steem = new SteepshotApiClient(ConfigurationManager.AppSettings["steem_url"]);
-        private readonly SteepshotApiClient _golos = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url"]);
-
-        private SteepshotApiClient Api(string name)
-        {
-            switch (name)
-            {
-                case "Steem":
-                    return _steem;
-                case "Golos":
-                    return _golos;
-                default:
-                    return null;
-            }
-        }
 
         private string Authenticate(SteepshotApiClient api)
         {
@@ -40,7 +24,7 @@ namespace Sweetshot.Tests
             var response = api.LoginWithPostingKey(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.IsLoggedIn, Is.True);
             Assert.That("User was logged in.", Is.EqualTo(response.Result.Message));
             Assert.That(response.Result.SessionId, Is.Not.Empty);
@@ -66,7 +50,7 @@ namespace Sweetshot.Tests
             var response = Api(name).LoginWithPostingKey(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Invalid posting key."));
         }
 
@@ -80,7 +64,7 @@ namespace Sweetshot.Tests
             var response = Api(name).LoginWithPostingKey(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Invalid posting key."));
         }
 
@@ -94,7 +78,7 @@ namespace Sweetshot.Tests
             var response = Api(name).LoginWithPostingKey(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Invalid posting key."));
         }
 
@@ -108,7 +92,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetUserPosts(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count, Is.Not.Null);
             Assert.That(response.Result.Offset, Is.Not.Empty);
             Assert.That(response.Result.Results, Is.Not.Empty);
@@ -143,7 +127,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetUserPosts(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Cannot get posts for this username"));
         }
 
@@ -160,7 +144,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetUserPosts(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count, Is.Not.Null);
             Assert.That(response.Result.Offset, Is.Not.Empty);
             Assert.That(response.Result.Results, Is.Not.Empty);
@@ -179,7 +163,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetUserPosts(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Results.Where(x => x.Vote).Any, Is.True);
         }
 
@@ -193,7 +177,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetUserPosts(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Results.Where(x => x.Vote).Any, Is.False);
         }
 
@@ -207,7 +191,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetUserRecentPosts(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count > 0);
             Assert.That(response.Result.Results.First().Body, Is.Not.Empty);
             Assert.That(response.Result.Results.First().Author, Is.Not.Empty);
@@ -225,7 +209,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetUserRecentPosts(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count > 0);
             Assert.That(response.Result.Results.First().Body, Is.Not.Empty);
             Assert.That(response.Result.Results.First().Author, Is.Not.Empty);
@@ -244,7 +228,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetPosts(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Results, Is.Not.Empty);
         }
 
@@ -259,7 +243,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetPosts(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count, Is.EqualTo(defaultLimit));
         }
 
@@ -275,7 +259,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetPosts(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Offset, Is.Not.Empty);
             Assert.That(response.Result.Count > 0);
             Assert.That(request.Limit, Is.EqualTo(response.Result.Count));
@@ -292,7 +276,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetPosts(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Offset, Is.Not.Empty);
             Assert.That(response.Result.Count > 0);
         }
@@ -307,7 +291,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetPosts(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Results, Is.Not.Empty);
         }
 
@@ -321,7 +305,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetPosts(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Results, Is.Not.Empty);
         }
 
@@ -335,7 +319,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetPostsByCategory(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Results, Is.Not.Empty);
             var postsWithoutCategoryInTags = response.Result.Results.Where(x => !x.Tags.Contains(category));
             var postShouldHaveCategoryInCategory = postsWithoutCategoryInTags.Any(x => !x.Category.Equals(category));
@@ -352,7 +336,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetPostsByCategory(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Not Found"));
         }
 
@@ -366,7 +350,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetPostsByCategory(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Results, Is.Empty);
         }
 
@@ -380,7 +364,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetPostsByCategory(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Not Found"));
         }
 
@@ -394,7 +378,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetPostsByCategory(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Results, Is.Not.Empty);
             var postsWithoutCategoryInTags = response.Result.Results.Where(x => !x.Tags.Contains(category));
             var postShouldHaveCategoryInCategory = postsWithoutCategoryInTags.Any(x => !x.Category.Equals(category));
@@ -411,7 +395,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetPostsByCategory(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Results, Is.Not.Empty);
             var postsWithoutCategoryInTags = response.Result.Results.Where(x => !x.Tags.Contains("food"));
             var postShouldHaveCategoryInCategory = postsWithoutCategoryInTags.Any(x => !x.Category.Equals("food"));
@@ -430,7 +414,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetPostsByCategory(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Results, Is.Not.Empty);
             Assert.That(response.Result.Results.Where(x => !x.Tags.Contains(category)), Is.Empty);
             Assert.That(response.Result.Results.Count, Is.EqualTo(request.Limit));
@@ -447,7 +431,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetPostsByCategory(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Results, Is.Not.Empty);
         }
 
@@ -466,7 +450,7 @@ namespace Sweetshot.Tests
             var response2 = Api(name).Vote(request).Result;
 
             // Assert
-            AssertFailedResult(response2);
+            AssertResult(response2);
             Assert.That(response2.Errors.Contains("You have already voted in a similar way"));
         }
 
@@ -485,7 +469,7 @@ namespace Sweetshot.Tests
             var response2 = Api(name).Vote(request).Result;
 
             // Assert
-            AssertFailedResult(response2);
+            AssertResult(response2);
             Assert.That(response2.Errors.Contains("You have already voted in a similar way"));
         }
 
@@ -499,7 +483,7 @@ namespace Sweetshot.Tests
             var response = Api(name).Vote(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Incorrect identifier"));
         }
 
@@ -513,7 +497,7 @@ namespace Sweetshot.Tests
             var response = Api(name).Vote(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Incorrect identifier"));
         }
 
@@ -527,7 +511,7 @@ namespace Sweetshot.Tests
             var response = Api(name).Vote(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Incorrect identifier"));
         }
 
@@ -541,7 +525,7 @@ namespace Sweetshot.Tests
             var response = Api(name).Vote(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Incorrect identifier"));
         }
 
@@ -560,7 +544,7 @@ namespace Sweetshot.Tests
             var response2 = Api(name).Flag(request).Result;
 
             // Assert
-            AssertFailedResult(response2);
+            AssertResult(response2);
             Assert.That(response2.Errors.Contains("You have already voted in a similar way"));
         }
 
@@ -579,7 +563,7 @@ namespace Sweetshot.Tests
             var response2 = Api(name).Flag(request).Result;
 
             // Assert
-            AssertFailedResult(response2);
+            AssertResult(response2);
             Assert.That(response2.Errors.Contains("You have already voted in a similar way"));
         }
 
@@ -593,7 +577,7 @@ namespace Sweetshot.Tests
             var response = Api(name).Flag(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Incorrect identifier"));
         }
 
@@ -607,7 +591,7 @@ namespace Sweetshot.Tests
             var response = Api(name).Flag(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Incorrect identifier"));
         }
 
@@ -621,7 +605,7 @@ namespace Sweetshot.Tests
             var response = Api(name).Flag(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Incorrect identifier"));
         }
 
@@ -635,7 +619,7 @@ namespace Sweetshot.Tests
             var response = Api(name).Flag(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Incorrect identifier"));
         }
 
@@ -649,7 +633,7 @@ namespace Sweetshot.Tests
             var response = Api(name).Follow(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("User does not exist."));
         }
 
@@ -665,7 +649,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetComments(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count > 0);
             Assert.That(response.Result.Results, Is.Not.Empty);
             Assert.That(response.Result.Results.First().Body, Is.Not.Empty);
@@ -700,7 +684,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetComments(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Results.Where(x => x.Vote).Any, Is.True);
         }
 
@@ -715,7 +699,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetComments(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Results.Where(x => x.Vote).Any, Is.False);
         }
 
@@ -729,7 +713,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetComments(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Wrong identifier."));
         }
 
@@ -743,7 +727,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetComments(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Wrong identifier."));
         }
 
@@ -757,7 +741,7 @@ namespace Sweetshot.Tests
             var response = Api(name).CreateComment(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("This field may not be blank."));
         }
 
@@ -771,7 +755,7 @@ namespace Sweetshot.Tests
             var response = Api(name).CreateComment(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("This field may not be blank."));
         }
 
@@ -791,7 +775,7 @@ namespace Sweetshot.Tests
             var response2 = Api(name).CreateComment(createCommentRequest).Result;
 
             // Assert
-            AssertFailedResult(response2);
+            AssertResult(response2);
             Assert.That(response2.Errors.Contains("You may only comment once every 20 seconds."));
         }
 
@@ -805,7 +789,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetCategories(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count > 0);
             Assert.That(response.Result.TotalCount, Is.EqualTo(-1));
             Assert.That(response.Result.Results, Is.Not.Empty);
@@ -827,7 +811,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetCategories(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count > 0);
             Assert.That(response.Result.TotalCount, Is.EqualTo(-1));
             Assert.That(response.Result.Results.Count, Is.EqualTo(limit));
@@ -845,7 +829,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetCategories(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count > 0);
             Assert.That(response.Result.TotalCount, Is.EqualTo(-1));
             Assert.That(response.Result.Results, Is.Not.Empty);
@@ -861,7 +845,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetCategories(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count > 0);
             Assert.That(response.Result.TotalCount, Is.EqualTo(-1));
             Assert.That(response.Result.Results, Is.Not.Empty);
@@ -878,7 +862,7 @@ namespace Sweetshot.Tests
             var response = Api(name).SearchCategories(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count > 0);
             Assert.That(response.Result.TotalCount >= 0);
             Assert.That(response.Result.Results, Is.Not.Empty);
@@ -895,7 +879,7 @@ namespace Sweetshot.Tests
             var response = Api(name).SearchCategories(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Results, Is.Empty);
             Assert.That(response.Result.Count, Is.EqualTo(0));
             Assert.That(response.Result.TotalCount, Is.EqualTo(0));
@@ -911,7 +895,7 @@ namespace Sweetshot.Tests
             var response = Api(name).SearchCategories(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Query should have at least 2 characters"));
         }
 
@@ -925,7 +909,7 @@ namespace Sweetshot.Tests
             var response = Api(name).SearchCategories(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("This field may not be blank."));
         }
 
@@ -944,7 +928,7 @@ namespace Sweetshot.Tests
             var response = Api(name).SearchCategories(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count, Is.EqualTo(limit));
             Assert.That(response.Result.Results.Count, Is.EqualTo(limit));
             Assert.That(response.Result.TotalCount > limit);
@@ -962,7 +946,7 @@ namespace Sweetshot.Tests
             var response = Api(name).SearchCategories(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Category used for offset was not found"));
         }
 
@@ -976,7 +960,7 @@ namespace Sweetshot.Tests
             var response = Api(name).SearchCategories(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count > 0);
             Assert.That(response.Result.TotalCount >= 0);
             Assert.That(response.Result.Results, Is.Not.Empty);
@@ -993,7 +977,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetUserProfile(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.PostingRewards, Is.Not.Null);
             Assert.That(response.Result.CurationRewards, Is.Not.Null);
             Assert.That(response.Result.LastAccountUpdate, Is.Not.Null);
@@ -1025,7 +1009,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetUserProfile(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("User not found"));
         }
 
@@ -1039,7 +1023,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetUserProfile(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.PostingRewards, Is.Not.Null);
             Assert.That(response.Result.CurationRewards, Is.Not.Null);
             Assert.That(response.Result.LastAccountUpdate, Is.Not.Null);
@@ -1071,7 +1055,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetUserFriends(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count, Is.Not.Null);
             Assert.That(response.Result.Offset, Is.Not.Empty);
             Assert.That(response.Result.Results, Is.Not.Empty);
@@ -1093,7 +1077,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetUserFriends(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count, Is.Not.Null);
             Assert.That(response.Result.Offset, Is.Not.Null);
             Assert.That(response.Result.Results, Is.Not.Empty);
@@ -1115,7 +1099,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetUserFriends(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count == 0);
             Assert.That(response.Result.Results, Is.Empty);
         }
@@ -1132,7 +1116,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetUserFriends(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count, Is.Not.Null);
             Assert.That(response.Result.Offset, Is.Not.Null);
             Assert.That(response.Result.Results, Is.Not.Empty);
@@ -1151,7 +1135,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetUserFriends(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count, Is.Not.Null);
             Assert.That(response.Result.Offset, Is.Not.Null);
             Assert.That(response.Result.Results, Is.Not.Empty);
@@ -1167,7 +1151,7 @@ namespace Sweetshot.Tests
             var response = Api(name).TermsOfService().Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Text, Is.Not.Empty);
         }
 
@@ -1182,7 +1166,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetPostInfo(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Body, Is.Not.Empty);
             Assert.That(response.Result.Title, Is.Not.Empty);
             Assert.That(response.Result.Url, Is.Not.Empty);
@@ -1215,7 +1199,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetPostInfo(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Body, Is.Not.Empty);
             Assert.That(response.Result.Title, Is.Not.Empty);
             Assert.That(response.Result.Url, Is.Not.Empty);
@@ -1247,7 +1231,7 @@ namespace Sweetshot.Tests
             var response = Api(name).GetPostInfo(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Wrong identifier."));
         }
 
@@ -1264,7 +1248,7 @@ namespace Sweetshot.Tests
             var response = Api(name).Upload(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("This field may not be blank."));
         }
 
@@ -1278,7 +1262,7 @@ namespace Sweetshot.Tests
             var response = Api(name).Upload(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Upload a valid image. The file you uploaded was either not an image or a corrupted image."));
         }
 
@@ -1295,7 +1279,7 @@ namespace Sweetshot.Tests
             var response = Api(name).Upload(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("The number of tags should not be more than 4. Please remove a couple of tags and try again."));
         }
 
@@ -1309,7 +1293,7 @@ namespace Sweetshot.Tests
             var response = Api(name).SearchUser(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count > 0);
             Assert.That(response.Result.TotalCount >= 0);
             Assert.That(response.Result.Results, Is.Not.Empty);
@@ -1326,7 +1310,7 @@ namespace Sweetshot.Tests
             var response = Api(name).SearchUser(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Results, Is.Empty);
             Assert.That(response.Result.Count, Is.EqualTo(0));
             Assert.That(response.Result.TotalCount, Is.EqualTo(0));
@@ -1342,7 +1326,7 @@ namespace Sweetshot.Tests
             var response = Api(name).SearchUser(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Query should have at least 3 characters"));
         }
 
@@ -1356,7 +1340,7 @@ namespace Sweetshot.Tests
             var response = Api(name).SearchUser(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("This field may not be blank."));
         }
 
@@ -1375,7 +1359,7 @@ namespace Sweetshot.Tests
             var response = Api(name).SearchUser(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count, Is.EqualTo(limit));
             Assert.That(response.Result.Results.Count, Is.EqualTo(limit));
             Assert.That(response.Result.TotalCount >= limit);
@@ -1393,7 +1377,7 @@ namespace Sweetshot.Tests
             var response = Api(name).SearchUser(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Username used for offset was not found"));
         }
 
@@ -1407,7 +1391,7 @@ namespace Sweetshot.Tests
             var response = Api(name).SearchUser(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.That(response.Result.Count > 0);
             Assert.That(response.Result.TotalCount >= 0);
             Assert.That(response.Result.Results, Is.Not.Empty);
@@ -1424,7 +1408,7 @@ namespace Sweetshot.Tests
             var response = Api(name).UserExistsCheck(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.True(response.Result.Exists);
         }
 
@@ -1438,7 +1422,7 @@ namespace Sweetshot.Tests
             var response = Api(name).UserExistsCheck(request).Result;
 
             // Assert
-            AssertSuccessfulResult(response);
+            AssertResult(response);
             Assert.False(response.Result.Exists);
         }
 
@@ -1452,7 +1436,7 @@ namespace Sweetshot.Tests
             var response = Api(name).Login(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Your version of Steepshot is too old. Please download an update."));
         }
 
@@ -1471,7 +1455,7 @@ namespace Sweetshot.Tests
 
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Your version of Steepshot is too old. Please download an update."));
         }
 
@@ -1489,24 +1473,8 @@ namespace Sweetshot.Tests
             var response = Api(name).ChangePassword(request).Result;
 
             // Assert
-            AssertFailedResult(response);
+            AssertResult(response);
             Assert.That(response.Errors.Contains("Your version of Steepshot is too old. Please download an update."));
-        }
-
-        private void AssertSuccessfulResult<T>(OperationResult<T> response)
-        {
-            Assert.That(response, Is.Not.Null);
-            Assert.That(response.Success, Is.True);
-            Assert.That(response.Result, Is.Not.Null);
-            Assert.That(response.Errors, Is.Empty);
-        }
-
-        private void AssertFailedResult<T>(OperationResult<T> response)
-        {
-            Assert.That(response, Is.Not.Null);
-            Assert.That(response.Success, Is.False);
-            Assert.That(response.Result, Is.Null);
-            Assert.That(response.Errors, Is.Not.Empty);
-        }
+        }       
     }
 }

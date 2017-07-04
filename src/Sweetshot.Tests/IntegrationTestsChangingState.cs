@@ -11,24 +11,8 @@ using Sweetshot.Library.Models.Requests;
 namespace Sweetshot.Tests
 {
     [TestFixture]
-    public class IntegrationTestsChangingState
+    public class IntegrationTestsChangingState : BaseTests
     {
-        private readonly SteepshotApiClient _steem = new SteepshotApiClient(ConfigurationManager.AppSettings["steem_url"]);
-        private readonly SteepshotApiClient _golos = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url"]);
-
-        private SteepshotApiClient Api(string name)
-        {
-            switch (name)
-            {
-                case "Steem":
-                    return _steem;
-                case "Golos":
-                    return _golos;
-                default:
-                    return null;
-            }
-        }
-
         private string Authenticate(string name, string postingKey, SteepshotApiClient api)
         {
             var request = new LoginWithPostingKeyRequest(name, postingKey);
@@ -205,27 +189,6 @@ namespace Sweetshot.Tests
 
             AssertResult(checkResponse);
             Assert.That(checkResponse.Result.ShowLowRated, Is.True);
-        }
-
-        private void AssertResult<T>(OperationResult<T> response)
-        {
-            Assert.That(response, Is.Not.Null);
-
-            if (response.Success)
-            {
-                Assert.That(response.Result, Is.Not.Null);
-                Assert.That(response.Errors, Is.Empty);
-            }
-            else
-            {
-                Assert.That(response.Result, Is.Null);
-                Assert.That(response.Errors, Is.Not.Empty);
-
-                foreach (var error in response.Errors)
-                {
-                    Console.WriteLine(error);
-                }
-            }
         }
     }
 }

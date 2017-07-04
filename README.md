@@ -3,6 +3,7 @@ HTTP client for Steepshot API
 
 # useful
 sudo shutdown -r now
+docker-compose restart agent_mono
 
 # teamcity setup
 1) Create directory structure
