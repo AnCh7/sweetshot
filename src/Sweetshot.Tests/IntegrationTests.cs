@@ -15,9 +15,7 @@ namespace Sweetshot.Tests
         private const string Name = "joseph.kalu";
         private const string PostingKey = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
 
-        //private readonly SteepshotApiClient _steem = new SteepshotApiClient(ConfigurationManager.AppSettings["steepshot_url_qa"]);
-        private readonly SteepshotApiClient _steem = new SteepshotApiClient(ConfigurationManager.AppSettings["steepshot_url"]);
-        //private readonly SteepshotApiClient _golos = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url_qa"]);
+        private readonly SteepshotApiClient _steem = new SteepshotApiClient(ConfigurationManager.AppSettings["steem_url"]);
         private readonly SteepshotApiClient _golos = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url"]);
 
         private SteepshotApiClient Api(string name)
@@ -48,6 +46,14 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.SessionId, Is.Not.Empty);
 
             return response.Result.SessionId;
+        }
+
+        [Test, Order(1)]
+        public void Print_Testing_Settings()
+        {
+            Console.WriteLine(ConfigurationManager.AppSettings["steem_url"]);
+            Console.WriteLine(ConfigurationManager.AppSettings["golos_url"]);
+            Assert.Pass();
         }
 
         [Test, Sequential]

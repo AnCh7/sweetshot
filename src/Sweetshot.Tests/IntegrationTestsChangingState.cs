@@ -13,12 +13,9 @@ namespace Sweetshot.Tests
     [TestFixture]
     public class IntegrationTestsChangingState
     {
-        private readonly SteepshotApiClient _steem = new SteepshotApiClient(ConfigurationManager.AppSettings["steepshot_url"]);
-
-        //private readonly SteepshotApiClient _steem = new SteepshotApiClient(ConfigurationManager.AppSettings["steepshot_url_qa"]);
+        private readonly SteepshotApiClient _steem = new SteepshotApiClient(ConfigurationManager.AppSettings["steem_url"]);
         private readonly SteepshotApiClient _golos = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url"]);
 
-        //private readonly SteepshotApiClient _golos = new SteepshotApiClient(ConfigurationManager.AppSettings["golos_url_qa"]);
         private SteepshotApiClient Api(string name)
         {
             switch (name)
