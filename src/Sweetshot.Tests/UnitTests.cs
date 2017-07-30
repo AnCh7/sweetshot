@@ -65,5 +65,16 @@ namespace Sweetshot.Tests
             Assert.That(requestArray.Photo, Is.EqualTo(requestBase64.Photo));
             Assert.That(requestArray.Photo.Length, Is.EqualTo(requestBase64.Photo.Length));
         }
+
+        [Test]
+        public void Upload_Empty_Title()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(() =>
+            {
+                new UploadImageRequest("sessionid", "", new byte[] { }, "cat1", "cat2", "cat3", "cat4");
+                new GetCommentsRequest("");
+            });
+            Assert.That(ex.ParamName, Is.EqualTo("title"));
+        }
     }
 }

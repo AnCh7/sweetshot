@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using Sweetshot.Library.HttpClient;
-using Sweetshot.Library.Models.Common;
 using Sweetshot.Library.Models.Requests;
 
 namespace Sweetshot.Tests
@@ -132,7 +131,8 @@ namespace Sweetshot.Tests
         }
 
         [Test, Sequential]
-        public void UserPosts_Offset_Limit([Values("Steem", "Golos")] string name,
+        public void UserPosts_Offset_Limit(
+        [Values("Steem", "Golos")] string name,
         [Values("/cat1/@joseph.kalu/cat636203389144533548", "/cat1/@joseph.kalu/cat636281384922864910")] string offset)
         {
             // Arrange
@@ -689,8 +689,10 @@ namespace Sweetshot.Tests
         }
 
         [Test, Sequential]
-        public void Comments_Without_SessionId_Check_False_Votes([Values("Steem", "Golos")] string name,
-            [Values("@joseph.kalu/cat636203355240074655", "@siberianshamen/chto-takoe-golos")] string url)
+        public void Comments_Without_SessionId_Check_False_Votes(
+        [Values("Steem", "Golos")] string name,
+        [Values("@dollarvigilante/could-ethereum-be-made-obsolete-by-the-new-decentralized-smart-contract-platform-eos",
+                "@siberianshamen/chto-takoe-golos")] string url)
         {
             // Arrange
             var request = new GetCommentsRequest(url);
@@ -1234,24 +1236,7 @@ namespace Sweetshot.Tests
             AssertResult(response);
             Assert.That(response.Errors.Contains("Wrong identifier."));
         }
-
-        [Test, Sequential]
-        public void Upload_Empty_Title([Values("Steem", "Golos")] string name)
-        {
-            // Arrange
-            var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-            var path = Path.Combine(dir.Parent.Parent.FullName, @"Data/cat.jpg");
-            var file = File.ReadAllBytes(path);
-            var request = new UploadImageRequest(Authenticate(Api(name)), "", file, "cat1", "cat2", "cat3", "cat4");
-
-            // Act
-            var response = Api(name).Upload(request).Result;
-
-            // Assert
-            AssertResult(response);
-            Assert.That(response.Errors.Contains("This field may not be blank."));
-        }
-
+        
         [Test, Sequential]
         public void Upload_Empty_Photo([Values("Steem", "Golos")] string name)
         {

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using RestSharp;
+using RestSharp.Portable;
 using Sweetshot.Library.Extensions;
 using Sweetshot.Library.Models.Common;
 using Sweetshot.Library.Models.Requests;
@@ -53,7 +55,7 @@ namespace Sweetshot.Library.HttpClient
             parameters.Add(new RequestParameter
             {
                 Key = "application/json",
-                Value = _jsonConverter.Serialize(request),
+                Value = request,
                 Type = ParameterType.RequestBody
             });
 
@@ -79,7 +81,7 @@ namespace Sweetshot.Library.HttpClient
                 new RequestParameter
                 {
                     Key = "application/json",
-                    Value = _jsonConverter.Serialize(request),
+                    Value = request,
                     Type = ParameterType.RequestBody
                 }
             };
@@ -90,11 +92,11 @@ namespace Sweetshot.Library.HttpClient
             var result = CreateResult<LoginResponse>(response.Content, errorResult);
             if (result.Success)
             {
-                foreach (var cookie in response.Cookies)
+                foreach (var cookie in response.Headers.GetValues("Set-Cookie"))
                 {
-                    if (cookie.Name == "sessionid")
+                    if (cookie.StartsWith("sessionid"))
                     {
-                        result.Result.SessionId = cookie.Value;
+                        result.Result.SessionId = cookie.Split(';').First().Split('=').Last();
                     }
                 }
 
@@ -120,7 +122,7 @@ namespace Sweetshot.Library.HttpClient
             var parameters2 = CreateOffsetLimitParameters(request.Offset, request.Limit);
             parameters2.AddRange(parameters);
 
-            var response = await _gateway.Get($"/user/{request.Username}/posts", parameters2);
+            var response = await _gateway.Get($"user/{request.Username}/posts", parameters2);
             var errorResult = CheckErrors(response);
             return CreateResult<UserPostResponse>(response.Content, errorResult);
         }
@@ -138,7 +140,7 @@ namespace Sweetshot.Library.HttpClient
             var parameters2 = CreateOffsetLimitParameters(request.Offset, request.Limit);
             parameters2.AddRange(parameters);
 
-            var response = await _gateway.Get("/recent", parameters2);
+            var response = await _gateway.Get("recent", parameters2);
             var errorResult = CheckErrors(response);
             return CreateResult<UserPostResponse>(response.Content, errorResult);
         }
@@ -195,7 +197,7 @@ namespace Sweetshot.Library.HttpClient
             parameters.Add(new RequestParameter
             {
                 Key = "application/json",
-                Value = _jsonConverter.Serialize(request),
+                Value = request,
                 Type = ParameterType.RequestBody
             });
 
@@ -229,7 +231,6 @@ namespace Sweetshot.Library.HttpClient
         public async Task<OperationResult<GetCommentResponse>> GetComments(GetCommentsRequest request)
         {
             var parameters = CreateSessionParameter(request.SessionId);
-
             var response = await _gateway.Get($"post/{request.Url}/comments", parameters);
             var errorResult = CheckErrors(response);
             return CreateResult<GetCommentResponse>(response.Content, errorResult);
@@ -247,7 +248,7 @@ namespace Sweetshot.Library.HttpClient
             parameters.Add(new RequestParameter
             {
                 Key = "application/json",
-                Value = _jsonConverter.Serialize(request),
+                Value = request,
                 Type = ParameterType.RequestBody
             });
 
@@ -337,7 +338,7 @@ namespace Sweetshot.Library.HttpClient
         {
             var parameters = CreateSessionParameter(request.SessionId);
 
-            var response = await _gateway.Get($"/user/{request.Username}/info", parameters);
+            var response = await _gateway.Get($"user/{request.Username}/info", parameters);
             var errorResult = CheckErrors(response);
             return CreateResult<UserProfileResponse>(response.Content, errorResult);
         }
@@ -366,7 +367,7 @@ namespace Sweetshot.Library.HttpClient
         /// </summary>
         public async Task<OperationResult<TermOfServiceResponse>> TermsOfService()
         {
-            const string endpoint = "/tos";
+            const string endpoint = "tos";
             var response = await _gateway.Get(endpoint, new List<RequestParameter>());
             var errorResult = CheckErrors(response);
             return CreateResult<TermOfServiceResponse>(response.Content, errorResult);
@@ -420,7 +421,7 @@ namespace Sweetshot.Library.HttpClient
             parameters.Add(new RequestParameter
             {
                 Key = "application/json",
-                Value = _jsonConverter.Serialize(request),
+                Value = request,
                 Type = ParameterType.RequestBody
             });
 
@@ -444,7 +445,7 @@ namespace Sweetshot.Library.HttpClient
             parameters.Add(new RequestParameter
             {
                 Key = "application/json",
-                Value = _jsonConverter.Serialize(request),
+                Value = request,
                 Type = ParameterType.RequestBody
             });
 
@@ -455,17 +456,7 @@ namespace Sweetshot.Library.HttpClient
 
         private List<RequestParameter> CreateSessionParameter(string sessionId)
         {
-            var parameters = new List<RequestParameter>();
-            if (!string.IsNullOrWhiteSpace(sessionId))
-            {
-                parameters.Add(new RequestParameter
-                {
-                    Key = "sessionid",
-                    Value = sessionId,
-                    Type = ParameterType.Cookie
-                });
-            }
-            return parameters;
+            return new List<RequestParameter>();
         }
 
         private List<RequestParameter> CreateOffsetLimitParameters(string offset, int limit)
@@ -487,19 +478,9 @@ namespace Sweetshot.Library.HttpClient
             var result = new OperationResult();
             var content = response.Content;
 
-            // Network transport or framework errors
-            if (response.ErrorException != null)
-            {
-                result.Errors.Add(response.ErrorMessage);
-            }
-            // Transport errors
-            else if (response.ResponseStatus != ResponseStatus.Completed)
-            {
-                result.Errors.Add("ResponseStatus: " + response.ResponseStatus);
-            }
             // HTTP errors
-            else if (response.StatusCode == HttpStatusCode.BadRequest ||
-                     response.StatusCode == HttpStatusCode.Forbidden)
+            if (response.StatusCode == HttpStatusCode.BadRequest ||
+                response.StatusCode == HttpStatusCode.Forbidden)
             {
                 var dic = _jsonConverter.Deserialize<Dictionary<string, List<string>>>(content);
                 foreach (var kvp in dic)

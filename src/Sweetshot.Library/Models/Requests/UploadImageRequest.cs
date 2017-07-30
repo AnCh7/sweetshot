@@ -8,6 +8,7 @@ namespace Sweetshot.Library.Models.Requests
         private UploadImageRequest(string sessionId, string title, params string[] tags)
         {
             if (string.IsNullOrWhiteSpace(sessionId)) throw new ArgumentNullException(nameof(sessionId));
+            if (string.IsNullOrWhiteSpace(title)) throw new ArgumentNullException(nameof(title));
 
             base.SessionId = sessionId;
             Title = title;
@@ -16,9 +17,7 @@ namespace Sweetshot.Library.Models.Requests
 
         public UploadImageRequest(string sessionId, string title, byte[] photo, params string[] tags) : this(sessionId, title, tags)
         {
-            if (photo == null) throw new ArgumentNullException(nameof(photo));
-
-            Photo = photo;
+            Photo = photo ?? throw new ArgumentNullException(nameof(photo));
         }
 
         public UploadImageRequest(string sessionId, string title, string photo, params string[] tags) : this(sessionId, title, tags)

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using RestSharp;
+using RestSharp.Portable;
+using RestSharp.Portable.HttpClient;
+using RestSharp.Portable.Serializers;
 
 namespace Sweetshot.Library.HttpClient
 {
@@ -30,40 +32,43 @@ namespace Sweetshot.Library.HttpClient
                 throw new ArgumentNullException(nameof(url));
             }
 
-            _restClient = new RestClient(url);
+            _restClient = new RestClient(url) {IgnoreResponseStatusCode = true};
         }
 
         public Task<IRestResponse> Get(string endpoint, IEnumerable<RequestParameter> parameters)
         {
             var request = CreateRequest(endpoint, parameters);
-            var response = _restClient.ExecuteGetTaskAsync(request);
+            request.Method = Method.GET;
+            var response = _restClient.Execute(request);
             return response;
         }
 
         public Task<IRestResponse> Post(string endpoint, IEnumerable<RequestParameter> parameters)
         {
             var request = CreateRequest(endpoint, parameters);
-            var response = _restClient.ExecutePostTaskAsync(request);
+            request.Method = Method.POST;
+            var response = _restClient.Execute(request);
             return response;
         }
 
         public Task<IRestResponse> Upload(string endpoint, string filename, byte[] file, IEnumerable<RequestParameter> parameters, List<string> tags)
         {
             var request = CreateRequest(endpoint, parameters);
+            request.Method = Method.POST;
             request.AddFile("photo", file, filename);
-            request.AlwaysMultipartFormData = true;
+            request.ContentCollectionMode = ContentCollectionMode.MultiPartForFileParameters;
             request.AddParameter("title", filename);
             foreach (var tag in tags)
             {
                 request.AddParameter("tags", tag);
             }
-            var response = _restClient.ExecutePostTaskAsync(request);
+            var response = _restClient.Execute(request);
             return response;
         }
 
         private IRestRequest CreateRequest(string endpoint, IEnumerable<RequestParameter> parameters)
         {
-            var restRequest = new RestRequest(endpoint) {RequestFormat = DataFormat.Json};
+            var restRequest = new RestRequest(endpoint) {Serializer = new JsonSerializer()};
 
             foreach (var parameter in parameters)
             {
