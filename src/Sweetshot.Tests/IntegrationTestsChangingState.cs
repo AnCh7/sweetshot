@@ -72,25 +72,7 @@ namespace Sweetshot.Tests
             Assert.That(commentsResponse.Result.Results.First().Title, Is.EqualTo(title));
             Assert.That(commentsResponse.Result.Results.First().Body, Is.EqualTo(body));
 
-            // 3) Vote up
-            var voteUpRequest = new VoteRequest(sessionId, true, lastPost.Url);
-            var voteUpResponse = Api(apiName).Vote(voteUpRequest).Result;
-            AssertResult(voteUpResponse);
-            Assert.That(voteUpResponse.Result.IsVoted, Is.True);
-            Assert.That(voteUpResponse.Result.NewTotalPayoutReward, Is.Not.Null);
-            Assert.That(voteUpResponse.Result.Message, Is.EqualTo("Upvoted"));
-            Assert.That(voteUpResponse.Result.NewTotalPayoutReward, Is.Not.Null);
-
-            // Wait for data to be writed into blockchain
-            Thread.Sleep(TimeSpan.FromSeconds(15));
-            // Provide sessionId with request to be able read voting information
-            userPostsRequest.SessionId = sessionId;
-            var userPostsResponse2 = Api(apiName).GetUserPosts(userPostsRequest).Result;
-            // Check if last post was voted
-            AssertResult(userPostsResponse2);
-            Assert.That(userPostsResponse2.Result.Results.First().Vote, Is.True);
-
-            // 4) Vote down
+            // 3) Vote down
             var voteDownRequest = new VoteRequest(sessionId, false, lastPost.Url);
             var voteDownResponse = Api(apiName).Vote(voteDownRequest).Result;
             AssertResult(voteDownResponse);
@@ -108,6 +90,24 @@ namespace Sweetshot.Tests
             AssertResult(userPostsResponse3);
             Assert.That(userPostsResponse3.Result.Results.First().Vote, Is.False);
 
+            // 4) Vote up
+            var voteUpRequest = new VoteRequest(sessionId, true, lastPost.Url);
+            var voteUpResponse = Api(apiName).Vote(voteUpRequest).Result;
+            AssertResult(voteUpResponse);
+            Assert.That(voteUpResponse.Result.IsVoted, Is.True);
+            Assert.That(voteUpResponse.Result.NewTotalPayoutReward, Is.Not.Null);
+            Assert.That(voteUpResponse.Result.Message, Is.EqualTo("Upvoted"));
+            Assert.That(voteUpResponse.Result.NewTotalPayoutReward, Is.Not.Null);
+
+            // Wait for data to be writed into blockchain
+            Thread.Sleep(TimeSpan.FromSeconds(15));
+            // Provide sessionId with request to be able read voting information
+            userPostsRequest.SessionId = sessionId;
+            var userPostsResponse2 = Api(apiName).GetUserPosts(userPostsRequest).Result;
+            // Check if last post was voted
+            AssertResult(userPostsResponse2);
+            Assert.That(userPostsResponse2.Result.Results.First().Vote, Is.True);
+            
             // 5) Vote up comment
             var commentUrl = commentsResponse.Result.Results.First().Url.Split('#').Last();
             var voteUpCommentRequest = new VoteRequest(sessionId, true, commentUrl);

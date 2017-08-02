@@ -2,15 +2,6 @@ using System.Collections.Generic;
 
 namespace Sweetshot.Library.Models.Responses
 {
-    ///{
-    ///  "total_count": -1,
-    ///  "count": 1,
-    ///  "results": [
-    ///    {
-    ///      "name": "life"
-    ///    }
-    ///  ]
-    ///}
     public class SearchResponse
     {
         public int TotalCount { get; set; }
@@ -20,6 +11,8 @@ namespace Sweetshot.Library.Models.Responses
 
     public class SearchResult
     {
+        public string Username { get; set; }
+        public string ProfileImage { get; set; }
         public string Name { get; set; }
     }
 }

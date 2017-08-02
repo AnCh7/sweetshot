@@ -425,7 +425,7 @@ namespace Sweetshot.Library.HttpClient
                 Type = ParameterType.RequestBody
             });
 
-            var endpoint = $"post/{request.Identifier}/{request.Type.GetDescription()}";
+            var endpoint = $"post{request.Identifier}/{request.Type.GetDescription()}";
             var response = await _gateway.Post(endpoint, parameters);
             var errorResult = CheckErrors(response);
             return CreateResult<FlagResponse>(response.Content, errorResult);
@@ -508,10 +508,6 @@ namespace Sweetshot.Library.HttpClient
                 else if (new Regex(@"<[^>]+>").IsMatch(content))
                 {
                     result.Errors.Add("Response content contains HTML : " + content);
-                }
-                else
-                {
-                    result.Errors.Add("Response content is not valid");
                 }
             }
 

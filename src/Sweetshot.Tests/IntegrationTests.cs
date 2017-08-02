@@ -2,6 +2,8 @@
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Sweetshot.Library.HttpClient;
 using Sweetshot.Library.Models.Requests;
@@ -447,13 +449,14 @@ namespace Sweetshot.Tests
 
             // Act
             var response = Api(name).Vote(request).Result;
+            Thread.Sleep(3000);
             var response2 = Api(name).Vote(request).Result;
 
             // Assert
             AssertResult(response2);
             Assert.That(response2.Errors.Contains("You have already voted in a similar way"));
         }
-
+        
         [Test, Sequential]
         public void Vote_Down_Already_Voted([Values("Steem", "Golos")] string name)
         {
@@ -466,6 +469,7 @@ namespace Sweetshot.Tests
 
             // Act
             var response = Api(name).Vote(request).Result;
+            Thread.Sleep(3000);
             var response2 = Api(name).Vote(request).Result;
 
             // Assert
@@ -1282,7 +1286,7 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.Count > 0);
             Assert.That(response.Result.TotalCount >= 0);
             Assert.That(response.Result.Results, Is.Not.Empty);
-            Assert.That(response.Result.Results.First().Name, Is.Not.Empty);
+            Assert.That(response.Result.Results.First().Username, Is.Not.Empty);
         }
 
         [Test, Sequential]
@@ -1349,7 +1353,7 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.Results.Count, Is.EqualTo(limit));
             Assert.That(response.Result.TotalCount >= limit);
             Assert.That(response.Result.Results, Is.Not.Empty);
-            Assert.That(response.Result.Results.First().Name, Is.EqualTo("abit"));
+            Assert.That(response.Result.Results.First().Username, Is.EqualTo("abit"));
         }
 
         [Test, Sequential]
@@ -1380,7 +1384,7 @@ namespace Sweetshot.Tests
             Assert.That(response.Result.Count > 0);
             Assert.That(response.Result.TotalCount >= 0);
             Assert.That(response.Result.Results, Is.Not.Empty);
-            Assert.That(response.Result.Results.First().Name, Is.Not.Empty);
+            Assert.That(response.Result.Results.First().Username, Is.Not.Empty);
         }
 
         [Test, Sequential]

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using RestSharp.Portable;
 using RestSharp.Portable.HttpClient;
-using RestSharp.Portable.Serializers;
+using Sweetshot.Library.Serializing;
 
 namespace Sweetshot.Library.HttpClient
 {
@@ -68,8 +68,7 @@ namespace Sweetshot.Library.HttpClient
 
         private IRestRequest CreateRequest(string endpoint, IEnumerable<RequestParameter> parameters)
         {
-            var restRequest = new RestRequest(endpoint) {Serializer = new JsonSerializer()};
-
+            var restRequest = new RestRequest(endpoint) {Serializer = new JsonNetConverter()};
             foreach (var parameter in parameters)
             {
                 restRequest.AddParameter(parameter.Key, parameter.Value, parameter.Type);
