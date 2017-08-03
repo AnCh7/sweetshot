@@ -63,6 +63,7 @@ namespace Steepshot.Core.Models.Responses
         public double MaxAcceptedPayout { get; set; }
         public double TotalPayoutReward { get; set; }
         public bool Vote { get; set; }
+		public bool Flag { get; set; }
         public string[] Tags { get; set; }
         public int Depth { get; set; }
     }
