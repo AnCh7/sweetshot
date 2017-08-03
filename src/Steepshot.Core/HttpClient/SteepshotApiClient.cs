@@ -110,9 +110,16 @@ namespace Steepshot.Core.HttpClient
             return CreateResult<UserPostResponse>(response.Content, errorResult);
         }
 
-        public Task<OperationResult<GetVotersResponse>> GetPostVoters(GetCommentsRequest request)
+        public async Task<OperationResult<GetVotersResponse>> GetPostVoters(GetCommentsRequest request)
         {
-            throw new NotImplementedException();
+            var parameters = CreateSessionParameter(request.SessionId);
+            //var parameters2 = CreateOffsetLimitParameters(request.Offset, request.Limit);
+            //parameters2.AddRange(parameters);
+
+            var endpoint = $"post/{request.Url}/voters";
+            var response = await _gateway.Get(endpoint, parameters);
+            var errorResult = CheckErrors(response);
+            return CreateResult<GetVotersResponse>(response.Content, errorResult);
         }
 
         public async Task<OperationResult<VoteResponse>> Vote(VoteRequest request)

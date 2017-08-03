@@ -1,3 +1,11 @@
+# todo
+- getcommentsrequest rename
+- cancelation
+- new upload
+- get voters tests
+- additional tests
+
+
 # sweetshot
 HTTP client for Steepshot API
 

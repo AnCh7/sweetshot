@@ -18,6 +18,7 @@ namespace Steepshot.Core.HttpClient
     {
         Task<IRestResponse> Get(string endpoint, IEnumerable<RequestParameter> parameters);
         Task<IRestResponse> Post(string endpoint, IEnumerable<RequestParameter> parameters);
+        Task<IRestResponse> Upload(string endpoint, string filename, byte[] file, List<string> tags, string login, string trx);
         Task<IRestResponse> Upload(string endpoint, string filename, byte[] file, IEnumerable<RequestParameter> parameters, List<string> tags);
     }
 
@@ -49,6 +50,23 @@ namespace Steepshot.Core.HttpClient
             request.Method = Method.POST;
             var response = _restClient.Execute(request);
             return response;
+        }
+
+        public Task<IRestResponse> Upload(string endpoint, string filename, byte[] file, List<string> tags, string login, string trx)
+        {
+//            var request = new RestRequest(endpoint) { RequestFormat = DataFormat.Json };
+//            request.AddFile("photo", file, filename);
+//            request.AlwaysMultipartFormData = true;
+//            request.AddParameter("title", filename);
+//            request.AddParameter("username", login);
+//            request.AddParameter("trx", trx);
+//            foreach (var tag in tags)
+//            {
+//                request.AddParameter("tags", tag);
+//            }
+//            var response = _restClient.ExecutePostTaskAsync(request);
+//            return response;
+            throw new NotImplementedException();
         }
 
         public Task<IRestResponse> Upload(string endpoint, string filename, byte[] file, IEnumerable<RequestParameter> parameters, List<string> tags)
