@@ -24,34 +24,6 @@ namespace Steepshot.Core.HttpClient
             _jsonConverter = new JsonNetConverter();
         }
 
-        [Obsolete]
-        public async Task<OperationResult<LoginResponse>> Login(LoginRequest request)
-        {
-            return await Authenticate("login", request);
-        }
-
-        [Obsolete]
-        public async Task<OperationResult<LoginResponse>> Register(RegisterRequest request)
-        {
-            return await Authenticate("register", request);
-        }
-
-        [Obsolete]
-        public async Task<OperationResult<ChangePasswordResponse>> ChangePassword(ChangePasswordRequest request)
-        {
-            var parameters = CreateSessionParameter(request.SessionId);
-            parameters.Add(new RequestParameter
-            {
-                Key = "application/json",
-                Value = request,
-                Type = ParameterType.RequestBody
-            });
-
-            var response = await _gateway.Post("user/change-password", parameters);
-            var errorResult = CheckErrors(response);
-            return CreateResult<ChangePasswordResponse>(response.Content, errorResult);
-        }
-
         public async Task<OperationResult<LoginResponse>> LoginWithPostingKey(LoginWithPostingKeyRequest request)
         {
             return await Authenticate("login-with-posting", request);
@@ -136,6 +108,11 @@ namespace Steepshot.Core.HttpClient
             var response = await _gateway.Get(endpoint, parameters2);
             var errorResult = CheckErrors(response);
             return CreateResult<UserPostResponse>(response.Content, errorResult);
+        }
+
+        public Task<OperationResult<GetVotersResponse>> GetPostVoters(GetCommentsRequest request)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<OperationResult<VoteResponse>> Vote(VoteRequest request)
@@ -301,29 +278,6 @@ namespace Steepshot.Core.HttpClient
             var response = await _gateway.Post(endpoint, parameters);
             var errorResult = CheckErrors(response);
             return CreateResult<FlagResponse>(response.Content, errorResult);
-        }
-
-        public async Task<OperationResult<IsLowRatedResponse>> IsLowRated(IsLowRatedRequest request)
-        {
-            var parameters = CreateSessionParameter(request.SessionId);
-            var response = await _gateway.Get("user/low-rated", parameters);
-            var errorResult = CheckErrors(response);
-            return CreateResult<IsLowRatedResponse>(response.Content, errorResult);
-        }
-
-        public async Task<OperationResult<SetLowRatedResponse>> SetLowRated(SetLowRatedRequest request)
-        {
-            var parameters = CreateSessionParameter(request.SessionId);
-            parameters.Add(new RequestParameter
-            {
-                Key = "application/json",
-                Value = request,
-                Type = ParameterType.RequestBody
-            });
-
-            var response = await _gateway.Post("user/low-rated", parameters);
-            var errorResult = CheckErrors(response);
-            return CreateResult<SetLowRatedResponse>(response.Content, errorResult);
         }
 
         private List<RequestParameter> CreateSessionParameter(string sessionId)

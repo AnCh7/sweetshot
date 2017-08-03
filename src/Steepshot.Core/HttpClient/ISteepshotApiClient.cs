@@ -9,23 +9,6 @@ namespace Steepshot.Core.HttpClient
     {
         /// <summary>
         ///     Examples:
-        ///     1) POST https://steepshot.org/api/v1/login HTTP/1.1
-        ///             {"username":"joseph.kalu","password":"test1234"}
-        /// </summary>
-        Task<OperationResult<LoginResponse>> Login(LoginRequest request);
-
-        Task<OperationResult<LoginResponse>> Register(RegisterRequest request);
-
-        /// <summary>
-        ///     Examples:
-        ///     1) POST https://steepshot.org/api/v1/user/change-password HTTP/1.1
-        ///             Cookie: sessionid=oh3f8vua8a5s2au5ovfqhsi6zvqgjfif
-        ///             {"old_password":"test1234","new_password":"test12345"}
-        /// </summary>
-        Task<OperationResult<ChangePasswordResponse>> ChangePassword(ChangePasswordRequest request);
-
-        /// <summary>
-        ///     Examples:
         ///     1) POST https://steepshot.org/api/v1/login-with-posting HTTP/1.1
         ///             {"username":"joseph.kalu","posting_key":"test1234"}
         /// </summary>
@@ -62,8 +45,13 @@ namespace Steepshot.Core.HttpClient
         ///     1) GET https://steepshot.org/api/v1/posts/food/top HTTP/1.1
         ///     2) GET https://steepshot.org/api/v1/posts/food/top?offset=%2Ftravel%2F%40sweetsssj%2Ftravel-with-me-39-my-appointment-with-gulangyu&limit=5 HTTP/1.1
         /// </summary>
-        /// 
         Task<OperationResult<UserPostResponse>> GetPostsByCategory(PostsByCategoryRequest request);
+        
+        /// <summary>
+        ///     Examples:
+        ///     1) GET https://qa.golos.steepshot.org/api/v1/post/@steepshot/steepshot-nekotorye-statisticheskie-dannye-i-otvety-na-voprosy/voters
+        /// </summary>
+        Task<OperationResult<GetVotersResponse>> GetPostVoters(GetCommentsRequest request);
 
         /// <summary>
         ///     Examples:
@@ -178,9 +166,5 @@ namespace Steepshot.Core.HttpClient
         Task<OperationResult<UserExistsResponse>> UserExistsCheck(UserExistsRequests request);
 
         Task<OperationResult<FlagResponse>> Flag(FlagRequest request);
-        
-        Task<OperationResult<IsLowRatedResponse>> IsLowRated(IsLowRatedRequest request);
-        
-        Task<OperationResult<SetLowRatedResponse>> SetLowRated(SetLowRatedRequest request);
     }
 }

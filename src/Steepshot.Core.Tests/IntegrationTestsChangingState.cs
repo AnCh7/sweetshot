@@ -168,25 +168,5 @@ namespace Steepshot.Core.Tests
             Assert.That(logoutResponse.Result.IsLoggedOut, Is.True);
             Assert.That(logoutResponse.Result.Message, Is.EqualTo("User is logged out"));
         }
-
-        [Test, Sequential]
-        public void LowRated_Tests([Values("Steem", "Golos")] string name)
-        {
-            // Arrange
-            var sessionId = Authenticate("joseph.kalu", "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG", Api(name));
-            var setRequest = new SetLowRatedRequest(sessionId, true);
-            var checkRequest = new IsLowRatedRequest(sessionId);
-
-            // Act
-            var setResponse = Api(name).SetLowRated(setRequest).Result;
-            var checkResponse = Api(name).IsLowRated(checkRequest).Result;
-
-            // Assert
-            AssertResult(setResponse);
-            Assert.That(setResponse.Result.IsSet, Is.True);
-
-            AssertResult(checkResponse);
-            Assert.That(checkResponse.Result.ShowLowRated, Is.True);
-        }
     }
 }

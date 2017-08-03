@@ -1413,56 +1413,5 @@ namespace Steepshot.Core.Tests
             AssertResult(response);
             Assert.False(response.Result.Exists);
         }
-
-        [Test, Sequential]
-        public void Obsolete_Login([Values("Steem", "Golos")] string name)
-        {
-            // Arrange
-            var request = new LoginRequest(Name, PostingKey);
-
-            // Act
-            var response = Api(name).Login(request).Result;
-
-            // Assert
-            AssertResult(response);
-            Assert.That(response.Errors.Contains("Your version of Steepshot is too old. Please download an update."));
-        }
-
-        [Test, Sequential]
-        public void Obsolete_Register_Already_Regirested([Values("Steem", "Golos")] string name)
-        {
-            const string username = "joseph.kalu";
-            const string password = "test12345";
-            const string postingKey = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
-
-            // Arrange
-            var request = new RegisterRequest(postingKey, username, password);
-
-            // Act
-            var response = Api(name).Register(request).Result;
-
-
-            // Assert
-            AssertResult(response);
-            Assert.That(response.Errors.Contains("Your version of Steepshot is too old. Please download an update."));
-        }
-
-        [Test, Sequential]
-        public void Obsolete_ChangePassword([Values("Steem", "Golos")] string name)
-        {
-            const string password = "test12345";
-            const string newPassword = "test123456";
-            const string postingKey = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
-
-            // Arrange
-            var request = new ChangePasswordRequest(Authenticate(Api(name)), password, newPassword);
-
-            // Act
-            var response = Api(name).ChangePassword(request).Result;
-
-            // Assert
-            AssertResult(response);
-            Assert.That(response.Errors.Contains("Your version of Steepshot is too old. Please download an update."));
-        }       
     }
 }
