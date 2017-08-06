@@ -3,12 +3,7 @@ using Newtonsoft.Json;
 
 namespace Steepshot.Core.Models.Requests
 {
-    public interface ILoginRequest
-    {
-        string Username { get; set; }
-    }
-
-    public class LoginWithPostingKeyRequest : ILoginRequest
+    public class LoginWithPostingKeyRequest : BaseRequest
     {
         public LoginWithPostingKeyRequest(string username, string postingKey)
         {

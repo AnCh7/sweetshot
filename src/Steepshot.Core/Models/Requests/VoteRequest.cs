@@ -1,16 +1,17 @@
 ﻿using System;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace Steepshot.Core.Models.Requests
 {
     public enum VoteType
     {
-        [Description("upvote")] Up,
-        [Description("downvote")] Down
+        [Display(Description = "upvote")] Up,
+        [Display(Description = "downvote")] Down
     }
 
-    public class VoteRequest : SessionIdField
+    public class VoteRequest : BaseRequest
     {
         public VoteRequest(string sessionId, bool isUp, string identifier)
         {

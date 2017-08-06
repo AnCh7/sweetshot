@@ -1,18 +1,28 @@
-﻿namespace Steepshot.Core.Models.Requests
+﻿using System;
+
+namespace Steepshot.Core.Models.Requests
 {
-    public class SessionIdField
+    public class BaseRequest
     {
         public string SessionId { get; set; }
+        public string Login { get; set; }
     }
 
-    public class OffsetLimitFields
+    public class BaseRequestWithOffsetLimitFields : BaseRequest
     {
         public string Offset { get; set; }
         public int Limit { get; set; }
     }
 
-    public class SessionIdOffsetLimitFields : OffsetLimitFields
+    public class InfoRequest : BaseRequest
     {
-        public string SessionId { get; set; }
+        public InfoRequest(string url)
+        {
+            if (string.IsNullOrWhiteSpace(url)) throw new ArgumentNullException(nameof(url));
+
+            Url = url;
+        }
+
+        public string Url { get; private set; }
     }
 }

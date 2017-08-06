@@ -6,7 +6,7 @@ using Steepshot.Core.Models.Requests;
 namespace Steepshot.Core.Tests
 {
     [TestFixture]
-    public class UnitTests
+    public class UnitTests : BaseTests
     {
         [Test]
         public void Vote_Empty_Identifier()
@@ -29,11 +29,11 @@ namespace Steepshot.Core.Tests
         }
 
         [Test]
-        public void Comments_Empty_Url()
+        public void InfoRequest_Empty_Url()
         {
             var ex = Assert.Throws<ArgumentNullException>(() =>
             {
-                new GetCommentsRequest("");
+                new InfoRequest("");
             });
             Assert.That(ex.ParamName, Is.EqualTo("url"));
         }
@@ -52,9 +52,7 @@ namespace Steepshot.Core.Tests
         public void Upload_Base64_Equals_ByteArray()
         {
             // Arrange
-            var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-            var path = Path.Combine(dir.Parent.Parent.FullName, @"Data/cat.jpg");
-            var file = File.ReadAllBytes(path);
+            var file = File.ReadAllBytes(TestImagePath());
 
             // Act
             var requestArray = new UploadImageRequest("sessionId", "cat" + DateTime.UtcNow.Ticks, file, "cat1", "cat2", "cat3", "cat4");
@@ -72,7 +70,7 @@ namespace Steepshot.Core.Tests
             var ex = Assert.Throws<ArgumentNullException>(() =>
             {
                 new UploadImageRequest("sessionid", "", new byte[] { }, "cat1", "cat2", "cat3", "cat4");
-                new GetCommentsRequest("");
+                new InfoRequest("");
             });
             Assert.That(ex.ParamName, Is.EqualTo("title"));
         }

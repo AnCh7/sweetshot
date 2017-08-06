@@ -8,7 +8,7 @@ namespace Steepshot.Core.Models.Requests
         UnFollow
     }
 
-    public class FollowRequest : SessionIdField
+    public class FollowRequest : BaseRequest
     {
         public FollowRequest(string sessionId, FollowType type, string username)
         {

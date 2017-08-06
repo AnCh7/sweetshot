@@ -2,7 +2,7 @@
 
 namespace Steepshot.Core.Models.Requests
 {
-    public class LogoutRequest : SessionIdField
+    public class LogoutRequest : BaseRequest
     {
         public LogoutRequest(string sessionId)
         {

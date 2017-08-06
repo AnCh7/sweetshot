@@ -6,12 +6,7 @@ using RestSharp.Portable;
 
 namespace Steepshot.Core.Serializing
 {
-    public interface IJsonConverter
-    {
-        T Deserialize<T>(string s);
-    }
-
-    public sealed class JsonNetConverter : ISerializer, IJsonConverter
+    public sealed class JsonNetConverter : ISerializer
     {
         private static readonly Encoding _encoding = new UTF8Encoding(false);
         private readonly JsonSerializer _serializer;
@@ -21,7 +16,6 @@ namespace Steepshot.Core.Serializing
         public JsonNetConverter()
         {
             ContentType = $"application/json; charset={_encoding.WebName}";
-
             _serializer = new JsonSerializer();
             Configure(_serializer);
         }
@@ -35,6 +29,17 @@ namespace Steepshot.Core.Serializing
             }
 
             return output.ToArray();
+        }
+        
+        public string Serialize(object obj)
+        {
+            var output = new MemoryStream();
+            using (var writer = new StreamWriter(output))
+            {
+                _serializer.Serialize(writer, obj);
+            }
+
+            return _encoding.GetString(output.ToArray());;
         }
 
         public T Deserialize<T>(string s)
@@ -52,6 +57,7 @@ namespace Steepshot.Core.Serializing
             {
                 NamingStrategy = new SnakeCaseNamingStrategy()
             };
+            serializer.DateFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.fffffffK";
         }
     }
 }

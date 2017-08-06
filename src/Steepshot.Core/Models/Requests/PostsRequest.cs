@@ -2,7 +2,7 @@
 
 namespace Steepshot.Core.Models.Requests
 {
-    public class UserPostsRequest : SessionIdOffsetLimitFields
+    public class UserPostsRequest : BaseRequestWithOffsetLimitFields
     {
         public UserPostsRequest(string username)
         {
@@ -14,7 +14,7 @@ namespace Steepshot.Core.Models.Requests
         public string Username { get; private set; }
     }
 
-    public class UserRecentPostsRequest : SessionIdOffsetLimitFields
+    public class UserRecentPostsRequest : BaseRequestWithOffsetLimitFields
     {
         public UserRecentPostsRequest(string sessionId)
         {
@@ -31,7 +31,7 @@ namespace Steepshot.Core.Models.Requests
         New
     }
 
-    public class PostsRequest : SessionIdOffsetLimitFields
+    public class PostsRequest : BaseRequestWithOffsetLimitFields
     {
         public PostsRequest(PostType type)
         {
@@ -49,17 +49,5 @@ namespace Steepshot.Core.Models.Requests
         }
 
         public string Category { get; set; }
-    }
-
-    public class PostsInfoRequest : SessionIdField
-    {
-        public PostsInfoRequest(string url)
-        {
-            if (string.IsNullOrWhiteSpace(url)) throw new ArgumentNullException(nameof(url));
-
-            Url = url;
-        }
-
-        public string Url { get; private set; }
     }
 }

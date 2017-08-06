@@ -1,16 +1,16 @@
 ﻿using System;
-using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace Steepshot.Core.Models.Requests
 {
     public enum FlagType
     {
-        [Description("flag")] Up,
-        [Description("downvote")] Down
+        [Display(Description = "flag")] Up,
+        [Display(Description = "downvote")] Down
     }
 
-    public class FlagRequest : SessionIdField
+    public class FlagRequest : BaseRequest
     {
         public FlagRequest(string sessionId, bool isUp, string identifier)
         {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -15,7 +14,7 @@ namespace Steepshot.Core.Tests
         private const string Name = "joseph.kalu";
         private const string PostingKey = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
 
-        private string Authenticate(SteepshotApiClient api)
+        private string Authenticate(ISteepshotApiClient api)
         {
             // Arrange
             var request = new LoginWithPostingKeyRequest(Name, PostingKey);
@@ -35,8 +34,8 @@ namespace Steepshot.Core.Tests
         [Test, Order(1)]
         public void Print_Testing_Settings()
         {
-            Console.WriteLine(ConfigurationManager.AppSettings["steem_url"]);
-            Console.WriteLine(ConfigurationManager.AppSettings["golos_url"]);
+            Console.WriteLine(Configuration["steem_url"]);
+            Console.WriteLine(Configuration["golos_url"]);
             Assert.Pass();
         }
 
@@ -453,7 +452,9 @@ namespace Steepshot.Core.Tests
 
             // Assert
             AssertResult(response2);
-            Assert.That(response2.Errors.Contains("You have already voted in a similar way"));
+            Assert.That(response2.Errors.Contains("You have already voted in a similar way") ||
+                        response2.Errors.Contains("Can only vote once every 3 seconds") ||
+                        response2.Errors.Contains("('Voter has used the maximum number of vote changes on this comment.',)"));
         }
         
         [Test, Sequential]
@@ -473,7 +474,9 @@ namespace Steepshot.Core.Tests
 
             // Assert
             AssertResult(response2);
-            Assert.That(response2.Errors.Contains("You have already voted in a similar way"));
+            Assert.That(response2.Errors.Contains("You have already voted in a similar way") ||
+                        response2.Errors.Contains("Can only vote once every 3 seconds") ||
+                        response2.Errors.Contains("('Voter has used the maximum number of vote changes on this comment.',)"));
         }
 
         [Test, Sequential]
@@ -548,7 +551,9 @@ namespace Steepshot.Core.Tests
 
             // Assert
             AssertResult(response2);
-            Assert.That(response2.Errors.Contains("You have already voted in a similar way"));
+            Assert.That(response2.Errors.Contains("You have already voted in a similar way") ||
+                        response2.Errors.Contains("('Can only vote once every 3 seconds.',)") ||
+                        response2.Errors.Contains("('Voter has used the maximum number of vote changes on this comment.',)"));
         }
 
         [Test, Sequential]
@@ -567,7 +572,9 @@ namespace Steepshot.Core.Tests
 
             // Assert
             AssertResult(response2);
-            Assert.That(response2.Errors.Contains("You have already voted in a similar way"));
+            Assert.That(response2.Errors.Contains("You have already voted in a similar way") ||
+                        response2.Errors.Contains("('Can only vote once every 3 seconds.',)") ||
+                        response2.Errors.Contains("('Voter has used the maximum number of vote changes on this comment.',)"));
         }
 
         [Test, Sequential]
@@ -646,7 +653,7 @@ namespace Steepshot.Core.Tests
                                      "@joseph.kalu/cat636281384922864910")] string url)
         {
             // Arrange
-            var request = new GetCommentsRequest(url);
+            var request = new InfoRequest(url);
 
             // Act
             var response = Api(name).GetComments(request).Result;
@@ -681,7 +688,7 @@ namespace Steepshot.Core.Tests
             [Values("@joseph.kalu/cat636203355240074655", "@joseph.kalu/hi-golos")] string url)
         {
             // Arrange
-            var request = new GetCommentsRequest(url) {SessionId = Authenticate(Api(name))};
+            var request = new InfoRequest(url) {SessionId = Authenticate(Api(name))};
 
             // Act
             var response = Api(name).GetComments(request).Result;
@@ -698,7 +705,7 @@ namespace Steepshot.Core.Tests
                 "@siberianshamen/chto-takoe-golos")] string url)
         {
             // Arrange
-            var request = new GetCommentsRequest(url);
+            var request = new InfoRequest(url);
 
             // Act
             var response = Api(name).GetComments(request).Result;
@@ -712,7 +719,7 @@ namespace Steepshot.Core.Tests
         public void Comments_Invalid_Url([Values("Steem", "Golos")] string name)
         {
             // Arrange
-            var request = new GetCommentsRequest("qwe");
+            var request = new InfoRequest("qwe");
 
             // Act
             var response = Api(name).GetComments(request).Result;
@@ -726,7 +733,7 @@ namespace Steepshot.Core.Tests
         public void Comments_Invalid_Url_But_Valid_User([Values("Steem", "Golos")] string name)
         {
             // Arrange
-            var request = new GetCommentsRequest("@asduj/qweqweqweqw");
+            var request = new InfoRequest("@asduj/qweqweqweqw");
 
             // Act
             var response = Api(name).GetComments(request).Result;
@@ -1110,7 +1117,7 @@ namespace Steepshot.Core.Tests
         }
 
         [Test, Sequential]
-        public void UserFriends_Followers_Offset_Limit([Values("Steem", "Golos")] string name, [Values("vivianupman", "pmartynov")] string offset)
+        public void UserFriends_Followers_Offset_Limit([Values("Steem", "Golos")] string name, [Values("vowestdream", "pmartynov")] string offset)
         {
             // Arrange
             var request = new UserFriendsRequest(Name, FriendsType.Followers);
@@ -1165,7 +1172,7 @@ namespace Steepshot.Core.Tests
             [Values("spam/@joseph.kalu/test-post-127", "@joseph.kalu/cat636281384922864910")] string url)
         {
             // Arrange
-            var request = new PostsInfoRequest(url);
+            var request = new InfoRequest(url);
 
             // Act
             var response = Api(name).GetPostInfo(request).Result;
@@ -1198,7 +1205,7 @@ namespace Steepshot.Core.Tests
             [Values("spam/@joseph.kalu/test-post-127", "@joseph.kalu/cat636281384922864910")] string url)
         {
             // Arrange
-            var request = new PostsInfoRequest(url) {SessionId = Authenticate(Api(name))};
+            var request = new InfoRequest(url) {SessionId = Authenticate(Api(name))};
 
             // Act
             var response = Api(name).GetPostInfo(request).Result;
@@ -1230,7 +1237,7 @@ namespace Steepshot.Core.Tests
         public void GetPostInfo_Invalid_Url([Values("Steem", "Golos")] string name)
         {
             // Arrange
-            var request = new PostsInfoRequest("spam/@joseph.kalu/qweqeqwqweqweqwe");
+            var request = new InfoRequest("spam/@joseph.kalu/qweqeqwqweqweqwe");
 
             // Act
             var response = Api(name).GetPostInfo(request).Result;
@@ -1258,9 +1265,7 @@ namespace Steepshot.Core.Tests
         public void Upload_Tags_Greater_Than_4([Values("Steem", "Golos")] string name)
         {
             // Arrange
-            var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-            var path = Path.Combine(dir.Parent.Parent.FullName, @"Data/cat.jpg");
-            var file = File.ReadAllBytes(path);
+            var file = File.ReadAllBytes(TestImagePath());
             var request = new UploadImageRequest(Authenticate(Api(name)), "cat", file, "cat1", "cat2", "cat3", "cat4", "cat5");
 
             // Act
@@ -1412,6 +1417,39 @@ namespace Steepshot.Core.Tests
             // Assert
             AssertResult(response);
             Assert.False(response.Result.Exists);
+        }
+        
+        [Test, Sequential]
+        public void CancelationTest()
+        {
+            // Arrange
+            // Act
+            var ex = Assert.Throws<AggregateException>(() =>
+            {
+                var request = new SearchWithQueryRequest("aar") {SessionId = Authenticate(Api("Steem"))};
+                var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(100));
+                var operationResult = Api("Steem").SearchUser(request, cts).Result;
+            });
+            
+            // Assert
+            Assert.That(ex.InnerException.Message, Is.EqualTo("A task was canceled."));
+        }
+        
+        [Test, Sequential]
+        public void Vote_Up_TotalBalance([Values("Steem", "Golos")] string name)
+        {
+            // Arrange
+            var userPostsRequest = new UserPostsRequest(Name);
+            var posts = Api(name).GetUserPosts(userPostsRequest).Result;
+            var lastPost = posts.Result.Results.First();
+
+            var request = new VoteRequest(Authenticate(Api(name)), true, lastPost.Url);
+
+            // Act
+            var response = Api(name).Vote(request).Result;
+
+            // Assert
+            Assert.IsTrue(response.Success);
         }
     }
 }

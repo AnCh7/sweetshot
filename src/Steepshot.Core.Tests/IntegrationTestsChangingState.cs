@@ -11,7 +11,7 @@ namespace Steepshot.Core.Tests
     [TestFixture]
     public class IntegrationTestsChangingState : BaseTests
     {
-        private string Authenticate(string name, string postingKey, SteepshotApiClient api)
+        private string Authenticate(string name, string postingKey, ISteepshotApiClient api)
         {
             var request = new LoginWithPostingKeyRequest(name, postingKey);
             var response = api.LoginWithPostingKey(request).Result;
@@ -21,15 +21,13 @@ namespace Steepshot.Core.Tests
         [Test, Sequential]
         public void BlockchainStateChangingTest([Values("Steem", "Golos")] string apiName, [Values("asduj", "pmartynov")] string user)
         {
-            const string Name = "joseph.kalu";
-            const string PostingKey = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
+            const string name = "joseph.kalu";
+            const string postingKey = "5JXCxj6YyyGUTJo9434ZrQ5gfxk59rE3yukN42WBA6t58yTPRTG";
 
-            var sessionId = Authenticate(Name, PostingKey, Api(apiName));
+            var sessionId = Authenticate(name, postingKey, Api(apiName));
 
             // 1) Create new post
-            var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-            var path = Path.Combine(dir.Parent.Parent.FullName, @"Data/cat.jpg");
-            var file = File.ReadAllBytes(path);
+            var file = File.ReadAllBytes(TestImagePath());
 
             var createPostRequest = new UploadImageRequest(sessionId, "cat" + DateTime.UtcNow.Ticks, file, "cat1", "cat2", "cat3", "cat4");
             var createPostResponse = Api(apiName).Upload(createPostRequest).Result;
@@ -43,7 +41,7 @@ namespace Steepshot.Core.Tests
             Thread.Sleep(TimeSpan.FromSeconds(15));
 
             // Load last created post
-            var userPostsRequest = new UserPostsRequest(Name);
+            var userPostsRequest = new UserPostsRequest(name);
             var userPostsResponse = Api(apiName).GetUserPosts(userPostsRequest).Result;
             AssertResult(userPostsResponse);
             var lastPost = userPostsResponse.Result.Results.First();
@@ -64,7 +62,7 @@ namespace Steepshot.Core.Tests
             Thread.Sleep(TimeSpan.FromSeconds(15));
 
             // Load comments for this post and check them
-            var getCommentsRequest = new GetCommentsRequest(lastPost.Url);
+            var getCommentsRequest = new InfoRequest(lastPost.Url);
             var commentsResponse = Api(apiName).GetComments(getCommentsRequest).Result;
             AssertResult(commentsResponse);
             Assert.That(commentsResponse.Result.Results.First().Title, Is.EqualTo(title));

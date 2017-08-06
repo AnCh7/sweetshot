@@ -5,8 +5,8 @@ namespace Steepshot.Core.Models.Common
 {
     public class OperationResult
     {
-        public List<string> Errors { get; set; }
         public bool Success => !Errors.Any();
+        public List<string> Errors { get; set; }
 
         public OperationResult()
         {

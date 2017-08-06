@@ -1,6 +1,6 @@
 ﻿namespace Steepshot.Core.Models.Requests
 {
-    public class SearchRequest : SessionIdOffsetLimitFields
+    public class SearchRequest : BaseRequestWithOffsetLimitFields
     {
     }
 
@@ -11,6 +11,6 @@
             Query = query;
         }
 
-        public string Query { get; private set; }
+        public string Query { get; set; }
     }
 }

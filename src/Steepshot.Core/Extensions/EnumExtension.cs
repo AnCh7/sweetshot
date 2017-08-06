@@ -1,5 +1,7 @@
 ﻿using System;
-using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Reflection;
 
 namespace Steepshot.Core.Extensions
 {
@@ -7,20 +9,11 @@ namespace Steepshot.Core.Extensions
     {
         public static string GetDescription(this Enum value)
         {
-            var type = value.GetType();
-            var name = Enum.GetName(type, value);
-            if (name != null)
-            {
-                var field = type.GetField(name);
-                if (field != null)
-                {
-                    var attr = Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute)) as DescriptionAttribute;
-                    if (attr != null)
-                        return attr.Description;
-                }
-            }
-
-            return string.Empty;
+            DisplayAttribute attribute = value.GetType()
+                .GetRuntimeField(value.ToString())
+                .GetCustomAttributes(typeof(DisplayAttribute), false)
+                .SingleOrDefault() as DisplayAttribute;
+            return attribute == null ? value.ToString() : attribute.Description;
         }
     }
 }
