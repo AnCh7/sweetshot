@@ -26,6 +26,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\UserRequests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Requests\FlagRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\BaseResponses.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\ChangePasswordResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\FlagResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\SearchResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Responses\CreateCommentResponse.cs" />
