@@ -1,12 +1,9 @@
 # todo
 - get voters tests
 - additional tests
-- merge sweet
-- merge android
 - recheck ditch
 - recheck userinfo class and postingkey in ditch
 - recheck ditch upload
-- fix tests
 
 # sweetshot
 HTTP client for Steepshot API

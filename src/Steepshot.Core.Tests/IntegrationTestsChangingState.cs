@@ -27,7 +27,7 @@ namespace Steepshot.Core.Tests
             var sessionId = Authenticate(name, postingKey, Api(apiName));
 
             // 1) Create new post
-            var file = File.ReadAllBytes(TestImagePath());
+            var file = File.ReadAllBytes(GetTestImagePath());
 
             var createPostRequest = new UploadImageRequest(sessionId, "cat" + DateTime.UtcNow.Ticks, file, "cat1", "cat2", "cat3", "cat4");
             var createPostResponse = Api(apiName).Upload(createPostRequest).Result;
