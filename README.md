@@ -4,6 +4,8 @@
 - recheck ditch
 - recheck userinfo class and postingkey in ditch
 - recheck ditch upload
+- remerge
+- run tests
 
 # sweetshot
 HTTP client for Steepshot API

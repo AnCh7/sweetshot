@@ -26,7 +26,7 @@ namespace Steepshot.Core.Tests
 
         protected string GetTestImagePath()
         {
-            var currentDir = Directory.GetCurrentDirectory();
+            var currentDir = AppContext.BaseDirectory;
             var parent = Directory.GetParent(currentDir).Parent;
             return Path.Combine(parent.FullName, @"Data/cat.jpg");
         }
